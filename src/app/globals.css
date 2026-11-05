@@ -713,7 +713,8 @@ html[data-year-blend] body {
   width: 100%;
   max-width: 72rem;
   margin: 0 auto;
-  padding: 24px 20px 32px;
+  padding: 24px max(20px, env(safe-area-inset-right, 0px)) 32px
+    max(20px, env(safe-area-inset-left, 0px));
 }
 
 .page-year {

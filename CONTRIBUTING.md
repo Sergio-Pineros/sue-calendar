@@ -1,15 +1,15 @@
-# Contributing to SÚE
+# Contributing
 
-SÚE is local-first and honest about its sources. Please keep that tone.
+Keep SÚE local-first and honest about its sources.
 
-## Develop
+## Setup
 
 ```bash
 npm install
 npm run dev
 ```
 
-Checks before a pull request:
+Before a PR:
 
 ```bash
 npm run test:calendar
@@ -17,38 +17,29 @@ npm run lint
 npm run build
 ```
 
-## Add a naming preset
+CI runs the same three commands.
 
-1. Add the 13 names and a one-line origin to `src/lib/naming.ts` (`PERIOD_PRESETS`).
-2. Extend the `NamingSystem` union in `src/lib/types.ts`.
-3. Add a test in `src/lib/naming.test.ts`.
-4. Do not invent ancient history. If the list is modern, poetic, or folk, say so.
+## Where to change things
 
-## Add a theme
+| Area | Files |
+| --- | --- |
+| Date math | `src/lib/sue-calendar.ts` + `*.test.ts` |
+| Names | `src/lib/naming.ts`, `NamingSystem` in `types.ts` |
+| Themes | `src/app/globals.css` + `src/lib/themes.ts` |
+| Copy | `src/lib/copy.ts` (English, i18n-ready) |
+| Google | `src/lib/google-calendar.ts` |
+| Apple | `src/lib/apple-calendar.ts` + `src/app/api/caldav/route.ts` |
 
-Themes are CSS variables plus a row in `src/lib/themes.ts`.
+Never persist Apple passwords on the server.
 
-1. Add a `[data-theme="your-id"]` block in `src/app/globals.css` (copy Ancient Wood and retoken).
-2. Add `--period-1` … `--period-13` and the HUD/wood tokens.
-3. Register the theme in `THEMES` with a short origin line.
-4. Extend the `ThemeId` union in `src/lib/types.ts`.
+## Naming presets
 
-Keep the year wheel carved (wood/stone/engraving). The rest of the UI can lean HUD / solarpunk.
-
-## Calendar engine
-
-Date math lives in `src/lib/` (`sue-calendar.ts`, `moon.ts`, `seasons.ts`, `sprints.ts`, `weekdays.ts`). If you change a rule, extend `npm run test:calendar`.
-
-## Copy / i18n
-
-User-facing English lives in `src/lib/copy.ts`. Add strings there instead of hard-coding them in components, so a later locale file can swap the module.
-
-## Calendar sync
-
-- Google: `src/lib/google-calendar.ts` (browser OAuth, read + write).
-- Apple: `src/lib/apple-calendar.ts` + `src/app/api/caldav/route.ts`. Never persist Apple passwords on the server.
-- `.ics`: `src/lib/ics.ts` remains the zero-account fallback.
+Add 13 names and a one-line **origin** in `PERIOD_PRESETS`. If the list is modern, poetic, or folk, say so. Do not invent ancient history.
 
 ## Research honesty
 
-The Research page labels **fact / calculation / interpretation**. If you add a claim, pick a label and a source. Do not say lunar phases scientifically determine personal outcomes.
+The Research page labels **fact / calculation / interpretation**. Do not say lunar phases scientifically determine personal outcomes. Do not claim a hertz value heals a named condition.
+
+## Native
+
+`npm run cap:sync` builds a static export (`CAPACITOR=1`) into `out/` and copies it into `ios/` and `android/`. Do not commit Capacitor copied `public` assets or Gradle/Pods build dirs — they are gitignored.

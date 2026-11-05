@@ -1,0 +1,36 @@
+name: Bug
+description: Something is broken
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      placeholder: What did you expect, and what did you see?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps
+      placeholder: 1. Open … 2. Tap …
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where
+      options:
+        - Web
+        - PWA (installed)
+        - iOS
+        - Android
+        - Unknown
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser or OS
+      placeholder: Safari 18 / iOS 18

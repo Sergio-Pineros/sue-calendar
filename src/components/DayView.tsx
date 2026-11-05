@@ -55,13 +55,13 @@ export function DayView({ iso }: { iso: string }) {
         </div>
         <div className="flex gap-2 font-mono text-sm">
           <Link
-            href={`/day/${addDays(iso, -1)}`}
+            href={`/day?iso=${addDays(iso, -1)}`}
             className="ghost-action"
           >
             ←
           </Link>
           <Link
-            href={`/day/${addDays(iso, 1)}`}
+            href={`/day?iso=${addDays(iso, 1)}`}
             className="ghost-action"
           >
             →

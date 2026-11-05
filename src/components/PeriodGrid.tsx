@@ -84,7 +84,7 @@ export function PeriodGrid({ period }: { period: number }) {
               return (
                 <Link
                   key={iso}
-                  href={`/day/${iso}`}
+                  href={`/day?iso=${iso}`}
                   className={`day-cell p-2 text-left ${
                     isToday
                       ? "is-today"
@@ -119,7 +119,7 @@ export function PeriodGrid({ period }: { period: number }) {
 
       {period === 6 && leap && (
         <Link
-          href={`/day/${leap}`}
+          href={`/day?iso=${leap}`}
           className="block py-3 text-sm text-ink-soft"
         >
           {copy.period.leapAfter} · {leap}

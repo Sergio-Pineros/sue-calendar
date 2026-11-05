@@ -1,5 +1,6 @@
 import type { ExternalEvent } from "./types";
 import type { CalDavCalendar, CalDavDraft } from "./caldav-server";
+import { caldavEndpoint } from "./caldav";
 
 export type { CalDavCalendar, CalDavDraft };
 
@@ -13,7 +14,7 @@ async function call<T>(
   appPassword: string,
   payload: CalDavAction,
 ): Promise<T> {
-  const res = await fetch("/api/caldav", {
+  const res = await fetch(caldavEndpoint(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ appleId, appPassword, ...payload }),

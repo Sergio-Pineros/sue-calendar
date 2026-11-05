@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Research honesty
+    url: https://github.com/Sergio-Pineros/sue-calendar/blob/main/CONTRIBUTING.md
+    about: Claims need a fact / calculation / interpretation label. Read CONTRIBUTING first.

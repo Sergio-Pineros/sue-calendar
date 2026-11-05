@@ -7,9 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:calendar": "npx tsx src/lib/sue-calendar.test.ts"
+    "test:calendar": "npx tsx src/lib/sue-calendar.test.ts",
+    "cap:build": "node scripts/cap-build.mjs",
+    "cap:sync": "npm run cap:build && npx cap sync",
+    "cap:ios": "npm run cap:sync && npx cap open ios",
+    "cap:android": "npm run cap:sync && npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/status-bar": "^8.0.4",
     "@gsap/react": "^2.1.2",
     "gsap": "^3.15.1",
     "next": "16.3.1",

@@ -1,5 +1,9 @@
 import { PeriodPage } from "@/components/PeriodPage";
 
+export function generateStaticParams() {
+  return Array.from({ length: 13 }, (_, i) => ({ n: String(i + 1) }));
+}
+
 export default async function Page({
   params,
 }: {

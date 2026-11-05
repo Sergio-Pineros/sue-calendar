@@ -338,7 +338,7 @@ function SprintSheet({
 
           {focused && (
             <div className="mt-4 text-center">
-              <Link href={`/day/${focused.date}`} className="display text-3xl">
+              <Link href={`/day?iso=${focused.date}`} className="display text-3xl">
                 {focused.date}
               </Link>
               <button

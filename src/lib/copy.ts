@@ -7,7 +7,7 @@ import type { EvidenceType, LayerKey, SprintIntensity } from "./types";
 export const copy = {
   app: {
     name: "SÚE",
-    tagline: "A 13 × 28 year-planning calendar that follows the moon.",
+    tagline: "An open-source 13-month calendar that plans your year with the moon.",
     loading: "SÚE",
     description:
       "Open-source, local-first year planning on a 13-period calendar. Thirteen periods of 28 days, plus Year Day and Leap Day.",

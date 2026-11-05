@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SÚE</string>
+    <string name="title_activity_main">SÚE</string>
+    <string name="package_name">app.pineros.sue</string>
+    <string name="custom_url_scheme">app.pineros.sue</string>
+</resources>

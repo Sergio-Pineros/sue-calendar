@@ -1,0 +1,20 @@
+name: Feature
+description: A small, concrete change
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: want
+    attributes:
+      label: What
+      placeholder: One sentence. What should someone be able to do?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      placeholder: Who is this for?
+  - type: markdown
+    attributes:
+      value: Keep it honest. No invented ancient history. No medical frequency claims.

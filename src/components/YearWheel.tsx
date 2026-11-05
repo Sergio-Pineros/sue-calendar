@@ -304,7 +304,7 @@ export function YearWheel({
     }
     if (r >= 196 && r <= 224) {
       const doy = Math.min(dim, Math.max(1, Math.round(localDeg / degreesPerDay + 0.5)));
-      router.push(`/day/${dateFromDoy(year, doy)}`);
+      router.push(`/day?iso=${dateFromDoy(year, doy)}`);
       return;
     }
     if (r >= 228 && r <= 348) {
@@ -336,7 +336,7 @@ export function YearWheel({
         <button
           type="button"
           className="display text-4xl md:text-5xl"
-          onClick={() => router.push(`/day/${focused.gregorianDate}`)}
+          onClick={() => router.push(`/day?iso=${focused.gregorianDate}`)}
         >
           {focused.suePeriodName}
           {focused.sueDayInPeriod ? ` · ${focused.sueDayInPeriod}` : ""}
@@ -620,11 +620,11 @@ export function YearWheel({
       {!hideChrome && (
         <>
           <div className="mt-2 flex justify-center gap-6 text-xs text-ink-soft">
-            <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${yearDay}`)}>
+            <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day?iso=${yearDay}`)}>
               {copy.year.yearDay} · {yearDay.slice(5)}
             </button>
             {leap && (
-              <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${leap}`)}>
+              <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day?iso=${leap}`)}>
                 {copy.year.leapDay} · {leap.slice(5)}
               </button>
             )}

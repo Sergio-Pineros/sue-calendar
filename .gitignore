@@ -40,3 +40,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Capacitor generated copies + native build output
+/ios/App/Pods
+/ios/App/App/public
+/ios/capacitor-cordova-ios-plugins
+/android/.gradle
+/android/app/build
+/android/build
+/android/local.properties
+/android/app/src/main/assets/public
+/android/capacitor-cordova-android-plugins
+*.iml
+.idea

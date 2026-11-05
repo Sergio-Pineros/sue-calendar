@@ -138,7 +138,7 @@ export function TodayHome() {
             return (
               <Link
                 key={iso}
-                href={`/day/${iso}`}
+                href={`/day?iso=${iso}`}
                 className={`day-cell ${
                   isToday ? "is-today" : rest || dayIntensity === "rest" ? "is-rest" : ""
                 }`}
