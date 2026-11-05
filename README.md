@@ -10,7 +10,8 @@ SÚE is built for Sergio Piñeros. It is English-first, customizable, and honest
 
 Saved from this repo’s v1 pass (mobile + desktop):
 
-- Year wheel (Ancient Amethyst default)
+- Year wheel (Ancient Amethyst default), scroll-scrubbed with period colour blend
+- Onboarding period-colour step
 - Sprint picker (tiles, no dropdowns)
 - Sprint sheet with a dedicated day ring
 - Settings
@@ -20,7 +21,8 @@ See the pull request artifacts for the latest captures.
 
 ## What it is
 
-- A **rotating year wheel** — engraved amethyst (or wood) stone, today large at the top. Scroll, swipe, or flick to travel the year; it spring-settles on a day. Tap a period or day to open it. Tap the center to return to today.
+- A **rotating year wheel** — large, half below the fold. Scroll scrubs the year; the page blends into that period’s colour; a marker rides a ring of period names. Release settles on the nearest day. Tap a period or day to open it. Tap the hub for today.
+- **Period colours** you choose in onboarding (Amethyst, Seasons, Moon, Spectrum, or per-period swatches), editable in Settings, stored locally
 - **Period names** you can switch: Roman numerals (default), numbers, International Fixed Calendar, Comte’s Positivist calendar, Graves’s Celtic Tree (1948), folk full-moon names, or your own 13
 - **Weekdays** you can rename, renumber (Sergio’s default is Sunday = −1 … Saturday = 5), and start on any day
 - **Moon-based sprints** — tap a large rhythm tile (no dropdowns). A full-screen sheet opens a dedicated day ring colored push / light / rest; tap a day to override. Swipe down to close. Rhythm, not science.
@@ -37,7 +39,7 @@ The early Roman calendar had 10 months, then 12. There is no “13 months from b
 
 ## Stack
 
-Next.js 16 · React 19 · Tailwind 4. All personal data stays in `localStorage` on this device.
+Next.js 16 · React 19 · Tailwind 4 · GSAP ScrollTrigger. All personal data stays in `localStorage` on this device.
 
 ## Run locally
 
@@ -95,6 +97,19 @@ Tokens live in `src/app/globals.css`. Register a theme in `src/lib/themes.ts`.
 | `solarpunk-mecha` | Light greenhouse HUD: moss, brass, hairlines. |
 | `night-ritual` | Darker starfield, quiet night observatory. |
 | `moss-circuit` | Forest phosphor, living circuit traces. |
+
+## Period colours
+
+Each of the 13 periods has its own colour. Choose a preset in onboarding or Settings (`src/lib/period-colors.ts`):
+
+| ID | Mood |
+| --- | --- |
+| `amethyst` | Default. The original purple ramp. |
+| `seasons` | Winter indigo → spring moss → summer brass → autumn russet. |
+| `moon` | New-moon dark to full-moon silver and back. |
+| `spectrum` | A hue walk that still sits on the dark HUD. |
+
+Tap a period and pick a swatch to override one stone. Overrides stay on this device.
 
 ## Naming presets
 

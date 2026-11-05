@@ -115,7 +115,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl px-5 py-8">{children}</main>
+      <main
+        className={
+          pathname === "/year"
+            ? "w-full"
+            : "mx-auto w-full max-w-6xl px-5 py-8"
+        }
+      >
+        {children}
+      </main>
       <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-line bg-paper/95 px-2 py-2 backdrop-blur-md md:hidden">
         {NAV.slice(0, 4).map((item) => {
           const active =

@@ -14,6 +14,11 @@ import type {
   WeekdayNamePreset,
   WeekdayNumberPreset,
 } from "./types";
+import {
+  emptyPeriodColorOverrides,
+  isPeriodColorPreset,
+  normalizePeriodColorOverrides,
+} from "./period-colors";
 import { addDays, sueToGregorian, todayISO } from "./sue-calendar";
 import { copy } from "./copy";
 import { EMPTY_CUSTOM_NAMES, migrateNaming } from "./naming";
@@ -51,6 +56,8 @@ export function defaultSettings(): SueSettings {
     weekdayNumberPreset: "sergio",
     weekdayNumbers: [...SERGIO_WEEKDAY_NUMBERS],
     theme: "ancient-amethyst",
+    periodColorPreset: "amethyst",
+    periodColorOverrides: emptyPeriodColorOverrides(),
     timezone:
       typeof Intl !== "undefined"
         ? Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -141,7 +148,7 @@ export function emptyState(): SueState {
   };
 }
 
-function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSettings {
+export function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSettings {
   const base = defaultSettings();
   if (!raw) return base;
   const naming = migrateNaming(raw.naming as NamingSystem | undefined);
@@ -178,10 +185,16 @@ function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSettings {
       raw.weekdayNumbers?.length === 7
         ? raw.weekdayNumbers
         : base.weekdayNumbers,
+    periodColorPreset: isPeriodColorPreset(raw.periodColorPreset)
+      ? raw.periodColorPreset
+      : base.periodColorPreset,
+    periodColorOverrides: normalizePeriodColorOverrides(raw.periodColorOverrides),
     layers: { ...base.layers, ...raw.layers },
     appleCalendarIds: raw.appleCalendarIds ?? [],
   };
 }
+
+export const normalizeSettingsForTest = normalizeSettings;
 
 export function loadState(): SueState {
   if (typeof window === "undefined") return emptyState();

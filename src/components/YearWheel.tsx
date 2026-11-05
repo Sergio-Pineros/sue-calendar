@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Ref } from "react";
 import { useRouter } from "next/navigation";
 import { useSueStore } from "./StoreProvider";
 import {
@@ -52,7 +52,23 @@ function dateFromDoy(year: number, doy: number): string {
   return `${next.getUTCFullYear()}-${m}-${d}`;
 }
 
-export function YearWheel({ compact = false }: { compact?: boolean }) {
+export function YearWheel({
+  compact = false,
+  hideChrome = false,
+  driven = false,
+  rotorRef,
+  activePeriod,
+  onRotate,
+  onHubTap,
+}: {
+  compact?: boolean;
+  hideChrome?: boolean;
+  driven?: boolean;
+  rotorRef?: Ref<SVGGElement>;
+  activePeriod?: number | null;
+  onRotate?: (deltaDeg: number, ended: boolean) => void;
+  onHubTap?: () => void;
+}) {
   const router = useRouter();
   const { state } = useSueStore();
   const reduced = usePrefersReducedMotion();
@@ -134,7 +150,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
         ornamentRef.current = (ornamentRef.current + dt * 4) % 360;
       }
 
-      if (!interactingRef.current) {
+      if (!driven && !interactingRef.current) {
         if (Math.abs(velocityRef.current) > 8) {
           offsetRef.current = clampOffset(offsetRef.current + velocityRef.current * dt);
           velocityRef.current *= Math.pow(0.08, dt);
@@ -157,15 +173,16 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
         }
       }
 
-      setOffset(offsetRef.current);
+      if (!driven) setOffset(offsetRef.current);
       setOrnament(ornamentRef.current);
       frame = window.requestAnimationFrame(tick);
     };
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
-  }, [reduced]);
+  }, [reduced, driven]);
 
   useEffect(() => {
+    if (driven) return;
     const el = stageRef.current;
     if (!el) return;
     let settle = 0;
@@ -186,17 +203,18 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
       window.clearTimeout(settle);
       el.removeEventListener("wheel", onWheel);
     };
-  }, []);
+  }, [driven]);
 
+  const displayOffset = offset;
   const restRotation = -(todayDoy - 0.5) * degreesPerDay;
-  const rotation = restRotation + offset;
+  const rotation = restRotation + displayOffset;
 
   useEffect(() => {
     rotationRef.current = rotation;
   }, [rotation]);
   const focusedDoy = Math.min(
     dim,
-    Math.max(1, Math.round(todayDoy - offset / degreesPerDay)),
+    Math.max(1, Math.round(todayDoy - displayOffset / degreesPerDay)),
   );
   const focusedIso = dateFromDoy(year, focusedDoy);
   const focused = gregorianToSue(focusedIso, naming);
@@ -231,7 +249,14 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
     const y = ((event.clientY - rect.top) / rect.height) * 800 - 400;
     const r = Math.hypot(x, y);
     const fromNorth = (Math.atan2(x, -y) * 180) / Math.PI;
-    const localDeg = ((fromNorth - rotationRef.current) % 360 + 360) % 360;
+    const visual = (() => {
+      const node =
+        rotorRef && typeof rotorRef === "object" ? rotorRef.current : null;
+      const raw = node?.style.transform ?? "";
+      const match = /rotate\((-?[\d.]+)deg\)/.exec(raw);
+      return match ? Number(match[1]) : rotationRef.current;
+    })();
+    const localDeg = ((fromNorth - visual) % 360 + 360) % 360;
     return { r, localDeg };
   }
 
@@ -260,8 +285,12 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
     if (ang < -180) ang += 360;
     const fromY = -(event.clientY - lastYRef.current) * 0.32;
     const combined = ang + fromY;
-    offsetRef.current = clampOffset(offsetRef.current + combined);
-    velocityRef.current = combined * 40;
+    if (onRotate) {
+      onRotate(combined, false);
+    } else {
+      offsetRef.current = clampOffset(offsetRef.current + combined);
+      velocityRef.current = combined * 40;
+    }
     lastAngleRef.current = next;
     lastYRef.current = event.clientY;
   }
@@ -269,7 +298,8 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
   function handleTap(event: React.PointerEvent<SVGSVGElement>) {
     const { r, localDeg } = localFromEvent(event);
     if (r < 168) {
-      goToToday();
+      if (onHubTap) onHubTap();
+      else goToToday();
       return;
     }
     if (r >= 196 && r <= 224) {
@@ -287,6 +317,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
     draggingRef.current = false;
     interactingRef.current = false;
     svgRef.current?.releasePointerCapture(event.pointerId);
+    if (didDragRef.current && onRotate) onRotate(0, true);
     if (!didDragRef.current) handleTap(event);
   }
 
@@ -298,7 +329,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
 
   return (
     <div ref={stageRef} className="wheel-stage relative mx-auto w-full max-w-[720px]">
-      <div className="mb-3 text-center">
+      {!hideChrome && <div className="mb-3 text-center">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
           {isToday ? copy.wheel.today : focused.gregorianDate}
         </p>
@@ -318,7 +349,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
           {" · "}
           <AsciiMoon name={focused.moon.name} />
         </p>
-      </div>
+      </div>}
       <svg
         ref={svgRef}
         viewBox="0 0 800 800"
@@ -377,8 +408,9 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
           })}
         </g>
         <g
+          ref={rotorRef}
           style={{
-            transform: `rotate(${rotation}deg)`,
+            transform: driven ? undefined : `rotate(${rotation}deg)`,
             transformOrigin: "400px 400px",
             willChange: "transform",
           }}
@@ -389,7 +421,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
             const a1 = (i + 1) * sweep - gap;
             const mid = (a0 + a1) / 2;
             const label = polar(cx, cy, 292, mid);
-            const active = focused.suePeriod === period;
+            const active = (activePeriod ?? focused.suePeriod) === period;
             return (
               <g key={period}>
                 <path
@@ -585,19 +617,23 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
           {year}
         </text>
       </svg>
-      <p className="mt-2 text-center font-mono text-[11px] text-ink-soft">
-        {reduced ? copy.wheel.reduced : copy.wheel.drag}
-      </p>
-      <div className="mt-2 flex justify-center gap-6 text-xs text-ink-soft">
-        <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${yearDay}`)}>
-          {copy.year.yearDay} · {yearDay.slice(5)}
-        </button>
-        {leap && (
-          <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${leap}`)}>
-            {copy.year.leapDay} · {leap.slice(5)}
-          </button>
-        )}
-      </div>
+      {!hideChrome && (
+        <>
+          <p className="mt-2 text-center font-mono text-[11px] text-ink-soft">
+            {reduced ? copy.wheel.reduced : copy.wheel.drag}
+          </p>
+          <div className="mt-2 flex justify-center gap-6 text-xs text-ink-soft">
+            <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${yearDay}`)}>
+              {copy.year.yearDay} · {yearDay.slice(5)}
+            </button>
+            {leap && (
+              <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${leap}`)}>
+                {copy.year.leapDay} · {leap.slice(5)}
+              </button>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

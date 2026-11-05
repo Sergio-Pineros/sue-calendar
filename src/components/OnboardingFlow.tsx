@@ -8,6 +8,7 @@ import { THEMES } from "@/lib/themes";
 import { WEEKDAYS, WEEKDAY_NUMBER_PRESETS } from "@/lib/weekdays";
 import { copy } from "@/lib/copy";
 import type { NamingSystem } from "@/lib/types";
+import { PeriodColorStudio } from "./PeriodColorStudio";
 
 export function OnboardingFlow() {
   const router = useRouter();
@@ -27,6 +28,13 @@ export function OnboardingFlow() {
         ))}
       </div>
 
+      {step === 3 ? (
+        <div className="mt-10 space-y-4">
+          <h1 className="display text-3xl">{copy.onboarding.colorsTitle}</h1>
+          <p className="text-sm text-ink-soft">{copy.onboarding.colorsBody}</p>
+          <PeriodColorStudio compact />
+        </div>
+      ) : (
       <div className="hud-frame mt-10 rounded-3xl p-6">
         {step === 0 && (
           <div className="space-y-4">
@@ -92,7 +100,7 @@ export function OnboardingFlow() {
             ))}
           </div>
         )}
-        {step === 3 && (
+        {step === 4 && (
           <div className="space-y-3">
             <h1 className="display text-3xl">{copy.onboarding.readyTitle}</h1>
             <p className="text-ink-soft">{copy.onboarding.readyBody}</p>
@@ -100,6 +108,7 @@ export function OnboardingFlow() {
           </div>
         )}
       </div>
+      )}
 
       <div className="mt-6 flex justify-between">
         <button
@@ -114,7 +123,7 @@ export function OnboardingFlow() {
           type="button"
           className="rounded-full bg-ink px-5 text-sm text-paper"
           onClick={() => {
-            if (step < 3) {
+            if (step < 4) {
               setStep((s) => s + 1);
               return;
             }
@@ -122,7 +131,7 @@ export function OnboardingFlow() {
             router.push("/");
           }}
         >
-          {step === 3 ? copy.onboarding.enter : copy.onboarding.continue}
+          {step === 4 ? copy.onboarding.enter : copy.onboarding.continue}
         </button>
       </div>
     </div>

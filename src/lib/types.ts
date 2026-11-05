@@ -18,6 +18,8 @@ export type ThemeId =
   | "night-ritual"
   | "moss-circuit";
 
+export type PeriodColorPreset = "amethyst" | "seasons" | "moon" | "spectrum";
+
 export type EvidenceType =
   | "fact"
   | "calculation"
@@ -202,6 +204,8 @@ export type SueSettings = {
   weekdayNumberPreset: WeekdayNumberPreset;
   weekdayNumbers: number[];
   theme: ThemeId;
+  periodColorPreset: PeriodColorPreset;
+  periodColorOverrides: (string | null)[];
   timezone: string;
   layers: Record<LayerKey, boolean>;
   onboarded: boolean;

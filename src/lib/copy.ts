@@ -115,6 +115,7 @@ export const copy = {
     noRest: "This week has no rest. Mark it on Today before filling the period.",
     overloaded: "The current week is dense. The overlay does not ask you to fit more in.",
     saveFocus: "Save focus",
+    weeks: "Four weeks. One colour. A planning sprint, not a lunar month.",
     replaceFocus: (title: string) => `Replace focus: ${title}`,
     placeholder: "One aim for these four weeks",
     footnote: "A period is a planning sprint. It is not a lunar month.",
@@ -189,6 +190,16 @@ export const copy = {
     weekdayNames: "Weekday labels",
     weekdayNumbers: "Weekday numbering",
     theme: "Theme",
+    periodColors: "Period colors",
+    periodColorsHint:
+      "Each of the thirteen periods has its own stone. Start from a preset, then tap a period and pick a swatch. Stored only on this device.",
+    colorPresets: "Auto palettes",
+    colorSwatches: "Swatches",
+    pickPeriod: "Tap a period, then a colour.",
+    autoAmethyst: "Amethyst",
+    autoSeasons: "Seasons",
+    autoMoon: "Moon",
+    autoSpectrum: "Spectrum",
     google: "Google Calendar",
     googleHint:
       "Read and write. Google remains the source of truth unless you create an event from SÚE. In Google Cloud create an OAuth client, authorize this origin, and put the Client ID in .env.local.",
@@ -234,7 +245,10 @@ export const copy = {
     selectOne: "Select at least one calendar.",
   },
   onboarding: {
-    steps: ["Names", "Week", "Theme", "Ready"],
+    steps: ["Names", "Week", "Theme", "Colors", "Ready"],
+    colorsTitle: "Color the thirteen periods",
+    colorsBody:
+      "Each period gets its own stone. Start from a preset — Amethyst is the default purple ramp — then tap a period and pick a swatch. You can change this later in Settings.",
     intro:
       "A 13 × 28 overlay on the calendar you already use. Not a lunar calendar. Not a lost universal calendar.",
     namesTitle: "How to name the thirteen periods",
@@ -289,8 +303,9 @@ export const copy = {
   },
   wheel: {
     today: "Today",
-    drag: "Scroll, swipe, or flick to travel the year. Tap a period or day to open it. Tap the center to return to today.",
-    reduced: "Motion is reduced. Scroll or drag to another day; tap the center for today.",
+    drag: "Scroll to turn the year. The page takes that period's colour. Tap a period or day to open it. Tap the hub for today.",
+    reduced: "Motion is reduced. Scroll to another period; tap the hub for today.",
+    ring: "Period names",
   },
   event: {
     untitled: "Untitled",

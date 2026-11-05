@@ -24,6 +24,7 @@ import {
 import { todayISO } from "@/lib/sue-calendar";
 import { PERIOD_PRESETS } from "@/lib/naming";
 import { THEMES } from "@/lib/themes";
+import { PeriodColorStudio } from "./PeriodColorStudio";
 import {
   WEEKDAYS,
   WEEKDAY_NAME_PRESETS,
@@ -200,6 +201,12 @@ export function SettingsView() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="display text-2xl">{copy.settings.periodColors}</h2>
+        <p className="text-sm text-ink-soft">{copy.settings.periodColorsHint}</p>
+        <PeriodColorStudio />
       </section>
 
       <section className="space-y-3">
