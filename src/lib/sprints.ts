@@ -214,6 +214,13 @@ export function buildSprint(input: {
   };
 }
 
+export function cycleSprintIntensity(day: SprintDay): SprintIntensity | undefined {
+  const order: SprintIntensity[] = ["push", "light", "rest"];
+  const current = day.override ?? day.recommended;
+  const next = order[(order.indexOf(current) + 1) % order.length];
+  return next === day.recommended ? undefined : next;
+}
+
 export function applySprintOverride(
   sprint: Sprint,
   date: string,

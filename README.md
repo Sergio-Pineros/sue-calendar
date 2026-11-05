@@ -10,19 +10,20 @@ SÚE is built for Sergio Piñeros. It is English-first, customizable, and honest
 
 Saved from this repo’s v1 pass (mobile + desktop):
 
-- Year wheel (Ancient Wood)
-- Sprint plan
+- Year wheel (Ancient Amethyst default)
+- Sprint picker (tiles, no dropdowns)
+- Sprint sheet with a dedicated day ring
 - Settings
-- Themes: Ancient Wood, Solarpunk Mecha, Night Ritual, Moss Circuit
+- Themes: Ancient Amethyst, Ancient Wood, Solarpunk Mecha, Night Ritual, Moss Circuit
 
 See the pull request artifacts for the latest captures.
 
 ## What it is
 
-- A **rotating year wheel** — carved wood/stone mood, today large at the top, drag/flick with spring return
+- A **rotating year wheel** — engraved amethyst (or wood) stone, today large at the top. Scroll, swipe, or flick to travel the year; it spring-settles on a day. Tap a period or day to open it. Tap the center to return to today.
 - **Period names** you can switch: Roman numerals (default), numbers, International Fixed Calendar, Comte’s Positivist calendar, Graves’s Celtic Tree (1948), folk full-moon names, or your own 13
 - **Weekdays** you can rename, renumber (Sergio’s default is Sunday = −1 … Saturday = 5), and start on any day
-- **Moon-based sprints** — push / light / rest as a rhythm, not science
+- **Moon-based sprints** — tap a large rhythm tile (no dropdowns). A full-screen sheet opens a dedicated day ring colored push / light / rest; tap a day to override. Swipe down to close. Rhythm, not science.
 - **Google Calendar** read + write (when you set a client ID)
 - **Apple / iCloud Calendar** via CalDAV (Apple ID + app-specific password)
 - **`.ics` import/export** as the universal fallback
@@ -89,9 +90,10 @@ Tokens live in `src/app/globals.css`. Register a theme in `src/lib/themes.ts`.
 
 | ID | Mood |
 | --- | --- |
-| `ancient-wood` | Default. Carved slab, warm grain, brass engraving. |
+| `ancient-amethyst` | Default. Engraved violet stone — original SÚE purple. |
+| `ancient-wood` | Carved slab, warm grain, brass engraving. |
 | `solarpunk-mecha` | Light greenhouse HUD: moss, brass, hairlines. |
-| `night-ritual` | Dark starfield, violet ink. |
+| `night-ritual` | Darker starfield, quiet night observatory. |
 | `moss-circuit` | Forest phosphor, living circuit traces. |
 
 ## Naming presets

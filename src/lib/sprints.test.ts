@@ -1,6 +1,7 @@
 import {
   applySprintOverride,
   buildSprint,
+  cycleSprintIntensity,
   intensityFromMoon,
   planSprintDays,
   recommendRange,
@@ -83,6 +84,10 @@ export function runSprintTests(): void {
   );
   const counts = sprintCounts(sprint);
   assert(counts.push + counts.light + counts.rest === 28, "counts cover every day");
+  const seed = { date: "2026-01-01", recommended: "push" as const, note: "" };
+  assert(cycleSprintIntensity(seed) === "light", "push cycles to light");
+  assert(cycleSprintIntensity({ ...seed, override: "light" }) === "rest", "light cycles to rest");
+  assert(cycleSprintIntensity({ ...seed, override: "rest" }) === undefined, "rest returns to recommendation");
 
   const mapped = gregorianToSue("2026-01-28");
   assert(mapped.sueDayInPeriod === 28, "fixture is last day of period");

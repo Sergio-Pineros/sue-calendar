@@ -9,9 +9,15 @@ export type ThemeMeta = {
 
 export const THEMES: ThemeMeta[] = [
   {
+    id: "ancient-amethyst",
+    label: "Ancient Amethyst",
+    origin: "Default. Engraved violet stone — the original SÚE purple, carved like the wood wheel.",
+    scheme: "dark",
+  },
+  {
     id: "ancient-wood",
     label: "Ancient Wood",
-    origin: "Default. Carved slab, warm grain, brass engraving.",
+    origin: "Carved slab, warm grain, brass engraving.",
     scheme: "dark",
   },
   {
@@ -23,7 +29,7 @@ export const THEMES: ThemeMeta[] = [
   {
     id: "night-ritual",
     label: "Night Ritual",
-    origin: "Dark starfield, violet ink, quiet night observatory.",
+    origin: "Darker starfield, quiet night observatory.",
     scheme: "dark",
   },
   {

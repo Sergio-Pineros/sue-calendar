@@ -71,14 +71,57 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
   const todayDoy = todayInYear ? todayDate.dayOfYear : 1;
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
   const ornamentRef = useRef(0);
+  const interactingRef = useRef(false);
+  const pinTodayRef = useRef(false);
   const draggingRef = useRef(false);
+  const didDragRef = useRef(false);
   const lastAngleRef = useRef(0);
+  const lastYRef = useRef(0);
+  const startXRef = useRef(0);
+  const startYRef = useRef(0);
   const lastTRef = useRef(0);
+  const dimRef = useRef(dim);
+  const todayDoyRef = useRef(todayDoy);
+  const degRef = useRef(degreesPerDay);
+  const rotationRef = useRef(0);
   const [offset, setOffset] = useState(0);
   const [ornament, setOrnament] = useState(0);
+
+  useEffect(() => {
+    dimRef.current = dim;
+    todayDoyRef.current = todayDoy;
+    degRef.current = degreesPerDay;
+  }, [dim, todayDoy, degreesPerDay]);
+
+  function clampOffset(value: number) {
+    const minOffset = (todayDoyRef.current - dimRef.current) * degRef.current;
+    const maxOffset = (todayDoyRef.current - 1) * degRef.current;
+    return Math.min(maxOffset, Math.max(minOffset, value));
+  }
+
+  function nearestDayOffset(value: number) {
+    const doy = Math.min(
+      dimRef.current,
+      Math.max(1, Math.round(todayDoyRef.current - value / degRef.current)),
+    );
+    return (todayDoyRef.current - doy) * degRef.current;
+  }
+
+  function goToToday() {
+    pinTodayRef.current = true;
+    interactingRef.current = false;
+    if (reduced) {
+      offsetRef.current = 0;
+      velocityRef.current = 0;
+      setOffset(0);
+    } else {
+      velocityRef.current = 0;
+    }
+  }
 
   useEffect(() => {
     let frame = 0;
@@ -91,23 +134,26 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
         ornamentRef.current = (ornamentRef.current + dt * 4) % 360;
       }
 
-      if (!draggingRef.current) {
-        if (Math.abs(velocityRef.current) > 2) {
-          offsetRef.current += velocityRef.current * dt;
-          velocityRef.current *= Math.pow(0.12, dt);
-        } else if (!reduced) {
-          const k = 18;
-          const c = 8;
-          const force = -k * offsetRef.current - c * velocityRef.current;
-          velocityRef.current += force * dt;
-          offsetRef.current += velocityRef.current * dt;
-          if (Math.abs(offsetRef.current) < 0.05 && Math.abs(velocityRef.current) < 0.05) {
-            offsetRef.current = 0;
-            velocityRef.current = 0;
-          }
+      if (!interactingRef.current) {
+        if (Math.abs(velocityRef.current) > 8) {
+          offsetRef.current = clampOffset(offsetRef.current + velocityRef.current * dt);
+          velocityRef.current *= Math.pow(0.08, dt);
         } else {
-          offsetRef.current = 0;
-          velocityRef.current = 0;
+          const target = pinTodayRef.current ? 0 : nearestDayOffset(offsetRef.current);
+          if (reduced) {
+            offsetRef.current = target;
+            velocityRef.current = 0;
+          } else {
+            const k = 28;
+            const c = 10;
+            const force = -k * (offsetRef.current - target) - c * velocityRef.current;
+            velocityRef.current += force * dt;
+            offsetRef.current += velocityRef.current * dt;
+            if (Math.abs(offsetRef.current - target) < 0.04 && Math.abs(velocityRef.current) < 0.04) {
+              offsetRef.current = target;
+              velocityRef.current = 0;
+            }
+          }
         }
       }
 
@@ -119,19 +165,46 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
     return () => window.cancelAnimationFrame(frame);
   }, [reduced]);
 
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    let settle = 0;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      pinTodayRef.current = false;
+      interactingRef.current = true;
+      const delta = event.deltaY + event.deltaX * 0.35;
+      offsetRef.current = clampOffset(offsetRef.current - delta * 0.16);
+      velocityRef.current = -delta * 0.7;
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        interactingRef.current = false;
+      }, 90);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      window.clearTimeout(settle);
+      el.removeEventListener("wheel", onWheel);
+    };
+  }, []);
+
   const restRotation = -(todayDoy - 0.5) * degreesPerDay;
   const rotation = restRotation + offset;
+
+  useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
   const focusedDoy = Math.min(
     dim,
     Math.max(1, Math.round(todayDoy - offset / degreesPerDay)),
   );
-  const focusedIso =
-    todayInYear && Math.abs(offset) < 0.4 ? today : dateFromDoy(year, focusedDoy);
+  const focusedIso = dateFromDoy(year, focusedDoy);
   const focused = gregorianToSue(focusedIso, naming);
+  const isToday = focusedIso === today;
 
   const densities = useMemo(() => {
     return Array.from({ length: 13 }, (_, i) => {
-      const start = (i * 28) + 1;
+      const start = i * 28 + 1;
       let count = 0;
       for (let d = 0; d < 28; d += 1) {
         const iso = dateFromDoy(year, start + d + (year % 4 === 0 && i >= 6 ? 1 : 0));
@@ -151,27 +224,70 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
     return (Math.atan2(y, x) * 180) / Math.PI;
   }
 
+  function localFromEvent(event: React.PointerEvent<SVGSVGElement>) {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect) return { r: 0, localDeg: 0 };
+    const x = ((event.clientX - rect.left) / rect.width) * 800 - 400;
+    const y = ((event.clientY - rect.top) / rect.height) * 800 - 400;
+    const r = Math.hypot(x, y);
+    const fromNorth = (Math.atan2(x, -y) * 180) / Math.PI;
+    const localDeg = ((fromNorth - rotationRef.current) % 360 + 360) % 360;
+    return { r, localDeg };
+  }
+
   function onPointerDown(event: React.PointerEvent<SVGSVGElement>) {
+    interactingRef.current = true;
     draggingRef.current = true;
+    didDragRef.current = false;
+    pinTodayRef.current = false;
     lastAngleRef.current = pointerAngle(event);
+    lastYRef.current = event.clientY;
+    startXRef.current = event.clientX;
+    startYRef.current = event.clientY;
     velocityRef.current = 0;
     svgRef.current?.setPointerCapture(event.pointerId);
   }
 
   function onPointerMove(event: React.PointerEvent<SVGSVGElement>) {
     if (!draggingRef.current) return;
+    const travelX = event.clientX - startXRef.current;
+    const travelY = event.clientY - startYRef.current;
+    if (travelX * travelX + travelY * travelY > 36) didDragRef.current = true;
+
     const next = pointerAngle(event);
-    let delta = next - lastAngleRef.current;
-    if (delta > 180) delta -= 360;
-    if (delta < -180) delta += 360;
-    offsetRef.current += delta;
-    velocityRef.current = delta * 40;
+    let ang = next - lastAngleRef.current;
+    if (ang > 180) ang -= 360;
+    if (ang < -180) ang += 360;
+    const fromY = -(event.clientY - lastYRef.current) * 0.32;
+    const combined = ang + fromY;
+    offsetRef.current = clampOffset(offsetRef.current + combined);
+    velocityRef.current = combined * 40;
     lastAngleRef.current = next;
+    lastYRef.current = event.clientY;
+  }
+
+  function handleTap(event: React.PointerEvent<SVGSVGElement>) {
+    const { r, localDeg } = localFromEvent(event);
+    if (r < 168) {
+      goToToday();
+      return;
+    }
+    if (r >= 196 && r <= 224) {
+      const doy = Math.min(dim, Math.max(1, Math.round(localDeg / degreesPerDay + 0.5)));
+      router.push(`/day/${dateFromDoy(year, doy)}`);
+      return;
+    }
+    if (r >= 228 && r <= 348) {
+      const period = Math.min(13, Math.max(1, Math.floor(localDeg / sweep) + 1));
+      router.push(`/period/${period}`);
+    }
   }
 
   function onPointerUp(event: React.PointerEvent<SVGSVGElement>) {
     draggingRef.current = false;
+    interactingRef.current = false;
     svgRef.current?.releasePointerCapture(event.pointerId);
+    if (!didDragRef.current) handleTap(event);
   }
 
   const cx = 400;
@@ -181,10 +297,10 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
   const weekdayN = weekdayNumber(focused.weekdayIndex, state.settings);
 
   return (
-    <div className="wheel-stage relative mx-auto w-full max-w-[720px]">
+    <div ref={stageRef} className="wheel-stage relative mx-auto w-full max-w-[720px]">
       <div className="mb-3 text-center">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {Math.abs(offset) < 0.8 ? copy.wheel.today : focused.gregorianDate}
+          {isToday ? copy.wheel.today : focused.gregorianDate}
         </p>
         <button
           type="button"
@@ -212,7 +328,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         role="img"
-        aria-label={`Year wheel for ${year}`}
+        aria-label={`Year wheel for ${year}. ${copy.wheel.drag}`}
       >
         <defs>
           <filter id="wood-grain" x="-20%" y="-20%" width="140%" height="140%">
@@ -282,8 +398,6 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
                   fillOpacity={active ? 0.95 : 0.62 + Math.min(densities[i], 6) * 0.04}
                   stroke={active ? "var(--ink)" : "color-mix(in oklab, var(--engrave) 45%, transparent)"}
                   strokeWidth={active ? 2.4 : 0.7}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/period/${period}`)}
                 />
                 {Array.from({ length: 3 }, (_, mark) => {
                   const groove = polar(cx, cy, 348 - mark * 8, a0);
@@ -307,9 +421,7 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill="var(--ink)"
-                  className="cursor-pointer"
                   style={{ fontSize: compact ? 13 : 15, fontFamily: "var(--font-display)" }}
-                  onClick={() => router.push(`/period/${period}`)}
                 >
                   {periodName(period, naming)}
                 </text>
@@ -342,8 +454,6 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
                 cy={p.y}
                 r={intensity === "rest" ? 2.6 : hasEvent ? 2.1 : 1.15}
                 fill={fill}
-                className="cursor-pointer"
-                onClick={() => router.push(`/day/${iso}`)}
               />
             );
           })}
@@ -401,7 +511,15 @@ export function YearWheel({ compact = false }: { compact?: boolean }) {
               );
             })}
         </g>
-        <circle cx={cx} cy={cy} r={168} fill="var(--paper-deep)" stroke="var(--engrave)" strokeWidth="1.2" />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={168}
+          fill="var(--paper-deep)"
+          stroke="var(--engrave)"
+          strokeWidth="1.2"
+          className="cursor-pointer"
+        />
         <g
           style={{
             transform: `rotate(${-ornament}deg)`,

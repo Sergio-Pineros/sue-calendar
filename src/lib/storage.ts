@@ -50,7 +50,7 @@ export function defaultSettings(): SueSettings {
     weekdayShortNames: [...WEEKDAY_SHORT],
     weekdayNumberPreset: "sergio",
     weekdayNumbers: [...SERGIO_WEEKDAY_NUMBERS],
-    theme: "ancient-wood",
+    theme: "ancient-amethyst",
     timezone:
       typeof Intl !== "undefined"
         ? Intl.DateTimeFormat().resolvedOptions().timeZone
