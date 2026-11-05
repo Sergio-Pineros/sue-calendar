@@ -14,6 +14,7 @@ Saved from this repo’s v1 pass (mobile + desktop):
 - Onboarding period-colour step
 - Sprint picker (tiles, no dropdowns)
 - Sprint sheet with a dedicated day ring
+- Frequency tuner (mobile + desktop)
 - Settings
 - Themes: Ancient Amethyst, Ancient Wood, Solarpunk Mecha, Night Ritual, Moss Circuit
 
@@ -26,6 +27,7 @@ See the pull request artifacts for the latest captures.
 - **Period names** you can switch: Roman numerals (default), numbers, International Fixed Calendar, Comte’s Positivist calendar, Graves’s Celtic Tree (1948), folk full-moon names, or your own 13
 - **Weekdays** you can rename, renumber (Sergio’s default is Sunday = −1 … Saturday = 5), and start on any day
 - **Moon-based sprints** — tap a large rhythm tile (no dropdowns). A full-screen sheet opens a dedicated day ring colored push / light / rest; tap a day to override. Swipe down to close. Rhythm, not science.
+- **Frequency tuner** — a rotary dial, waveforms, volume fade, optional binaural beats, Solfeggio / 432 / 440 / Schumann presets, and an ASCII oscilloscope. Tradition labels, not medical claims. Reach it from **Tune** in the tab bar or Today.
 - **Google Calendar** read + write (when you set a client ID)
 - **Apple / iCloud Calendar** via CalDAV (Apple ID + app-specific password)
 - **`.ics` import/export** as the universal fallback
@@ -125,6 +127,12 @@ See `src/lib/naming.ts`. Each preset has an origin line shown in Settings.
 | `folk` | Traditional almanac full-moon names + Blue Moon. |
 | `custom` | Your 13 names, local only. |
 
+## Frequency tuner
+
+A Web Audio tone you can turn with a finger. Oscillator create / start / stop follows [Michal Ferber’s frequency-tone-generator](https://github.com/MichalAFerber/frequency-tone-generator) (MIT). SÚE adds fade-in/out, waveforms, binaural mode, calendar-tied suggestions, and local favorites. Hertz is physics; assigned meanings (healing, DNA, mood) are tradition or preference. See [THIRD_PARTY.md](./THIRD_PARTY.md) for the license notice.
+
+Schumann 7.83 Hz is a real Earth-ionosphere resonance and is sub-audible, so the tuner offers it as a binaural beat on a 200 Hz carrier.
+
 ## License
 
-MIT. See [LICENSE](./LICENSE) and [CONTRIBUTING.md](./CONTRIBUTING.md).
+MIT. See [LICENSE](./LICENSE), [THIRD_PARTY.md](./THIRD_PARTY.md), and [CONTRIBUTING.md](./CONTRIBUTING.md).

@@ -151,6 +151,19 @@ export const RESEARCH: ResearchEntry[] = [
     notes: "Document platform limits. Pure local mode works with zero accounts.",
     sourceUrl: "https://developer.apple.com/documentation/eventkit",
   },
+  {
+    id: "frequency",
+    title: "Frequency tuner",
+    category: "Product",
+    evidence: "Modern interpretation",
+    summary:
+      "A built-in Web Audio tone you can tune, fade, and optionally play as a binaural beat. Presets include concert 432 / 440 Hz, the modern Solfeggio set, and Schumann 7.83 Hz as a beat (the Earth resonance itself is real and sub-audible).",
+    rule: "Hertz values are physics. Assigned meanings (healing, DNA, mood) are tradition or marketing, not evidence. Moon and period suggestions are a planning overlay.",
+    appUse: "Tune tab, Today card, and rest-day links. Favorites stay in localStorage.",
+    notes:
+      "SÚE does not map frequencies to diseases. A specific hertz value does not treat a named condition.",
+    sourceUrl: "https://github.com/MichalAFerber/frequency-tone-generator",
+  },
 ];
 
 export const CLAIMS_TO_AVOID = [
@@ -161,6 +174,8 @@ export const CLAIMS_TO_AVOID = [
   "Calendar reform proves a hidden ancient knowledge.",
   "Lunar phases scientifically determine personal outcomes.",
   "The early Romans used a permanent 13-month year before a later change.",
+  "A specific hertz value heals a named condition.",
+  "432 Hz or Solfeggio tones are scientifically proven to repair the body.",
 ];
 
 export const CLAIMS_OK = [
@@ -171,6 +186,7 @@ export const CLAIMS_OK = [
   "Modern fixed-calendar proposals tried to solve real administrative problems.",
   "Watching your own patterns over time can be useful.",
   "Sprint recommendations are a rhythm you can override, not a forecast.",
+  "You can listen to a tone while planning; that is preference, not medicine.",
 ];
 
 export const EVIDENCE_BADGE = {

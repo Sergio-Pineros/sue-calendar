@@ -245,6 +245,16 @@ export function DayView({ iso }: { iso: string }) {
         </section>
       )}
 
+      {(rest ||
+        sprints.some((sprint) => sprintIntensityOn(sprint, iso) === "rest")) && (
+        <Link
+          href="/tune?hz=432"
+          className="block rounded-2xl border border-rest/40 bg-rest/10 px-4 py-3 text-sm"
+        >
+          {copy.day.restTone}
+        </Link>
+      )}
+
       {state.settings.layers.personal && state.personalCycles.length > 0 && (
         <section>
           <h2 className="display text-2xl">{copy.day.ownCycle}</h2>

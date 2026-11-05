@@ -213,6 +213,7 @@ export type SueSettings = {
   selectedCalendarIds: string[];
   appleCalendarIds: string[];
   lastSyncedAt: string | null;
+  frequencyFavorites: number[];
 };
 
 export type SueState = {

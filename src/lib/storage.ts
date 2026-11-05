@@ -29,6 +29,7 @@ import {
   clampWeekStart,
 } from "./weekdays";
 import { isThemeId } from "./themes";
+import { normalizeFavorites } from "./frequency";
 
 const STORAGE_KEY = "sue:v1";
 export const APPLE_STORAGE_KEY = "sue:apple";
@@ -68,6 +69,7 @@ export function defaultSettings(): SueSettings {
     selectedCalendarIds: [],
     appleCalendarIds: [],
     lastSyncedAt: null,
+    frequencyFavorites: [],
   };
 }
 
@@ -191,6 +193,7 @@ export function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSet
     periodColorOverrides: normalizePeriodColorOverrides(raw.periodColorOverrides),
     layers: { ...base.layers, ...raw.layers },
     appleCalendarIds: raw.appleCalendarIds ?? [],
+    frequencyFavorites: normalizeFavorites(raw.frequencyFavorites),
   };
 }
 

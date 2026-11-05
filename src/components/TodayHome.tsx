@@ -24,6 +24,7 @@ import { isMajorMoonPhase } from "@/lib/moon";
 import { weekdayShortLabel } from "@/lib/weekdays";
 import { copy } from "@/lib/copy";
 import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
+import { suggestedTone } from "@/lib/frequency";
 import { HudFrame } from "./Hud";
 
 export function TodayHome() {
@@ -64,6 +65,12 @@ export function TodayHome() {
   const intensity = sprintToday
     ? sprintIntensityOn(sprintToday, today)
     : null;
+  const tone = suggestedTone({
+    moon: mapped.moon.name,
+    period: mapped.suePeriod,
+    intensity,
+    rest: Boolean(restToday),
+  });
 
   return (
     <div className="space-y-8">
@@ -86,6 +93,15 @@ export function TodayHome() {
           </p>
         </HudFrame>
       )}
+
+      <Link href={`/tune?hz=${tone.hz}`} className="tuner-offer">
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
+          {copy.today.tone}
+        </p>
+        <p className="display mt-1 text-3xl">{tone.label}</p>
+        <p className="mt-2 text-sm text-ink-soft">{tone.reason}</p>
+        <span className="mt-3 inline-block text-sm text-brass">{copy.today.toneOpen}</span>
+      </Link>
 
       <HudFrame label={copy.today.focus}>
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">

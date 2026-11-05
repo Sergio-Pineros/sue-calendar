@@ -13,6 +13,7 @@ const NAV = [
   { href: "/year", label: copy.nav.year },
   { href: "/period", label: copy.nav.period },
   { href: "/sprints", label: copy.nav.sprints },
+  { href: "/tune", label: copy.nav.tune },
   { href: "/reflect", label: copy.nav.reflect },
   { href: "/research", label: copy.nav.research },
   { href: "/settings", label: copy.nav.settings },
@@ -124,8 +125,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-line bg-paper/95 px-2 py-2 backdrop-blur-md md:hidden">
-        {NAV.slice(0, 4).map((item) => {
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 gap-1 border-t border-line bg-paper/95 px-1 py-2 backdrop-blur-md md:hidden">
+        {NAV.slice(0, 5).map((item) => {
           const active =
             item.href === "/"
               ? pathname === "/"
