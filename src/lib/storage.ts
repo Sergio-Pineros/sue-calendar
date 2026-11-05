@@ -73,6 +73,26 @@ export function defaultSettings(): SueSettings {
   };
 }
 
+/** Skip onboarding: Roman names, Sergio week, Amethyst dark palette. */
+export function applySkippedOnboarding(settings: SueSettings): SueSettings {
+  const defaults = defaultSettings();
+  return {
+    ...settings,
+    naming: defaults.naming,
+    customPeriodNames: [...defaults.customPeriodNames],
+    weekStart: defaults.weekStart,
+    weekdayNamePreset: defaults.weekdayNamePreset,
+    weekdayNames: [...defaults.weekdayNames],
+    weekdayShortNames: [...defaults.weekdayShortNames],
+    weekdayNumberPreset: defaults.weekdayNumberPreset,
+    weekdayNumbers: [...defaults.weekdayNumbers],
+    theme: defaults.theme,
+    periodColorPreset: defaults.periodColorPreset,
+    periodColorOverrides: emptyPeriodColorOverrides(),
+    onboarded: true,
+  };
+}
+
 function uid(): string {
   return crypto.randomUUID();
 }

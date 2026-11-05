@@ -12,12 +12,25 @@ import { PeriodColorStudio } from "./PeriodColorStudio";
 
 export function OnboardingFlow() {
   const router = useRouter();
-  const { state, setNaming, setTheme, updateSettings, completeOnboarding } = useSueStore();
+  const { state, setNaming, setTheme, updateSettings, completeOnboarding, skipOnboarding } =
+    useSueStore();
   const [step, setStep] = useState(0);
 
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
-      <p className="display text-center text-5xl tracking-[0.4em]">{copy.app.name}</p>
+      <div className="sticky top-0 z-10 flex justify-end bg-paper/80 py-2 backdrop-blur-md">
+        <button
+          type="button"
+          className="tap text-sm text-ink-soft"
+          onClick={() => {
+            skipOnboarding();
+            router.push("/app");
+          }}
+        >
+          {copy.onboarding.skip}
+        </button>
+      </div>
+      <p className="display text-center text-5xl tracking-[-0.04em]">{copy.app.name}</p>
       <div className="mx-auto mt-8 flex gap-2">
         {copy.onboarding.steps.map((label, i) => (
           <span
@@ -104,10 +117,20 @@ export function OnboardingFlow() {
       </div>
       )}
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex items-center justify-between gap-4">
         <button
           type="button"
-          className="text-sm text-ink-soft"
+          className="tap text-sm text-ink-soft"
+          onClick={() => {
+            skipOnboarding();
+            router.push("/app");
+          }}
+        >
+          {copy.onboarding.skip}
+        </button>
+        <button
+          type="button"
+          className="tap text-sm text-ink-soft"
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
         >
@@ -122,7 +145,7 @@ export function OnboardingFlow() {
               return;
             }
             completeOnboarding();
-            router.push("/");
+            router.push("/app");
           }}
         >
           {step === 4 ? copy.onboarding.enter : copy.onboarding.continue}

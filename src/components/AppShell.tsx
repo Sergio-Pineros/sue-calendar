@@ -9,7 +9,7 @@ import { useSueStore } from "./StoreProvider";
 import { GlyphScramble, AsciiVine } from "./Ascii";
 
 const NAV = [
-  { href: "/", label: copy.nav.today },
+  { href: "/app", label: copy.nav.today },
   { href: "/year", label: copy.nav.year },
   { href: "/period", label: copy.nav.period },
   { href: "/sprints", label: copy.nav.sprints },
@@ -23,6 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { state, setViewYear } = useSueStore();
+  const landing = pathname === "/";
   const onboarding = pathname.startsWith("/onboarding");
   const isClient = useSyncExternalStore(
     () => () => {},
@@ -31,10 +32,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (isClient && !state.settings.onboarded && !onboarding) {
+    if (isClient && !state.settings.onboarded && !onboarding && !landing) {
       router.replace("/onboarding");
     }
-  }, [isClient, onboarding, router, state.settings.onboarded]);
+  }, [isClient, landing, onboarding, router, state.settings.onboarded]);
+
+  if (landing) {
+    return <>{children}</>;
+  }
 
   if (!isClient) {
     return (
@@ -83,8 +88,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <nav className="chrome-desk">
             {NAV.map((item) => {
               const active =
-                item.href === "/"
-                  ? pathname === "/"
+                item.href === "/app"
+                  ? pathname === "/app"
                   : pathname.startsWith(item.href);
               return (
                 <Link
@@ -114,8 +119,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="chrome-tab" aria-label="Primary">
         {NAV.slice(0, 5).map((item) => {
           const active =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/app"
+              ? pathname === "/app"
               : pathname.startsWith(item.href);
           return (
             <Link

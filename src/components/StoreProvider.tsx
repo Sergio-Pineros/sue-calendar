@@ -21,7 +21,8 @@ import type {
   SueState,
   ThemeId,
 } from "@/lib/types";
-import { emptyState, loadState, newGoal, saveState } from "@/lib/storage";
+import { applySkippedOnboarding, emptyState, loadState, newGoal, saveState } from "@/lib/storage";
+import { markEntered } from "@/lib/entry";
 import { nextPeriodRef } from "@/lib/sue-calendar";
 
 type StoreContextValue = {
@@ -34,6 +35,7 @@ type StoreContextValue = {
   setLayer: (key: LayerKey, value: boolean) => void;
   setViewYear: (year: number) => void;
   completeOnboarding: () => void;
+  skipOnboarding: () => void;
   setPeriodFocus: (year: number, period: number, title: string) => void;
   addGoal: (goal: Goal) => void;
   updateGoal: (goal: Goal) => void;
@@ -118,10 +120,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     (year: number) => updateSettings({ viewYear: year }),
     [updateSettings],
   );
-  const completeOnboarding = useCallback(
-    () => updateSettings({ onboarded: true }),
-    [updateSettings],
-  );
+  const completeOnboarding = useCallback(() => {
+    markEntered();
+    updateSettings({ onboarded: true });
+  }, [updateSettings]);
+  const skipOnboarding = useCallback(() => {
+    markEntered();
+    patch((s) => ({ ...s, settings: applySkippedOnboarding(s.settings) }));
+  }, []);
 
   const value = useMemo<StoreContextValue>(
     () => ({
@@ -134,6 +140,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setLayer,
       setViewYear,
       completeOnboarding,
+      skipOnboarding,
       setPeriodFocus: (year, period, title) =>
         patch((s) => {
           const existing = s.goals.find(
@@ -307,7 +314,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           settings: { ...emptyState().settings, ...next.settings },
         })),
     }),
-    [completeOnboarding, setCustomPeriodNames, setLayer, setNaming, setTheme, setViewYear, state, updateSettings],
+    [completeOnboarding, setCustomPeriodNames, setLayer, setNaming, setTheme, setViewYear, skipOnboarding, state, updateSettings],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

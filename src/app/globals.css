@@ -1067,6 +1067,96 @@ html[data-year-blend] body {
   }
 }
 
+.landing {
+  min-height: 100svh;
+  padding: calc(12px + env(safe-area-inset-top, 0px))
+    max(20px, env(safe-area-inset-right, 0px))
+    calc(32px + env(safe-area-inset-bottom, 0px))
+    max(20px, env(safe-area-inset-left, 0px));
+}
+
+.landing-wait {
+  background: var(--paper);
+}
+
+.landing-bar {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.landing-hero {
+  width: min(78vw, 340px);
+  margin: 12px auto 8px;
+  pointer-events: none;
+}
+
+.landing-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 28rem;
+}
+
+.landing-copy h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(3.2rem, 14vw, 5rem);
+}
+
+.landing-pitch {
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.landing-cta {
+  margin-top: 20px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.landing-beats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.landing-install {
+  margin-top: 40px;
+}
+
+.landing-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--ink-soft);
+}
+
+.landing-foot {
+  margin-top: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.landing-foot a {
+  color: var(--ink);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (prefers-reduced-transparency: reduce) {
   .chrome-top,
   .chrome-tab,

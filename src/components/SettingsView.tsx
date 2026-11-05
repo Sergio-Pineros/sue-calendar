@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import { useSueStore } from "@/components/StoreProvider";
 import { exportIcs, parseIcs } from "@/lib/ics";
 import {
@@ -34,6 +35,7 @@ import { copy } from "@/lib/copy";
 import type { NamingSystem } from "@/lib/types";
 
 export function SettingsView() {
+  const router = useRouter();
   const {
     state,
     setNaming,
@@ -178,6 +180,14 @@ export function SettingsView() {
           {copy.settings.kicker}
         </p>
         <h1 className="display text-4xl">{copy.settings.kicker}</h1>
+        <button
+          type="button"
+          className="ghost-action mt-4"
+          onClick={() => router.push("/onboarding")}
+        >
+          {copy.settings.setup}
+        </button>
+        <p className="mt-1 text-sm text-ink-soft">{copy.settings.setupHint}</p>
       </header>
 
       <section className="space-y-3">

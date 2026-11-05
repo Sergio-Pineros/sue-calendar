@@ -1,5 +1,14 @@
-const CACHE = "sue-v1";
-const PRECACHE = ["/", "/year", "/sprints", "/tune", "/settings", "/manifest.webmanifest"];
+const CACHE = "sue-v2";
+const PRECACHE = [
+  "/",
+  "/app",
+  "/onboarding",
+  "/year",
+  "/sprints",
+  "/tune",
+  "/settings",
+  "/manifest.webmanifest",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -36,6 +45,8 @@ self.addEventListener("fetch", (event) => {
         const cached = await caches.match(request);
         if (cached) return cached;
         if (request.mode === "navigate") {
+          const app = await caches.match("/app");
+          if (app) return app;
           const home = await caches.match("/");
           if (home) return home;
         }

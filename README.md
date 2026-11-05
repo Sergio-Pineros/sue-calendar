@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/hero-wheel.png" alt="SÚE year wheel" width="920" />
+  <img src="docs/landing-mobile.png" alt="SÚE landing page" width="320" />
 </p>
 
 # SÚE
@@ -30,7 +30,11 @@ An open-source 13-month calendar that plans your year with the moon.
 
   <img src="docs/feature-naming.png" alt="Naming presets" width="280" />
 
-Works with **zero accounts**. Google, Apple, and `.ics` are optional.
+- **Home** — today, after you open or install the app.
+
+  <img src="docs/feature-home.png" alt="Home" width="280" />
+
+Works with **zero accounts**. Google, Apple, and `.ics` are optional. Onboarding can be skipped — Roman names, Sunday = −1, Amethyst dark. Reopen it from Settings.
 
 ## Quick start
 
@@ -55,7 +59,7 @@ A synodic month is about 29.53 days — the moon is a layer on the year, not the
 
 ## Install the app
 
-**Web (PWA).** Open the deployed site in Safari or Chrome → Add to Home Screen. Offline cache covers the local-first app. The `/api/caldav` proxy is not available offline.
+**Web (PWA).** The site opens on a landing page. Chrome/Android can **Install**. iOS Safari: Share → Add to Home Screen. Installed and returning users go straight to `/app`. The service worker caches the local-first app. The `/api/caldav` proxy is not available offline.
 
 **iOS / Android (Capacitor).**
 

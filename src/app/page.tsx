@@ -1,7 +1,7 @@
 "use client";
 
-import { TodayHome } from "@/components/TodayHome";
+import { LandingPage } from "@/components/LandingPage";
 
 export default function Page() {
-  return <TodayHome />;
+  return <LandingPage />;
 }

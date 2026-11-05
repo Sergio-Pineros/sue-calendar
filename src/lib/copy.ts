@@ -246,6 +246,8 @@ export const copy = {
       `Detected timezone: ${tz}. All-day events are civil dates, not UTC instants.`,
     lastSync: (when: string) => `Last sync: ${when}`,
     selectOne: "Select at least one calendar.",
+    setup: "Onboarding",
+    setupHint: "Names, week, theme, colours.",
   },
   onboarding: {
     steps: ["Names", "Week", "Theme", "Colors", "Ready"],
@@ -269,6 +271,19 @@ export const copy = {
     back: "Back",
     continue: "Continue",
     enter: "Enter today",
+    skip: "Skip",
+  },
+  landing: {
+    kicker: "13 × 28",
+    open: "Open app",
+    beats: ["Year wheel", "Moon sprints", "Frequency tuner", "Offline"],
+    install: "Add to Home Screen",
+    installAction: "Install",
+    iosShare: "Share",
+    iosAdd: "Add to Home Screen",
+    installFallback: "Browser menu → Add to Home Screen",
+    oss: "Open source. Local-first. MIT.",
+    github: "GitHub",
   },
   sprints: {
     kicker: "Sprints",

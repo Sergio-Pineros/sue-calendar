@@ -17,6 +17,7 @@ import "./wheel-scrub.test";
 import "./frequency.test";
 import "./spring.test";
 import "./caldav.test";
+import "./entry.test";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
