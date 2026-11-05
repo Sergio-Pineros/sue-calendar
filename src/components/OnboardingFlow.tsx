@@ -18,7 +18,6 @@ export function OnboardingFlow() {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
       <p className="display text-center text-5xl tracking-[0.4em]">{copy.app.name}</p>
-      <p className="mt-4 text-center text-ink-soft">{copy.onboarding.intro}</p>
       <div className="mx-auto mt-8 flex gap-2">
         {copy.onboarding.steps.map((label, i) => (
           <span
@@ -31,11 +30,10 @@ export function OnboardingFlow() {
       {step === 3 ? (
         <div className="mt-10 space-y-4">
           <h1 className="display text-3xl">{copy.onboarding.colorsTitle}</h1>
-          <p className="text-sm text-ink-soft">{copy.onboarding.colorsBody}</p>
           <PeriodColorStudio compact />
         </div>
       ) : (
-      <div className="hud-frame mt-10 rounded-3xl p-6">
+      <div className="mt-10 space-y-4">
         {step === 0 && (
           <div className="space-y-4">
             <h1 className="display text-3xl">{copy.onboarding.namesTitle}</h1>
@@ -53,7 +51,6 @@ export function OnboardingFlow() {
         {step === 1 && (
           <div className="space-y-4">
             <h1 className="display text-3xl">{copy.onboarding.weekTitle}</h1>
-            <p className="text-ink-soft">{copy.onboarding.weekBody}</p>
             <div className="grid gap-2">
               {WEEKDAY_NUMBER_PRESETS.filter((preset) => preset.id !== "custom").map((preset) => (
                 <Choice
@@ -74,7 +71,7 @@ export function OnboardingFlow() {
                 onChange={(event) =>
                   updateSettings({ weekStart: Number(event.target.value) })
                 }
-                className="mt-2 w-full rounded-full border border-line bg-card px-4"
+                className="ghost-input mt-2 w-full"
               >
                 {WEEKDAYS.map((day, index) => (
                   <option key={day} value={index}>
@@ -88,7 +85,6 @@ export function OnboardingFlow() {
         {step === 2 && (
           <div className="space-y-4">
             <h1 className="display text-3xl">{copy.onboarding.themeTitle}</h1>
-            <p className="text-sm text-ink-soft">{copy.onboarding.themeBody}</p>
             {THEMES.map((theme) => (
               <Choice
                 key={theme.id}
@@ -103,8 +99,6 @@ export function OnboardingFlow() {
         {step === 4 && (
           <div className="space-y-3">
             <h1 className="display text-3xl">{copy.onboarding.readyTitle}</h1>
-            <p className="text-ink-soft">{copy.onboarding.readyBody}</p>
-            <p className="text-ink-soft">{copy.onboarding.calendarBody}</p>
           </div>
         )}
       </div>
@@ -153,9 +147,7 @@ function Choice({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-2xl border p-4 text-left ${
-        active ? "border-ink bg-ink text-paper" : "border-line"
-      }`}
+      className={`w-full py-3 text-left ${active ? "text-ink" : "text-ink-soft"}`}
     >
       <p className="font-medium">{title}</p>
       <p className={`mt-1 text-sm ${active ? "text-paper/70" : "text-ink-soft"}`}>

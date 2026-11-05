@@ -67,14 +67,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     customNames: state.settings.customPeriodNames,
   };
 
+  function hrefFor(href: string) {
+    return href === "/period"
+      ? `/period/${gregorianToSue(todayISO(), naming).suePeriod ?? 1}`
+      : href;
+  }
+
   return (
-    <div className="min-h-screen pb-24 md:pb-0">
-      <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
-          <Link href="/year" className="display text-2xl tracking-[0.28em]">
+    <div className="app-root">
+      <header className="chrome-top">
+        <div className="chrome-top-inner">
+          <Link href="/year" className="display text-2xl">
             <GlyphScramble text={copy.app.name} />
           </Link>
-          <nav className="hidden flex-wrap items-center gap-1 text-sm md:flex">
+          <nav className="chrome-desk">
             {NAV.map((item) => {
               const active =
                 item.href === "/"
@@ -83,49 +89,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               return (
                 <Link
                   key={item.href}
-                  href={
-                    item.href === "/period"
-                      ? `/period/${gregorianToSue(todayISO(), naming).suePeriod ?? 1}`
-                      : item.href
-                  }
-                  className={`chip rounded-full px-3 ${
-                    active ? "bg-ink text-paper" : "text-ink-soft hover:text-ink"
-                  }`}
+                  href={hrefFor(item.href)}
+                  className={active ? "is-active" : ""}
                 >
                   {item.label}
                 </Link>
               );
             })}
           </nav>
-          <div className="flex items-center gap-2 font-mono text-xs text-ink-soft">
-            <button
-              type="button"
-              className="tap rounded-full border border-line px-3"
-              onClick={() => setViewYear(state.settings.viewYear - 1)}
-            >
+          <div className="chrome-year">
+            <button type="button" onClick={() => setViewYear(state.settings.viewYear - 1)}>
               ←
             </button>
             <span>{state.settings.viewYear}</span>
-            <button
-              type="button"
-              className="tap rounded-full border border-line px-3"
-              onClick={() => setViewYear(state.settings.viewYear + 1)}
-            >
+            <button type="button" onClick={() => setViewYear(state.settings.viewYear + 1)}>
               →
             </button>
           </div>
         </div>
       </header>
-      <main
-        className={
-          pathname === "/year"
-            ? "w-full"
-            : "mx-auto w-full max-w-6xl px-5 py-8"
-        }
-      >
+      <main className={pathname === "/year" ? "page-year" : "page"}>
         {children}
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 gap-1 border-t border-line bg-paper/95 px-1 py-2 backdrop-blur-md md:hidden">
+      <nav className="chrome-tab" aria-label="Primary">
         {NAV.slice(0, 5).map((item) => {
           const active =
             item.href === "/"
@@ -134,14 +120,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           return (
             <Link
               key={item.href}
-              href={
-                item.href === "/period"
-                  ? `/period/${gregorianToSue(todayISO(), naming).suePeriod ?? 1}`
-                  : item.href
-              }
-              className={`flex min-h-11 items-center justify-center rounded-xl text-xs ${
-                active ? "bg-ink text-paper" : "text-ink-soft"
-              }`}
+              href={hrefFor(item.href)}
+              className={active ? "is-active" : ""}
             >
               {item.label}
             </Link>

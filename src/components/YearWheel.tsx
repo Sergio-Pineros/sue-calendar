@@ -619,9 +619,6 @@ export function YearWheel({
       </svg>
       {!hideChrome && (
         <>
-          <p className="mt-2 text-center font-mono text-[11px] text-ink-soft">
-            {reduced ? copy.wheel.reduced : copy.wheel.drag}
-          </p>
           <div className="mt-2 flex justify-center gap-6 text-xs text-ink-soft">
             <button type="button" className="tap hover:text-ink" onClick={() => router.push(`/day/${yearDay}`)}>
               {copy.year.yearDay} · {yearDay.slice(5)}

@@ -58,7 +58,6 @@ export function ReflectView() {
         {copy.reflect.kicker}
       </p>
       <h1 className="display text-4xl">{copy.reflect.title(today.suePeriodName)}</h1>
-      <p className="text-ink-soft">{copy.reflect.intro}</p>
       {PROMPTS.map((prompt) => (
         <label key={prompt.key} className="block">
           <span className="text-sm font-medium">{prompt.label}</span>
@@ -68,7 +67,7 @@ export function ReflectView() {
               setAnswers((a) => ({ ...a, [prompt.key]: e.target.value }))
             }
             rows={3}
-            className="mt-2 w-full rounded-2xl border border-line bg-card px-4 py-3 text-sm outline-none focus:border-ink"
+            className="ghost-input mt-2 w-full"
           />
         </label>
       ))}
@@ -86,9 +85,7 @@ export function ReflectView() {
         </p>
       )}
       {today.isYearDay && (
-        <p className="rounded-2xl border border-year-day/40 bg-year-day/10 p-4 text-sm">
-          {copy.reflect.yearDay}
-        </p>
+        <p className="text-sm text-ink-soft">{copy.reflect.yearDay}</p>
       )}
     </div>
   );

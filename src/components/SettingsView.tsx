@@ -177,7 +177,7 @@ export function SettingsView() {
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
           {copy.settings.kicker}
         </p>
-        <h1 className="display text-4xl">{copy.settings.title}</h1>
+        <h1 className="display text-4xl">{copy.settings.kicker}</h1>
       </header>
 
       <section className="space-y-3">
@@ -188,10 +188,8 @@ export function SettingsView() {
               key={theme.id}
               type="button"
               onClick={() => setTheme(theme.id)}
-              className={`rounded-2xl border p-4 text-left ${
-                state.settings.theme === theme.id
-                  ? "border-ink bg-ink text-paper"
-                  : "border-line"
+              className={`py-3 text-left ${
+                state.settings.theme === theme.id ? "text-ink" : "text-ink-soft"
               }`}
             >
               <p className="font-medium">{theme.label}</p>
@@ -205,22 +203,18 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.periodColors}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.periodColorsHint}</p>
         <PeriodColorStudio />
       </section>
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.periods}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.periodHint}</p>
         {PERIOD_PRESETS.map((preset) => (
           <button
             key={preset.id}
             type="button"
             onClick={() => setNaming(preset.id as NamingSystem)}
-            className={`mr-2 mb-2 rounded-full border px-4 text-sm ${
-              state.settings.naming === preset.id
-                ? "border-ink bg-ink text-paper"
-                : "border-line"
+            className={`ghost-action mr-2 mb-2 ${
+              state.settings.naming === preset.id ? "text-ink" : "text-ink-soft"
             }`}
           >
             {preset.label}
@@ -241,7 +235,7 @@ export function SettingsView() {
                     next[index] = event.target.value;
                     setCustomPeriodNames(next);
                   }}
-                  className="mt-1 w-full rounded-full border border-line bg-card px-3"
+                  className="ghost-input mt-1 w-full"
                 />
               </label>
             ))}
@@ -258,7 +252,7 @@ export function SettingsView() {
             onChange={(event) =>
               updateSettings({ weekStart: Number(event.target.value) })
             }
-            className="mt-2 w-full rounded-full border border-line bg-card px-4"
+            className="ghost-input mt-2 w-full"
           >
             {WEEKDAYS.map((day, index) => (
               <option key={day} value={index}>
@@ -273,10 +267,8 @@ export function SettingsView() {
             key={preset.id}
             type="button"
             onClick={() => updateSettings({ weekdayNamePreset: preset.id })}
-            className={`mr-2 rounded-full border px-4 text-sm ${
-              state.settings.weekdayNamePreset === preset.id
-                ? "border-ink bg-ink text-paper"
-                : "border-line"
+            className={`ghost-action mr-2 ${
+              state.settings.weekdayNamePreset === preset.id ? "text-ink" : "text-ink-soft"
             }`}
           >
             {preset.label}
@@ -294,7 +286,7 @@ export function SettingsView() {
                     weekdayNames[index] = event.target.value;
                     updateSettings({ weekdayNames });
                   }}
-                  className="mt-1 w-full rounded-full border border-line bg-card px-3"
+                  className="ghost-input mt-1 w-full"
                 />
               </label>
             ))}
@@ -306,10 +298,8 @@ export function SettingsView() {
             key={preset.id}
             type="button"
             onClick={() => updateSettings({ weekdayNumberPreset: preset.id })}
-            className={`mr-2 rounded-full border px-4 text-sm ${
-              state.settings.weekdayNumberPreset === preset.id
-                ? "border-ink bg-ink text-paper"
-                : "border-line"
+            className={`ghost-action mr-2 ${
+              state.settings.weekdayNumberPreset === preset.id ? "text-ink" : "text-ink-soft"
             }`}
           >
             {preset.label}
@@ -328,7 +318,7 @@ export function SettingsView() {
                     weekdayNumbers[index] = Number(event.target.value);
                     updateSettings({ weekdayNumbers });
                   }}
-                  className="mt-1 w-full rounded-full border border-line bg-card px-2"
+                  className="ghost-input mt-1 w-full"
                 />
               </label>
             ))}
@@ -338,7 +328,6 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.google}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.googleHint}</p>
         {hasGoogle ? (
           <>
             <button
@@ -353,7 +342,7 @@ export function SettingsView() {
               <ul className="space-y-2">
                 {calendars.map((calendar) => (
                   <li key={calendar.id}>
-                    <label className="flex min-h-11 items-center gap-3 rounded-2xl border border-line px-4 text-sm">
+                    <label className="flex min-h-11 items-center gap-3 text-sm">
                       <input
                         type="checkbox"
                         checked={selected.includes(calendar.id)}
@@ -381,7 +370,7 @@ export function SettingsView() {
               <button
                 type="button"
                 disabled={syncing}
-                className="rounded-full border border-line px-4 text-sm disabled:opacity-60"
+                className="ghost-action disabled:opacity-60"
                 onClick={importGoogle}
               >
                 {copy.settings.googleImport(state.settings.viewYear)}
@@ -389,9 +378,7 @@ export function SettingsView() {
             )}
           </>
         ) : (
-          <p className="hud-frame rounded-2xl p-4 text-sm text-ink-soft">
-            {copy.settings.googleMissing}
-          </p>
+          <p className="text-sm text-ink-soft">{copy.settings.googleMissing}</p>
         )}
         {lastSync && (
           <p className="text-xs text-ink-soft">{copy.settings.lastSync(lastSync)}</p>
@@ -400,20 +387,18 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.apple}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.appleHint}</p>
-        <p className="text-xs text-ink-soft">{copy.settings.appleHow}</p>
         <input
           value={appleId}
           onChange={(event) => setAppleId(event.target.value)}
           placeholder={copy.settings.appleId}
-          className="w-full rounded-full border border-line bg-card px-4 text-sm"
+          className="ghost-input w-full"
         />
         <input
           type="password"
           value={applePassword}
           onChange={(event) => setApplePassword(event.target.value)}
           placeholder={copy.settings.applePassword}
-          className="w-full rounded-full border border-line bg-card px-4 text-sm"
+          className="ghost-input w-full"
         />
         <label className="flex min-h-11 items-center gap-2 text-sm">
           <input
@@ -436,7 +421,7 @@ export function SettingsView() {
           <ul className="space-y-2">
             {appleCalendars.map((calendar) => (
               <li key={calendar.url}>
-                <label className="flex min-h-11 items-center gap-3 rounded-2xl border border-line px-4 text-sm">
+                <label className="flex min-h-11 items-center gap-3 text-sm">
                   <input
                     type="checkbox"
                     checked={appleSelected.includes(calendar.url)}
@@ -459,7 +444,7 @@ export function SettingsView() {
           <button
             type="button"
             disabled={syncing}
-            className="rounded-full border border-line px-4 text-sm"
+            className="ghost-action"
             onClick={importApple}
           >
             {copy.settings.appleImport}
@@ -469,9 +454,8 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.ics}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.icsHint}</p>
         <div className="flex flex-wrap gap-2">
-          <label className="inline-flex cursor-pointer rounded-full border border-line px-4 text-sm">
+          <label className="ghost-action inline-flex cursor-pointer">
             {copy.settings.icsImport}
             <input
               type="file"
@@ -493,7 +477,7 @@ export function SettingsView() {
           </label>
           <button
             type="button"
-            className="rounded-full border border-line px-4 text-sm"
+            className="ghost-action"
             onClick={exportCalendar}
           >
             {copy.settings.icsExport}
@@ -503,16 +487,15 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.backup}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.backupHint}</p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            className="rounded-full border border-line px-4 text-sm"
+            className="ghost-action"
             onClick={exportBackup}
           >
             {copy.settings.downloadBackup}
           </button>
-          <label className="inline-flex cursor-pointer rounded-full border border-line px-4 text-sm">
+          <label className="ghost-action inline-flex cursor-pointer">
             {copy.settings.restoreBackup}
             <input
               type="file"
@@ -537,7 +520,6 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.cycle}</h2>
-        <p className="text-sm text-ink-soft">{copy.settings.cycleHint}</p>
         <form
           className="flex gap-2"
           onSubmit={(event) => {
@@ -551,7 +533,7 @@ export function SettingsView() {
             value={cycleName}
             onChange={(event) => setCycleName(event.target.value)}
             placeholder={copy.settings.cycleName}
-            className="flex-1 rounded-full border border-line bg-card px-4 text-sm outline-none focus:border-ink"
+            className="ghost-input flex-1"
           />
           <button className="rounded-full bg-ink px-4 text-sm text-paper">
             {copy.settings.create}
@@ -561,7 +543,7 @@ export function SettingsView() {
           {state.personalCycles.map((cycle) => (
             <li
               key={cycle.id}
-              className="flex items-center justify-between rounded-2xl border border-line px-4 py-2"
+              className="flex items-center justify-between py-2"
             >
               <span>
                 {cycle.name} · {cycle.length} days

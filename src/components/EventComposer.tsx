@@ -70,12 +70,11 @@ export function EventComposer({
   return (
     <form className="space-y-3" onSubmit={submit}>
       <h2 className="display text-2xl">{copy.day.addEvent}</h2>
-      <p className="text-sm text-ink-soft">{copy.day.addEventHint}</p>
       <input
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         placeholder={copy.day.title}
-        className="w-full rounded-full border border-line bg-card px-4 text-sm outline-none focus:border-ink"
+        className="ghost-input w-full"
       />
       <div className="flex flex-wrap gap-3 text-sm">
         <label className="flex items-center gap-2">
@@ -92,13 +91,13 @@ export function EventComposer({
             type="time"
             value={time}
             onChange={(event) => setTime(event.target.value)}
-            className="rounded-full border border-line bg-card px-3"
+            className="ghost-input"
           />
         )}
         <select
           value={target}
           onChange={(event) => setTarget(event.target.value)}
-          className="rounded-full border border-line bg-card px-3"
+          className="ghost-input"
         >
           <option value="local">{copy.day.local}</option>
           {googleClientId() &&

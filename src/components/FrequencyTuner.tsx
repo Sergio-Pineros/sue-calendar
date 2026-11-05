@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSueStore } from "./StoreProvider";
 import { copy } from "@/lib/copy";
@@ -9,32 +8,38 @@ import {
   DEFAULT_VOLUME,
   FREQUENCY_PRESETS,
   WAVEFORMS,
-  beatFor,
-  carrierFor,
   formatHz,
   hzToDial,
   dialToHz,
   isFavorite,
-  meaningForHz,
   parseHz,
-  periodTone,
   snapHz,
   suggestedTone,
   toggleFavorite,
   type Waveform,
 } from "@/lib/frequency";
 import { ToneEngine } from "@/lib/tone-engine";
-import { gregorianToSue, periodName, todayISO } from "@/lib/sue-calendar";
+import { gregorianToSue, todayISO } from "@/lib/sue-calendar";
 import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
+import { haptic } from "@/lib/haptic";
+import { project, rubberbandT, settled, springStep } from "@/lib/spring";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 const VOLUME_STEPS = [0.06, 0.12, 0.18, 0.28, 0.4];
-const NUDGES = [-10, -1, -0.1, 0.1, 1, 10];
-const SCOPE_CHARS = " ·-~=≡█";
+const ARC = 270;
+const START = -135;
 
 function polar(cx: number, cy: number, r: number, deg: number) {
   const a = ((deg - 90) * Math.PI) / 180;
   return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+
+function pointerAngle(event: PointerEvent<SVGSVGElement>) {
+  const rect = event.currentTarget.getBoundingClientRect();
+  return (Math.atan2(
+    event.clientY - rect.top - rect.height / 2,
+    event.clientX - rect.left - rect.width / 2,
+  ) * 180) / Math.PI + 90;
 }
 
 export function FrequencyTuner() {
@@ -65,11 +70,21 @@ export function FrequencyTuner() {
   const [binaural, setBinaural] = useState(Boolean(suggestion.binaural));
   const [offset, setOffset] = useState(suggestion.binaural ? suggestion.hz : 4);
   const [typed, setTyped] = useState(formatHz(initialHz));
-  const [ascii, setAscii] = useState("· · · · · · · ·");
-  const [scope, setScope] = useState("");
-  const [dragging, setDragging] = useState(false);
+  const [sheet, setSheet] = useState(false);
+  const [needle, setNeedle] = useState(START + hzToDial(initialHz) * ARC);
+
   const engine = useRef<ToneEngine | null>(null);
-  const lastAngle = useRef(0);
+  const hzRef = useRef(initialHz);
+  const tRef = useRef(hzToDial(initialHz));
+  const velRef = useRef(0);
+  const grabRef = useRef(0);
+  const draggingRef = useRef(false);
+  const lastA = useRef(0);
+  const lastT = useRef(0);
+  const samples = useRef<Array<{ t: number; a: number }>>([]);
+  const lastDetent = useRef(initialHz);
+  const scopeRef = useRef<SVGPathElement | null>(null);
+  const springing = useRef(0);
 
   useEffect(() => {
     engine.current = new ToneEngine();
@@ -81,21 +96,20 @@ export function FrequencyTuner() {
     let frame = 0;
     const tick = () => {
       const analyser = engine.current?.getAnalyser();
-      if (analyser) {
+      const path = scopeRef.current;
+      if (analyser && path) {
         const data = new Uint8Array(analyser.fftSize);
         analyser.getByteTimeDomainData(data);
-        const step = Math.floor(data.length / 48);
-        let line = "";
-        let path = "";
-        for (let i = 0; i < 48; i += 1) {
+        const n = 72;
+        const step = Math.floor(data.length / n);
+        let d = "";
+        for (let i = 0; i < n; i += 1) {
           const v = data[i * step] / 255;
-          line += SCOPE_CHARS[Math.min(6, Math.floor(v * 7))];
-          const x = (i / 47) * 200;
-          const y = 20 - (v - 0.5) * 36;
-          path += (i ? " L " : "M ") + x.toFixed(1) + " " + y.toFixed(1);
+          const a = -180 + (i / (n - 1)) * 360;
+          const p = polar(160, 160, 78 + (v - 0.5) * 22, a);
+          d += `${i ? " L" : "M"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
         }
-        setAscii(line);
-        setScope(path);
+        path.setAttribute("d", d);
       }
       frame = window.requestAnimationFrame(tick);
     };
@@ -103,122 +117,145 @@ export function FrequencyTuner() {
     return () => window.cancelAnimationFrame(frame);
   }, [playing]);
 
-  function patchPlaying(next: {
-    hz?: number;
-    wave?: Waveform;
-    volume?: number;
-    binaural?: boolean;
-    offset?: number;
-  }) {
-    engine.current?.update({
-      hz: next.hz ?? hz,
-      wave: next.wave ?? wave,
-      volume: next.volume ?? volume,
-      binaural: next.binaural ?? binaural,
-      offset: next.offset ?? offset,
-    });
-  }
-
-  function applyHz(next: number, extra?: { binaural?: boolean; offset?: number }) {
+  function commitHz(next: number, extra?: { binaural?: boolean; offset?: number }) {
     const snapped = snapHz(next);
+    hzRef.current = snapped;
     setHz(snapped);
     setTyped(formatHz(snapped));
     if (extra?.binaural !== undefined) setBinaural(extra.binaural);
     if (extra?.offset !== undefined) setOffset(extra.offset);
-    patchPlaying({
+    engine.current?.update({
       hz: snapped,
-      binaural: extra?.binaural,
-      offset: extra?.offset,
+      wave,
+      volume,
+      binaural: extra?.binaural ?? binaural,
+      offset: extra?.offset ?? offset,
     });
+    if (Math.abs(snapped - lastDetent.current) >= 1) {
+      const hit = FREQUENCY_PRESETS.some((item) => Math.abs(item.hz - snapped) < 0.6);
+      if (hit) haptic("rigid");
+      lastDetent.current = snapped;
+    }
   }
 
-  async function togglePlay() {
+  function applyT(t: number, live: boolean) {
+    const visual = live ? rubberbandT(t) : clampT(t);
+    tRef.current = visual;
+    setNeedle(START + visual * ARC);
+    commitHz(dialToHz(clampT(visual)));
+  }
+
+  function clampT(t: number) {
+    return Math.min(1, Math.max(0, t));
+  }
+
+  function springTo(targetT: number, velocity: number, damping: number) {
+    window.cancelAnimationFrame(springing.current);
+    if (reduced) {
+      applyT(targetT, false);
+      velRef.current = 0;
+      return;
+    }
+    let current = tRef.current;
+    let v = velocity;
+    const step = (now: number) => {
+      const prev = lastT.current || now;
+      const dt = Math.min(0.032, (now - prev) / 1000 || 1 / 60);
+      lastT.current = now;
+      const next = springStep(current, targetT, v, dt, damping, 0.4);
+      current = next.value;
+      v = next.velocity;
+      velRef.current = v;
+      applyT(current, true);
+      if (settled(current, targetT, v)) {
+        applyT(targetT, false);
+        return;
+      }
+      springing.current = window.requestAnimationFrame(step);
+    };
+    lastT.current = 0;
+    springing.current = window.requestAnimationFrame(step);
+  }
+
+  function onDialDown(event: PointerEvent<SVGSVGElement>) {
+    window.cancelAnimationFrame(springing.current);
+    draggingRef.current = true;
+    const pointer = pointerAngle(event);
+    grabRef.current = pointer - (START + tRef.current * ARC);
+    lastA.current = pointer;
+    lastT.current = event.timeStamp;
+    samples.current = [{ t: event.timeStamp, a: pointer }];
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function onDialMove(event: PointerEvent<SVGSVGElement>) {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    const pointer = pointerAngle(event);
+    const now = event.timeStamp;
+    samples.current.push({ t: now, a: pointer });
+    if (samples.current.length > 6) samples.current.shift();
+    lastA.current = pointer;
+    lastT.current = now;
+    applyT((pointer - grabRef.current - START) / ARC, true);
+  }
+
+  function onDialUp(event: PointerEvent<SVGSVGElement>) {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    draggingRef.current = false;
+    const hist = samples.current;
+    let velocity = 0;
+    if (hist.length >= 2) {
+      const a = hist[0];
+      const b = hist[hist.length - 1];
+      const dt = Math.max(8, b.t - a.t);
+      velocity = ((b.a - a.a) / ARC / dt) * 1000;
+    }
+    const projected = tRef.current + project(velocity, 0.99);
+    const target = clampT(projected);
+    const flick = Math.abs(velocity) > 0.35;
+    springTo(target, velocity, flick ? 0.8 : 1);
+  }
+
+  async function playNow() {
     const tone = engine.current;
     if (!tone) return;
+    haptic("light");
     if (tone.isPlaying) {
       tone.stop();
       setPlaying(false);
       return;
     }
-    await tone.play({ hz, wave, volume, binaural, offset });
+    await tone.play({ hz: hzRef.current, wave, volume, binaural, offset });
     setPlaying(true);
   }
 
   function applyPreset(id: string) {
     const preset = FREQUENCY_PRESETS.find((item) => item.id === id);
     if (!preset) return;
-    applyHz(preset.hz, {
-      binaural: Boolean(preset.binaural),
-      offset: preset.binaural ? preset.hz : offset || 4,
-    });
+    haptic("rigid");
+    const nextBinaural = Boolean(preset.binaural);
+    const nextOffset = preset.binaural ? preset.hz : offset || 4;
+    setBinaural(nextBinaural);
+    setOffset(nextOffset);
+    tRef.current = hzToDial(Math.max(20, preset.hz));
+    commitHz(preset.hz, { binaural: nextBinaural, offset: nextOffset });
+    springTo(hzToDial(Math.max(20, preset.hz)), 0, 1);
   }
 
-  function onDialDown(event: PointerEvent<SVGSVGElement>) {
-    setDragging(true);
-    lastAngle.current = pointerAngle(event);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function onDialMove(event: PointerEvent<SVGSVGElement>) {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
-    const next = pointerAngle(event);
-    let delta = next - lastAngle.current;
-    if (delta > 180) delta -= 360;
-    if (delta < -180) delta += 360;
-    lastAngle.current = next;
-    const t = Math.min(1, Math.max(0, hzToDial(hz) + delta / 270));
-    applyHz(dialToHz(t));
-  }
-
-  function onDialUp(event: PointerEvent<SVGSVGElement>) {
-    setDragging(false);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  }
-
-  const needle = -135 + hzToDial(hz) * 270;
-  const meaning = meaningForHz(hz);
   const favorites = state.settings.frequencyFavorites;
-  const left = carrierFor(hz, binaural);
-  const beat = beatFor(hz, binaural, offset);
-  const periodHz = periodTone(mapped.suePeriod);
 
   return (
-    <div className="tuner space-y-8">
-      <header>
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.tune.kicker}
-        </p>
-        <h1 className="display text-4xl">{copy.tune.title}</h1>
-        <p className="mt-3 max-w-2xl text-sm text-ink-soft">{copy.tune.honesty}</p>
-        <p className="mt-2 text-xs text-ink-soft">{copy.tune.safety}</p>
+    <div className="tuner">
+      <header className="tuner-head">
+        <p className="kicker">{copy.tune.kicker}</p>
+        <p className="tuner-safety">{copy.tune.safety}</p>
       </header>
 
-      <section className="tuner-suggest">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-          {copy.tune.today}
-        </p>
-        <button type="button" className="tuner-chip is-wide" onClick={() => applyHz(suggestion.hz)}>
-          <span className="display text-2xl">{suggestion.label}</span>
-          <span className="block text-sm text-ink-soft">{suggestion.reason}</span>
-        </button>
-        <button
-          type="button"
-          className="tuner-chip is-wide"
-          onClick={() => applyHz(periodHz)}
-        >
-          <span className="display text-xl">
-            {periodName(mapped.suePeriod, naming)} · {formatHz(periodHz)} Hz
-          </span>
-          <span className="block text-sm text-ink-soft">{copy.tune.periodHint}</span>
-        </button>
-      </section>
-
-      <section className="tuner-stage">
+      <section className="tuner-hero">
         <svg
           viewBox="0 0 320 320"
-          className={`tuner-dial ${dragging ? "is-drag" : ""}`}
+          className="tuner-dial"
           onPointerDown={onDialDown}
           onPointerMove={onDialMove}
           onPointerUp={onDialUp}
@@ -229,20 +266,29 @@ export function FrequencyTuner() {
           aria-valuenow={Math.round(hz)}
           aria-label={copy.tune.dial}
         >
-          <circle cx="160" cy="160" r="150" fill="var(--paper-deep)" />
-          <circle cx="160" cy="160" r="144" fill="none" stroke="var(--brass)" strokeWidth="10" />
-          <circle cx="160" cy="160" r="136" fill="none" stroke="var(--engrave)" strokeWidth="1.8" opacity="0.7" />
+          <defs>
+            <radialGradient id="tuner-stone" cx="46%" cy="38%" r="62%">
+              <stop offset="0%" stopColor="var(--wood)" />
+              <stop offset="68%" stopColor="var(--wood-deep)" />
+              <stop offset="100%" stopColor="var(--paper-deep)" />
+            </radialGradient>
+          </defs>
+          <circle cx="160" cy="160" r="154" fill="var(--paper-deep)" />
+          <circle cx="160" cy="160" r="146" fill="url(#tuner-stone)" />
+          <circle cx="160" cy="160" r="150" fill="none" stroke="var(--brass)" strokeWidth="10" />
+          <circle cx="160" cy="160" r="138" fill="none" stroke="var(--brass-soft)" strokeWidth="1.2" opacity="0.45" />
+          <circle cx="160" cy="160" r="88" fill="var(--paper-deep)" opacity="0.55" />
           <path
-            d={`M ${polar(160, 160, 124, -135).x} ${polar(160, 160, 124, -135).y} A 124 124 0 1 1 ${polar(160, 160, 124, 135).x} ${polar(160, 160, 124, 135).y}`}
+            d={`M ${polar(160, 160, 126, START).x} ${polar(160, 160, 126, START).y} A 126 126 0 1 1 ${polar(160, 160, 126, START + ARC).x} ${polar(160, 160, 126, START + ARC).y}`}
             fill="none"
             stroke="var(--brass)"
-            strokeWidth="3"
-            opacity="0.85"
+            strokeWidth="3.2"
+            opacity="0.88"
           />
           {Array.from({ length: 25 }, (_, i) => {
-            const a = -135 + (i / 24) * 270;
-            const p0 = polar(160, 160, 112, a);
-            const p1 = polar(160, 160, i % 4 === 0 ? 130 : 122, a);
+            const a = START + (i / 24) * ARC;
+            const p0 = polar(160, 160, 114, a);
+            const p1 = polar(160, 160, i % 4 === 0 ? 132 : 124, a);
             return (
               <line
                 key={i}
@@ -251,50 +297,32 @@ export function FrequencyTuner() {
                 x2={p1.x}
                 y2={p1.y}
                 stroke="var(--brass)"
-                strokeWidth={i % 4 === 0 ? 2.2 : 1}
-                opacity={i % 4 === 0 ? 0.95 : 0.45}
+                strokeWidth={i % 4 === 0 ? 2.1 : 1}
+                opacity={i % 4 === 0 ? 0.95 : 0.42}
               />
             );
           })}
-          {[
-            { hz: 20, t: 0 },
-            { hz: 200, t: 0.5 },
-            { hz: 2000, t: 1 },
-          ].map((mark) => {
-            const a = -135 + mark.t * 270;
-            const p = polar(160, 160, 98, a);
-            return (
-              <text
-                key={mark.hz}
-                x={p.x}
-                y={p.y}
-                fill="var(--ink-soft)"
-                fontSize="9"
-                textAnchor="middle"
-                dominantBaseline="middle"
-              >
-                {mark.hz}
-              </text>
-            );
-          })}
-          <g
-            className="tuner-needle"
-            style={{ transform: `rotate(${needle}deg)` }}
-          >
-            <line
-              x1="160"
-              y1="160"
-              x2="160"
-              y2="50"
-              stroke="var(--brass)"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
+          <path
+            ref={scopeRef}
+            className="tuner-scope"
+            d="M 80 160 A 80 80 0 1 1 240 160"
+            fill="none"
+            stroke="var(--brass)"
+            strokeWidth="1.15"
+            opacity="0.42"
+          />
+          <g style={{ transform: `rotate(${needle}deg)`, transformOrigin: "160px 160px" }}>
+            <line x1="160" y1="160" x2="160" y2="42" stroke="var(--brass-soft)" strokeWidth="3.4" strokeLinecap="round" />
           </g>
-          <circle cx="160" cy="160" r="10" fill="var(--brass)" />
+          <circle cx="160" cy="160" r="11" fill="var(--brass)" />
         </svg>
+      </section>
 
-        <div className="tuner-readout">
+      <div className="tuner-readout">
+        <button type="button" className="tuner-nudge" onPointerDown={() => commitHz(hz - (hz < 100 ? 0.1 : 1))}>
+          −
+        </button>
+        <label className="tuner-hz-wrap">
           <input
             value={typed}
             inputMode="decimal"
@@ -303,207 +331,232 @@ export function FrequencyTuner() {
             onChange={(event) => setTyped(event.target.value)}
             onBlur={() => {
               const next = parseHz(typed);
-              if (next != null) applyHz(next);
-              else setTyped(formatHz(hz));
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                const next = parseHz(typed);
-                if (next != null) applyHz(next);
+              if (next == null) {
+                setTyped(formatHz(hz));
+                return;
               }
+              commitHz(next);
+              springTo(hzToDial(Math.min(2000, Math.max(20, next))), 0, 1);
             }}
           />
           <span className="tuner-unit">Hz</span>
-          {meaning && <p className="mt-2 text-sm text-ink-soft">{meaning}</p>}
-        </div>
-
-        <button
-          type="button"
-          className={`tuner-play ${playing ? "is-on" : ""}`}
-          onClick={() => void togglePlay()}
-        >
-          {playing ? copy.tune.stop : copy.tune.play}
+        </label>
+        <button type="button" className="tuner-nudge" onPointerDown={() => commitHz(hz + (hz < 100 ? 0.1 : 1))}>
+          +
         </button>
-      </section>
+      </div>
 
-      <div className="flex flex-wrap justify-center gap-2">
-        {NUDGES.map((step) => (
+      <button
+        type="button"
+        className={`tuner-play ${playing ? "is-on" : ""}`}
+        onPointerDown={(event) => {
+          event.preventDefault();
+          void playNow();
+        }}
+      >
+        {playing ? copy.tune.stop : copy.tune.play}
+      </button>
+
+      <div className="tuner-presets" aria-label={copy.tune.presets}>
+        {FREQUENCY_PRESETS.map((preset) => (
           <button
-            key={step}
+            key={preset.id}
             type="button"
-            className="tuner-chip"
-            onClick={() => applyHz(hz + step)}
+            className={Math.abs(preset.hz - hz) < 0.05 ? "is-active" : ""}
+            onPointerDown={() => applyPreset(preset.id)}
           >
-            {step > 0 ? `+${step}` : String(step)}
+            {preset.hz < 20 ? preset.hz.toFixed(2) : String(preset.hz)}
           </button>
         ))}
       </div>
 
-      <section>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-          {copy.tune.wave}
-        </p>
-        <div className="tuner-waves">
-          {WAVEFORMS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`tuner-wave ${wave === item.id ? "is-active" : ""}`}
-              onClick={() => {
-                setWave(item.id);
-                patchPlaying({ wave: item.id });
-              }}
-            >
-              <span className="tuner-glyph">{item.glyph}</span>
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </section>
+      <div className="tuner-secondary">
+        {WAVEFORMS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={wave === item.id ? "is-active" : ""}
+            aria-label={item.label}
+            onPointerDown={() => {
+              setWave(item.id);
+              engine.current?.update({ wave: item.id, hz, volume, binaural, offset });
+            }}
+          >
+            {item.glyph}
+          </button>
+        ))}
+        <button type="button" className="is-more" onPointerDown={() => setSheet(true)}>
+          {copy.tune.more}
+        </button>
+      </div>
 
-      <section className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-            {copy.tune.volume}
-          </p>
-          <div className="flex gap-2">
+      {sheet && (
+        <TunerSheet
+          reduced={reduced}
+          volume={volume}
+          binaural={binaural}
+          offset={offset}
+          hz={hz}
+          favorites={favorites}
+          onClose={() => setSheet(false)}
+          onVolume={(next) => {
+            setVolume(next);
+            engine.current?.update({ volume: next, hz, wave, binaural, offset });
+          }}
+          onBinaural={() => {
+            const next = !binaural;
+            const nextOffset = next && offset === 0 ? 4 : offset;
+            setBinaural(next);
+            if (next && offset === 0) setOffset(4);
+            engine.current?.update({ binaural: next, offset: nextOffset, hz, wave, volume });
+          }}
+          onOffset={(next) => {
+            setOffset(next);
+            engine.current?.update({ offset: next, hz, wave, volume, binaural });
+          }}
+          onFavorite={() =>
+            updateSettings({ frequencyFavorites: toggleFavorite(favorites, hz) })
+          }
+          onFav={(fav) => {
+            commitHz(fav);
+            springTo(hzToDial(Math.max(20, fav)), 0, 1);
+            setSheet(false);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function TunerSheet({
+  reduced,
+  volume,
+  binaural,
+  offset,
+  hz,
+  favorites,
+  onClose,
+  onVolume,
+  onBinaural,
+  onOffset,
+  onFavorite,
+  onFav,
+}: {
+  reduced: boolean;
+  volume: number;
+  binaural: boolean;
+  offset: number;
+  hz: number;
+  favorites: number[];
+  onClose: () => void;
+  onVolume: (value: number) => void;
+  onBinaural: () => void;
+  onOffset: (value: number) => void;
+  onFavorite: () => void;
+  onFav: (hz: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const [holding, setHolding] = useState(false);
+  const startY = useRef(0);
+  const lastY = useRef(0);
+  const lastT = useRef(0);
+  const vel = useRef(0);
+  const dragging = useRef(false);
+
+  useEffect(() => {
+    const id = window.requestAnimationFrame(() => setOpen(true));
+    return () => window.cancelAnimationFrame(id);
+  }, []);
+
+  function dismiss() {
+    setOpen(false);
+    window.setTimeout(onClose, reduced ? 0 : 280);
+  }
+
+  return (
+    <div className="sheet" role="dialog" aria-label={copy.tune.more}>
+      <button type="button" className={`sheet-scrim ${open ? "is-open" : ""}`} aria-label={copy.tune.close} onClick={dismiss} />
+      <div
+        className={`sheet-panel ${open ? "is-open" : ""}`}
+        style={{
+          transform: open ? `translateY(${dragY}px)` : "translateY(100%)",
+          transition: holding || reduced ? "none" : "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      >
+        <div
+          className="sheet-handle"
+          onPointerDown={(event) => {
+            dragging.current = true;
+            setHolding(true);
+            startY.current = event.clientY;
+            lastY.current = event.clientY;
+            lastT.current = performance.now();
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={(event) => {
+            if (!dragging.current) return;
+            const now = performance.now();
+            vel.current = ((event.clientY - lastY.current) / Math.max(8, now - lastT.current)) * 1000;
+            lastY.current = event.clientY;
+            lastT.current = now;
+            setDragY(Math.max(0, event.clientY - startY.current));
+          }}
+          onPointerUp={() => {
+            dragging.current = false;
+            setHolding(false);
+            if (dragY > 72 || vel.current > 800) dismiss();
+            else setDragY(0);
+          }}
+        >
+          <span />
+        </div>
+        <div className="sheet-body">
+          <p className="kicker">{copy.tune.volume}</p>
+          <div className="tuner-vols">
             {VOLUME_STEPS.map((step, index) => (
               <button
                 key={step}
                 type="button"
-                className={`tuner-vol ${volume === step ? "is-active" : ""}`}
-                onClick={() => {
-                  setVolume(step);
-                  patchPlaying({ volume: step });
-                }}
+                className={volume === step ? "is-active" : ""}
                 aria-label={`${copy.tune.volume} ${index + 1}`}
+                onPointerDown={() => onVolume(step)}
               >
                 {["·", "░", "▒", "▓", "█"][index]}
               </button>
             ))}
           </div>
-        </div>
-        <button
-          type="button"
-          className={`tuner-chip ${binaural ? "is-active" : ""}`}
-          onClick={() => {
-            const next = !binaural;
-            setBinaural(next);
-            const nextOffset = next && offset === 0 ? 4 : offset;
-            if (next && offset === 0) setOffset(4);
-            patchPlaying({ binaural: next, offset: nextOffset });
-          }}
-        >
-          {copy.tune.binaural}
-        </button>
-      </section>
-
-      {binaural && (
-        <div className="space-y-2 text-center">
-          <p className="text-sm text-ink-soft">
-            {copy.tune.phones} · L {formatHz(left)} / R {formatHz(left + beat)}
-          </p>
-          {hz >= 20 && (
-            <div className="flex flex-wrap justify-center gap-2">
+          <button type="button" className={`tuner-text-btn ${binaural ? "is-active" : ""}`} onPointerDown={onBinaural}>
+            {copy.tune.binaural}
+          </button>
+          {binaural && hz >= 20 && (
+            <div className="tuner-vols">
               {[2, 4, 8].map((step) => (
                 <button
                   key={step}
                   type="button"
-                  className={`tuner-chip ${offset === step ? "is-active" : ""}`}
-                  onClick={() => {
-                    setOffset(step);
-                    patchPlaying({ offset: step });
-                  }}
+                  className={offset === step ? "is-active" : ""}
+                  onPointerDown={() => onOffset(step)}
                 >
-                  {copy.tune.beat} {step}
+                  {step}
+                </button>
+              ))}
+            </div>
+          )}
+          <button type="button" className="tuner-text-btn" onPointerDown={onFavorite}>
+            {isFavorite(favorites, hz) ? copy.tune.unstar : copy.tune.star}
+          </button>
+          {favorites.length > 0 && (
+            <div className="tuner-presets">
+              {favorites.map((fav) => (
+                <button key={fav} type="button" onPointerDown={() => onFav(fav)}>
+                  {formatHz(fav)}
                 </button>
               ))}
             </div>
           )}
         </div>
-      )}
-
-      <section>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-          {copy.tune.presets}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {FREQUENCY_PRESETS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              className={`tuner-chip ${Math.abs(preset.hz - hz) < 0.05 ? "is-active" : ""}`}
-              onClick={() => applyPreset(preset.id)}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-            {copy.tune.favorites}
-          </p>
-          <button
-            type="button"
-            className="tuner-chip"
-            onClick={() =>
-              updateSettings({
-                frequencyFavorites: toggleFavorite(favorites, hz),
-              })
-            }
-          >
-            {isFavorite(favorites, hz) ? copy.tune.unstar : copy.tune.star}
-          </button>
-        </div>
-        {favorites.length === 0 ? (
-          <p className="text-sm text-ink-soft">{copy.tune.noFavorites}</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {favorites.map((fav) => (
-              <button
-                key={fav}
-                type="button"
-                className="tuner-chip"
-                onClick={() => applyHz(fav)}
-              >
-                {formatHz(fav)} Hz
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="tuner-scope" aria-hidden>
-        <svg viewBox="0 0 200 40" className="w-full">
-          <path
-            d={scope || "M 0 20 L 200 20"}
-            fill="none"
-            stroke="var(--brass)"
-            strokeWidth="1.2"
-          />
-        </svg>
-        <pre className="ascii text-center text-[11px] leading-none">
-          {playing ? ascii : reduced ? copy.tune.scopeStill : copy.tune.scopeIdle}
-        </pre>
-      </section>
-
-      <p className="text-center text-xs text-ink-soft">
-        {copy.tune.credit}{" "}
-        <Link href="/research" className="text-brass underline-offset-4 hover:underline">
-          {copy.nav.research}
-        </Link>
-        .
-      </p>
+      </div>
     </div>
   );
-}
-
-function pointerAngle(event: PointerEvent<SVGSVGElement>) {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const x = event.clientX - rect.left - rect.width / 2;
-  const y = event.clientY - rect.top - rect.height / 2;
-  return (Math.atan2(y, x) * 180) / Math.PI;
 }

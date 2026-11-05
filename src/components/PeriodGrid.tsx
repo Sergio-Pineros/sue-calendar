@@ -58,9 +58,7 @@ export function PeriodGrid({ period }: { period: number }) {
       </div>
 
       {goal && state.settings.layers.goals && (
-        <p className="hud-frame rounded-2xl px-4 py-3 text-sm">
-          {copy.period.focus} <span className="font-medium">{goal.title}</span>
-        </p>
+        <p className="display text-3xl">{goal.title}</p>
       )}
 
       <div className="grid grid-cols-7 gap-2 text-center font-mono text-[11px] text-ink-soft">
@@ -87,12 +85,12 @@ export function PeriodGrid({ period }: { period: number }) {
                 <Link
                   key={iso}
                   href={`/day/${iso}`}
-                  className={`min-h-[92px] rounded-2xl border p-2 text-left ${
+                  className={`day-cell p-2 text-left ${
                     isToday
-                      ? "border-ink bg-ink text-paper"
+                      ? "is-today"
                       : rest || intensity === "rest"
-                        ? "border-rest/40 bg-rest/10"
-                        : "border-line bg-card/80 hover:border-ink/40"
+                        ? "is-rest"
+                        : ""
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -122,7 +120,7 @@ export function PeriodGrid({ period }: { period: number }) {
       {period === 6 && leap && (
         <Link
           href={`/day/${leap}`}
-          className="block rounded-2xl border border-dashed border-brass px-4 py-3 text-sm"
+          className="block py-3 text-sm text-ink-soft"
         >
           {copy.period.leapAfter} · {leap}
         </Link>

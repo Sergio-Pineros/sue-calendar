@@ -12,7 +12,6 @@ import {
   sprintCounts,
   sprintIntensityOn,
   SPRINT_STYLES,
-  synodicHint,
 } from "@/lib/sprints";
 import { newSprint } from "@/lib/storage";
 import { addDays, gregorianToSue, periodName, todayISO } from "@/lib/sue-calendar";
@@ -418,8 +417,6 @@ export function SprintView() {
           {copy.sprints.kicker}
         </p>
         <h1 className="display text-4xl">{copy.sprints.title}</h1>
-        <p className="mt-3 max-w-2xl text-sm text-ink-soft">{copy.sprints.honesty}</p>
-        <p className="mt-2 font-mono text-[11px] text-ink-soft">{synodicHint()}</p>
       </header>
 
       <section>
@@ -438,7 +435,6 @@ export function SprintView() {
                 {GLYPH[item.id]}
               </span>
               <span className="display text-2xl leading-none">{item.label}</span>
-              <span className="text-sm text-ink-soft">{item.origin}</span>
             </button>
           ))}
         </div>

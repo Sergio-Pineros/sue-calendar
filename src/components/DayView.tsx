@@ -56,13 +56,13 @@ export function DayView({ iso }: { iso: string }) {
         <div className="flex gap-2 font-mono text-sm">
           <Link
             href={`/day/${addDays(iso, -1)}`}
-            className="tap rounded-full border border-line px-3"
+            className="ghost-action"
           >
             ←
           </Link>
           <Link
             href={`/day/${addDays(iso, 1)}`}
-            className="tap rounded-full border border-line px-3"
+            className="ghost-action"
           >
             →
           </Link>
@@ -95,19 +95,11 @@ export function DayView({ iso }: { iso: string }) {
         </InfoCard>
       </div>
 
-      {mapped.isYearDay && (
-        <p className="rounded-2xl border border-year-day/40 bg-year-day/10 px-4 py-3 text-sm">
-          {copy.day.yearDay}
-        </p>
-      )}
-      {mapped.isLeapDay && (
-        <p className="rounded-2xl border border-brass/40 bg-brass/10 px-4 py-3 text-sm">
-          {copy.day.leapDay}
-        </p>
-      )}
+      {mapped.isYearDay && <p className="text-sm text-ink-soft">{copy.day.yearDay}</p>}
+      {mapped.isLeapDay && <p className="text-sm text-ink-soft">{copy.day.leapDay}</p>}
 
       {sprints.length > 0 && (
-        <section className="hud-frame rounded-2xl p-4">
+        <section>
           <h2 className="display text-2xl">{copy.day.sprint}</h2>
           {sprints.map((sprint) => {
             const intensity = sprintIntensityOn(sprint, iso);
@@ -121,7 +113,7 @@ export function DayView({ iso }: { iso: string }) {
                     <button
                       key={key}
                       type="button"
-                      className="rounded-full border border-line px-3 text-xs"
+                      className="ghost-action text-xs"
                       onClick={() =>
                         updateSprint(applySprintOverride(sprint, iso, key))
                       }
@@ -131,7 +123,7 @@ export function DayView({ iso }: { iso: string }) {
                   ))}
                   <button
                     type="button"
-                    className="rounded-full border border-line px-3 text-xs"
+                    className="ghost-action text-xs"
                     onClick={() =>
                       updateSprint(applySprintOverride(sprint, iso, undefined))
                     }
@@ -148,7 +140,6 @@ export function DayView({ iso }: { iso: string }) {
       {state.settings.layers.events && (
         <section>
           <h2 className="display text-2xl">{copy.day.events}</h2>
-          <p className="mb-3 mt-1 text-sm text-ink-soft">{copy.day.eventsHint}</p>
           {events.length === 0 ? (
             <p className="text-sm text-ink-soft">{copy.day.noEvents}</p>
           ) : (
@@ -156,7 +147,7 @@ export function DayView({ iso }: { iso: string }) {
               {events.map((event) => (
                 <li
                   key={event.id}
-                  className="hud-frame rounded-2xl px-4 py-3"
+                  className="py-2"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium">{event.title}</p>
@@ -213,7 +204,7 @@ export function DayView({ iso }: { iso: string }) {
               value={habitTitle}
               onChange={(e) => setHabitTitle(e.target.value)}
               placeholder={copy.today.addHabit}
-              className="flex-1 rounded-full border border-line bg-card px-4 text-sm outline-none focus:border-ink"
+              className="ghost-input flex-1"
             />
             <button className="rounded-full bg-ink px-4 text-sm text-paper">
               {copy.today.add}
@@ -229,7 +220,7 @@ export function DayView({ iso }: { iso: string }) {
             <button
               type="button"
               onClick={() => removeRest(rest.id)}
-              className="mt-2 rounded-full border border-rest px-4 text-sm text-rest"
+              className="ghost-action mt-2 text-rest"
             >
               {copy.day.unmarkRest}
             </button>
@@ -237,7 +228,7 @@ export function DayView({ iso }: { iso: string }) {
             <button
               type="button"
               onClick={() => addRest(newRest(iso))}
-              className="mt-2 rounded-full border border-line px-4 text-sm"
+              className="ghost-action mt-2"
             >
               {copy.day.markRest}
             </button>
@@ -249,7 +240,7 @@ export function DayView({ iso }: { iso: string }) {
         sprints.some((sprint) => sprintIntensityOn(sprint, iso) === "rest")) && (
         <Link
           href="/tune?hz=432"
-          className="block rounded-2xl border border-rest/40 bg-rest/10 px-4 py-3 text-sm"
+          className="display text-2xl"
         >
           {copy.day.restTone}
         </Link>
@@ -294,7 +285,7 @@ function InfoCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="hud-frame rounded-2xl p-4">
+    <div>
       <div className="mb-2 flex items-center justify-between">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
           {label}

@@ -32,7 +32,7 @@ export function HudSwitch({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex min-h-11 w-full items-center justify-between gap-4 rounded-xl border border-line px-4 text-left"
+      className="flex min-h-11 w-full items-center justify-between gap-4 px-0 text-left"
     >
       <span className="text-sm">{label}</span>
       <span

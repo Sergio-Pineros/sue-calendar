@@ -15,6 +15,7 @@ import "./sprints.test";
 import "./period-colors.test";
 import "./wheel-scrub.test";
 import "./frequency.test";
+import "./spring.test";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
