@@ -4,27 +4,27 @@ export type ThemeMeta = {
   id: ThemeId;
   label: string;
   origin: string;
-  scheme: "light" | "dark";
+  scheme: "dark";
 };
 
 export const THEMES: ThemeMeta[] = [
   {
     id: "ancient-amethyst",
     label: "Ancient Amethyst",
-    origin: "Default. Engraved violet stone — the original SÚE purple, carved like the wood wheel.",
+    origin: "Default. Deep violet stone — the original SÚE purple, kept in the dark.",
     scheme: "dark",
   },
   {
     id: "ancient-wood",
     label: "Ancient Wood",
-    origin: "Carved slab, warm grain, brass engraving.",
+    origin: "Carved slab, warm grain, muted brass engraving.",
     scheme: "dark",
   },
   {
     id: "solarpunk-mecha",
     label: "Solarpunk Mecha",
-    origin: "Light greenhouse HUD: moss, brass, technical hairlines.",
-    scheme: "light",
+    origin: "Night greenhouse HUD: moss, muted brass, technical hairlines.",
+    scheme: "dark",
   },
   {
     id: "night-ritual",

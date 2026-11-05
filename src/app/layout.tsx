@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree, IBM_Plex_Mono, Spectral } from "next/font/google";
+import { Geist } from "next/font/google";
 import { StoreProvider } from "@/components/StoreProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AppShell } from "@/components/AppShell";
@@ -8,23 +8,9 @@ import { NativeShell } from "@/components/NativeShell";
 import { copy } from "@/lib/copy";
 import "./globals.css";
 
-const display = Spectral({
-  variable: "--font-display",
+const sans = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-});
-
-const ui = Figtree({
-  variable: "--font-ui",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const mono = IBM_Plex_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  variable: "--font-geist",
 });
 
 export const metadata: Metadata = {
@@ -53,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#140c1f",
+  themeColor: "#100c16",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -65,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-theme="ancient-amethyst"
-      className={`${display.variable} ${ui.variable} ${mono.variable} h-full antialiased`}
+      className={`${sans.variable} ${sans.className} h-full antialiased`}
     >
       <body className="min-h-full">
         <StoreProvider>

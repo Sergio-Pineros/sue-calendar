@@ -116,7 +116,7 @@ export function EventComposer({
       <button
         type="submit"
         disabled={busy}
-        className="rounded-full bg-ink px-4 text-sm text-paper disabled:opacity-60"
+        className="btn-fill rounded-full px-4 text-sm disabled:opacity-60"
       >
         {busy ? copy.day.creating : copy.day.create}
       </button>

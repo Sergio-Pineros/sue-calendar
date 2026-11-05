@@ -453,7 +453,7 @@ export function YearWheel({
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill="var(--ink)"
-                  style={{ fontSize: compact ? 13 : 15, fontFamily: "var(--font-display)" }}
+                  style={{ fontSize: compact ? 13 : 15, fontWeight: 500, letterSpacing: "-0.02em" }}
                 >
                   {periodName(period, naming)}
                 </text>
@@ -536,7 +536,7 @@ export function YearWheel({
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill="var(--engrave)"
-                  style={{ fontSize: 8, fontFamily: "var(--font-mono)" }}
+                  style={{ fontSize: 8, fontWeight: 500, letterSpacing: "0.04em" }}
                 >
                   {sabbat.name.slice(0, 3)}
                 </text>
@@ -603,7 +603,7 @@ export function YearWheel({
           y={cy - 8}
           textAnchor="middle"
           fill="var(--brass)"
-          style={{ fontSize: 13, letterSpacing: "0.32em", fontFamily: "var(--font-mono)" }}
+          style={{ fontSize: 13, letterSpacing: "0.18em", fontWeight: 500 }}
         >
           SÚE
         </text>
@@ -612,7 +612,7 @@ export function YearWheel({
           y={cy + 18}
           textAnchor="middle"
           fill="var(--ink)"
-          style={{ fontSize: 22, fontFamily: "var(--font-display)" }}
+          style={{ fontSize: 22, fontWeight: 500, letterSpacing: "-0.03em" }}
         >
           {year}
         </text>

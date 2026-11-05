@@ -41,7 +41,7 @@ export function HudSwitch({
         }`}
       >
         <span
-          className="absolute top-0.5 size-5 rounded-full bg-ink transition-transform"
+          className="absolute top-0.5 size-5 rounded-full bg-brass transition-transform"
           style={{ transform: checked ? "translateX(22px)" : "translateX(2px)" }}
         />
       </span>

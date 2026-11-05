@@ -206,7 +206,7 @@ export function DayView({ iso }: { iso: string }) {
               placeholder={copy.today.addHabit}
               className="ghost-input flex-1"
             />
-            <button className="rounded-full bg-ink px-4 text-sm text-paper">
+            <button className="btn-fill rounded-full px-4 text-sm">
               {copy.today.add}
             </button>
           </form>

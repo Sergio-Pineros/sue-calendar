@@ -17,6 +17,7 @@ import {
 } from "@/lib/sue-calendar";
 import {
   blendPeriodColors,
+  mutePageTone,
   resolvePeriodColors,
 } from "@/lib/period-colors";
 import {
@@ -82,7 +83,7 @@ export function YearWheelStage() {
     const periodIndex = periodIndexFromDoy(doy, year);
     const start = periodStartDayOfYear(year, periodIndex + 1);
     const mixPos = Math.min(12, periodIndex + (doy - start) / 28);
-    const mixed = blendPeriodColors(colors, mixPos);
+    const mixed = mutePageTone(blendPeriodColors(colors, mixPos));
     if (root.current) root.current.style.backgroundColor = mixed;
     document.documentElement.style.setProperty("--year-blend", mixed);
     if (rotor.current) {

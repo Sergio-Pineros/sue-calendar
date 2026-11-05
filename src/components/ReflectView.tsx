@@ -73,7 +73,7 @@ export function ReflectView() {
       ))}
       <button
         type="button"
-        className="rounded-full bg-ink px-5 text-sm text-paper"
+        className="btn-fill rounded-full px-5 text-sm"
         onClick={save}
       >
         {copy.reflect.save}

@@ -86,8 +86,8 @@ function SprintRing({
           <g key={day.date}>
             <path
               d={wedge(cx, cy, 104, 178, a0, a1)}
-              fill={intensityColor(intensity)}
-              fillOpacity={active ? 1 : intensity === "rest" ? 0.55 : 0.88}
+              fill={`color-mix(in oklab, ${intensityColor(intensity)} 38%, var(--paper-deep))`}
+              fillOpacity={active ? 1 : intensity === "rest" ? 0.7 : 0.88}
               stroke={active ? "var(--ink)" : "color-mix(in oklab, var(--paper-deep) 35%, transparent)"}
               strokeWidth={active ? 2.2 : 0.4}
               className="cursor-pointer"
@@ -99,8 +99,8 @@ function SprintRing({
                 y={mid.y}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill={intensity === "rest" ? "var(--ink)" : "var(--paper-deep)"}
-                style={{ fontSize: 9, fontFamily: "var(--font-mono)" }}
+                fill="var(--ink)"
+                style={{ fontSize: 9, fontWeight: 500, letterSpacing: "0.02em" }}
                 className="pointer-events-none"
               >
                 {day.date.slice(8)}
@@ -124,7 +124,7 @@ function SprintRing({
         y={cy - 10}
         textAnchor="middle"
         fill="var(--brass)"
-        style={{ fontSize: 13, letterSpacing: "0.22em", fontFamily: "var(--font-mono)" }}
+        style={{ fontSize: 13, letterSpacing: "0.14em", fontWeight: 500 }}
       >
         {GLYPH[sprint.style]}
       </text>
@@ -133,7 +133,7 @@ function SprintRing({
         y={cy + 18}
         textAnchor="middle"
         fill="var(--ink)"
-        style={{ fontSize: 20, fontFamily: "var(--font-display)" }}
+        style={{ fontSize: 20, fontWeight: 500, letterSpacing: "-0.03em" }}
       >
         {copy.sprints.days(sprint.days.length)}
       </text>

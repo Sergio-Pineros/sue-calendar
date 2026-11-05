@@ -115,7 +115,7 @@ export function OnboardingFlow() {
         </button>
         <button
           type="button"
-          className="rounded-full bg-ink px-5 text-sm text-paper"
+          className="btn-fill rounded-full px-5 text-sm"
           onClick={() => {
             if (step < 4) {
               setStep((s) => s + 1);
@@ -150,7 +150,7 @@ function Choice({
       className={`w-full py-3 text-left ${active ? "text-ink" : "text-ink-soft"}`}
     >
       <p className="font-medium">{title}</p>
-      <p className={`mt-1 text-sm ${active ? "text-paper/70" : "text-ink-soft"}`}>
+      <p className="mt-1 text-sm text-ink-soft">
         {body}
       </p>
     </button>

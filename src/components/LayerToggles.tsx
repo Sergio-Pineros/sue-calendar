@@ -29,7 +29,7 @@ export function LayerToggles() {
             onClick={() => setLayer(key, !on)}
             className={`chip rounded-full border px-3 text-xs tracking-wide ${
               on
-                ? "border-ink bg-ink text-paper"
+                ? "border-line bg-ink/10 text-ink"
                 : "border-line bg-transparent text-ink-soft"
             }`}
           >

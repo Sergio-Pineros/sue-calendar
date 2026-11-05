@@ -15,7 +15,7 @@ async function boot() {
     if (!core.Capacitor.isNativePlatform()) return;
     const { StatusBar, Style } = await import("@capacitor/status-bar");
     await StatusBar.setStyle({ style: Style.Dark });
-    await StatusBar.setBackgroundColor({ color: "#140c1f" });
+    await StatusBar.setBackgroundColor({ color: "#100c16" });
   } catch {
     /* web or plugin missing */
   }

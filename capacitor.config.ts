@@ -9,15 +9,15 @@ const config: CapacitorConfig = {
   },
   ios: {
     contentInset: "automatic",
-    backgroundColor: "#140c1f",
+    backgroundColor: "#100c16",
   },
   android: {
-    backgroundColor: "#140c1f",
+    backgroundColor: "#100c16",
   },
   plugins: {
     StatusBar: {
       style: "DARK",
-      backgroundColor: "#140c1f",
+      backgroundColor: "#100c16",
     },
   },
 };

@@ -99,7 +99,7 @@ export function PeriodGrid({ period }: { period: number }) {
                       <MoonGlyph name={mapped.moon.name} size={14} />
                     )}
                   </div>
-                  <div className={`mt-1 text-[11px] ${isToday ? "text-paper/70" : "text-ink-soft"}`}>
+                  <div className="mt-1 text-[11px] text-ink-soft">
                     {iso.slice(8)}
                   </div>
                   {events.slice(0, 2).map((event) => (

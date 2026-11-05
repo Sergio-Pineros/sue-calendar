@@ -251,7 +251,7 @@ export const copy = {
     steps: ["Names", "Week", "Theme", "Colors", "Ready"],
     colorsTitle: "Color the thirteen periods",
     colorsBody:
-      "Each period gets its own stone. Start from a preset — Amethyst is the default purple ramp — then tap a period and pick a swatch. You can change this later in Settings.",
+      "Each period gets its own stone. Start from a preset — Amethyst is the default deep violet — then tap a period and pick a swatch. You can change this later in Settings.",
     intro:
       "A 13 × 28 overlay on the calendar you already use. Not a lunar calendar. Not a lost universal calendar.",
     namesTitle: "How to name the thirteen periods",
@@ -259,7 +259,7 @@ export const copy = {
     weekBody:
       "Sergio's default numbers Sunday as −1 and Monday as 0. You can change names, the first day of the week, and the numbering anytime.",
     themeTitle: "Pick a skin",
-    themeBody: "Ancient Amethyst is the default — the original purple, carved like stone. Ancient Wood and the others are tokens you can switch anytime.",
+    themeBody: "Ancient Amethyst is the default — deep violet, kept in the dark. The others are tokens you can switch anytime.",
     readyTitle: "The year, in thirteen rhythms",
     readyBody:
       "13 × 28 = 364 regular days. Year Day closes the solar year. Leap Day appears only in leap years, between periods 6 and 7.",

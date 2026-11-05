@@ -193,7 +193,7 @@ export function SettingsView() {
               }`}
             >
               <p className="font-medium">{theme.label}</p>
-              <p className={`mt-1 text-xs ${state.settings.theme === theme.id ? "text-paper/70" : "text-ink-soft"}`}>
+              <p className="mt-1 text-xs text-ink-soft">
                 {theme.origin}
               </p>
             </button>
@@ -333,7 +333,7 @@ export function SettingsView() {
             <button
               type="button"
               disabled={syncing}
-              className="rounded-full bg-ink px-4 text-sm text-paper disabled:opacity-60"
+              className="btn-fill rounded-full px-4 text-sm disabled:opacity-60"
               onClick={connectGoogle}
             >
               {calendars.length ? copy.settings.googleReconnect : copy.settings.googleConnect}
@@ -412,7 +412,7 @@ export function SettingsView() {
         <button
           type="button"
           disabled={syncing || !appleId || !applePassword}
-          className="rounded-full bg-ink px-4 text-sm text-paper disabled:opacity-60"
+          className="btn-fill rounded-full px-4 text-sm disabled:opacity-60"
           onClick={connectApple}
         >
           {copy.settings.appleConnect}
@@ -535,7 +535,7 @@ export function SettingsView() {
             placeholder={copy.settings.cycleName}
             className="ghost-input flex-1"
           />
-          <button className="rounded-full bg-ink px-4 text-sm text-paper">
+          <button className="btn-fill rounded-full px-4 text-sm">
             {copy.settings.create}
           </button>
         </form>
