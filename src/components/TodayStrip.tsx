@@ -8,19 +8,25 @@ import {
   gregorianToSue,
   todayISO,
 } from "@/lib/sue-calendar";
-import { MOON_LABELS_ES } from "@/lib/moon";
-import { SEASON_LABELS_ES } from "@/lib/seasons";
+import { moonLabel } from "@/lib/moon";
+import { seasonLabel } from "@/lib/seasons";
+import { copy } from "@/lib/copy";
 import { MoonGlyph } from "./MoonGlyph";
 import { SourceBadge } from "./SourceBadge";
+import { AsciiMoon } from "./Ascii";
 
 export function TodayStrip() {
   const { state } = useSueStore();
-  const today = gregorianToSue(todayISO(), state.settings.naming);
+  const naming = {
+    preset: state.settings.naming,
+    customNames: state.settings.customPeriodNames,
+  };
+  const today = gregorianToSue(todayISO(), naming);
   return (
-    <section className="mb-8 grid gap-4 rounded-3xl border border-line bg-card/70 p-5 md:grid-cols-[1fr_auto]">
+    <section className="hud-frame mb-8 grid gap-4 rounded-3xl p-5 md:grid-cols-[1fr_auto]">
       <div>
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          Hoy
+          {copy.today.kicker}
         </p>
         <h1 className="display mt-1 text-3xl md:text-4xl">
           {formatGregorianLong(today.gregorianDate)}
@@ -35,21 +41,22 @@ export function TodayStrip() {
       <div className="flex flex-col justify-end gap-2 text-sm">
         <div className="flex items-center gap-2">
           <MoonGlyph name={today.moon.name} />
+          <AsciiMoon name={today.moon.name} />
           <span>
-            {MOON_LABELS_ES[today.moon.name]} · {today.moon.illumination}%
+            {moonLabel(today.moon.name)} · {today.moon.illumination}%
           </span>
           <SourceBadge type="calculation" />
         </div>
         <div className="text-ink-soft">
-          {SEASON_LABELS_ES[today.season]}
-          {today.seasonMarker ? ` · ${today.seasonMarker}` : ""}
+          {seasonLabel(today.season)}
+          {today.seasonMarker ? ` · ${copy.seasons[today.seasonMarker]}` : ""}
         </div>
         {today.suePeriod && (
           <Link
             href={`/period/${today.suePeriod}`}
             className="text-brass underline-offset-4 hover:underline"
           >
-            Abrir periodo {today.suePeriodName}
+            {copy.today.openPeriod(today.suePeriodName)}
           </Link>
         )}
       </div>

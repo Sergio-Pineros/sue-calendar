@@ -1,4 +1,5 @@
 import type { ExternalEvent, RestBlock } from "./types";
+import { copy } from "./copy";
 
 export const BUSY_DAY = 4;
 export const BUSY_WEEK = 10;
@@ -41,12 +42,16 @@ export function weekLoad(
 
 export function hasLiveCalendar(events: ExternalEvent[]): boolean {
   return events.some(
-    (event) => event.source === "google" || event.source === "ics",
+    (event) =>
+      event.source === "google" ||
+      event.source === "ics" ||
+      event.source === "apple" ||
+      event.source === "local",
   );
 }
 
 export function eventTimeLabel(event: ExternalEvent): string {
-  if (event.allDay) return "Todo el día";
+  if (event.allDay) return copy.day.allDay;
   const stamp = event.start.slice(11, 16);
-  return stamp || "Con hora";
+  return stamp || copy.day.timed;
 }

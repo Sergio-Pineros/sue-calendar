@@ -1,16 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CLAIMS_OK, CLAIMS_TO_AVOID, RESEARCH } from "@/lib/research";
+import { CLAIMS_OK, CLAIMS_TO_AVOID, EVIDENCE_BADGE, RESEARCH } from "@/lib/research";
 import { SYNODIC_MONTH } from "@/lib/moon";
 import { SourceBadge } from "./SourceBadge";
-
-const EVIDENCE_BADGE = {
-  "Hecho histórico": "fact",
-  "Cálculo astronómico": "calculation",
-  "Interpretación moderna": "interpretation",
-  "Requisito de producto": "personal",
-} as const;
+import { copy } from "@/lib/copy";
 
 export function ResearchView() {
   const [open, setOpen] = useState<string | null>("ifc");
@@ -18,20 +12,17 @@ export function ResearchView() {
     <div className="space-y-8">
       <header className="max-w-2xl">
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          Origen
+          {copy.research.kicker}
         </p>
-        <h1 className="display text-4xl">Qué es SÚE, y qué no es</h1>
+        <h1 className="display text-4xl">{copy.research.title}</h1>
         <p className="mt-3 text-ink-soft">
-          SÚE toma la claridad de un calendario fijo de 13 × 28 como lente de
-          planificación. No afirma que la humanidad usara un único calendario
-          universal de 13 meses. Un mes lunar dura unos {SYNODIC_MONTH} días,
-          no 28.
+          {copy.research.intro(SYNODIC_MONTH.toFixed(2))}
         </p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <List title="SÚE puede decir" items={CLAIMS_OK} />
-        <List title="SÚE no dice" items={CLAIMS_TO_AVOID} tone="avoid" />
+        <List title={copy.research.canSay} items={CLAIMS_OK} />
+        <List title={copy.research.cannotSay} items={CLAIMS_TO_AVOID} tone="avoid" />
       </div>
 
       <div className="space-y-3">
@@ -40,7 +31,7 @@ export function ResearchView() {
           return (
             <article
               key={entry.id}
-              className="rounded-2xl border border-line bg-card/80"
+              className="hud-frame rounded-2xl"
             >
               <button
                 type="button"
@@ -64,11 +55,11 @@ export function ResearchView() {
               {expanded && (
                 <div className="space-y-2 border-t border-line px-4 py-4 text-sm">
                   <p>
-                    <span className="font-medium">Regla: </span>
+                    <span className="font-medium">{copy.research.rule} </span>
                     {entry.rule}
                   </p>
                   <p>
-                    <span className="font-medium">En el producto: </span>
+                    <span className="font-medium">{copy.research.inProduct} </span>
                     {entry.appUse}
                   </p>
                   <p className="text-ink-soft">{entry.notes}</p>
@@ -78,7 +69,7 @@ export function ResearchView() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Fuente
+                    {copy.research.source}
                   </a>
                 </div>
               )}
@@ -100,7 +91,7 @@ function List({
   tone?: "ok" | "avoid";
 }) {
   return (
-    <section className="rounded-2xl border border-line bg-card p-5">
+    <section className="hud-frame rounded-2xl p-5">
       <h2 className="display text-2xl">{title}</h2>
       <ul className="mt-3 space-y-2 text-sm">
         {items.map((item) => (

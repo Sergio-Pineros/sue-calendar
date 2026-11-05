@@ -1,4 +1,4 @@
-import type { CalendarDate, NamingSystem, Weekday } from "./types";
+import type { CalendarDate, NamingContext, NamingSystem } from "./types";
 import { moonForDate } from "./moon";
 import { seasonForDate } from "./seasons";
 import {
@@ -12,6 +12,8 @@ import {
   todayISO,
   weekdayIndex,
 } from "./iso-date";
+import { periodNameFromContext, resolveNaming } from "./naming";
+import { WEEKDAYS } from "./weekdays";
 
 export {
   addDays,
@@ -25,75 +27,22 @@ export {
   weekdayIndex,
 };
 
+export { WEEKDAYS } from "./weekdays";
+export { IFC_PERIOD_NAMES } from "./naming";
+
 export const PERIODS_PER_YEAR = 13;
 export const DAYS_PER_PERIOD = 28;
 export const WEEKS_PER_PERIOD = 4;
 export const REGULAR_DAYS = PERIODS_PER_YEAR * DAYS_PER_PERIOD;
 
-export const IFC_PERIOD_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "Sol",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
-
-export const SUE_PERIOD_NAMES = [
-  "Alba",
-  "Nieve",
-  "Brote",
-  "Lluvia",
-  "Fronda",
-  "Estío",
-  "Umbral",
-  "Calor",
-  "Cosecha",
-  "Ocre",
-  "Niebla",
-  "Ceniza",
-  "Víspera",
-] as const;
-
-export const WEEKDAYS: Weekday[] = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-export const WEEKDAY_SHORT_ES = ["D", "L", "M", "X", "J", "V", "S"];
-export const WEEKDAY_LONG_ES = [
-  "domingo",
-  "lunes",
-  "martes",
-  "miércoles",
-  "jueves",
-  "viernes",
-  "sábado",
-];
+export type NamingInput = NamingSystem | NamingContext | undefined;
 
 export function periodName(
   period: number | null,
-  naming: NamingSystem,
+  naming: NamingInput = "roman",
   special: "year-day" | "leap-day" | null = null,
 ): string {
-  if (special === "year-day") return "Year Day";
-  if (special === "leap-day") return "Leap Day";
-  if (!period) return "—";
-  if (naming === "ifc") return IFC_PERIOD_NAMES[period - 1];
-  if (naming === "sue") return SUE_PERIOD_NAMES[period - 1];
-  return `Periodo ${period}`;
+  return periodNameFromContext(period, resolveNaming(naming), special);
 }
 
 /**
@@ -107,7 +56,7 @@ export function periodName(
  */
 export function gregorianToSue(
   iso: string,
-  naming: NamingSystem = "sue",
+  naming: NamingInput = "roman",
 ): CalendarDate {
   const { year, month, day } = parseISODate(iso);
   const doy = gregorianDayOfYear(year, month, day);
@@ -141,6 +90,7 @@ export function gregorianToSue(
   const wd = weekdayIndex(iso);
   const season = seasonForDate(iso);
   const special = isYearDay ? "year-day" : isLeapDay ? "leap-day" : null;
+  const ctx = resolveNaming(naming);
 
   return {
     gregorianDate: iso,
@@ -152,7 +102,7 @@ export function gregorianToSue(
     dayOfYear: doy,
     sueYear: year,
     suePeriod,
-    suePeriodName: periodName(suePeriod, naming, special),
+    suePeriodName: periodNameFromContext(suePeriod, ctx, special),
     sueWeekInPeriod: sueDayInPeriod
       ? Math.ceil(sueDayInPeriod / 7)
       : null,
@@ -236,10 +186,10 @@ export function periodRangeLabel(year: number, period: number): {
 export function formatSueLabel(date: CalendarDate): string {
   if (date.isYearDay) return `${date.sueYear} · Year Day`;
   if (date.isLeapDay) return `${date.sueYear} · Leap Day`;
-  return `${date.sueYear} · ${date.suePeriodName} · día ${date.sueDayInPeriod} · semana ${date.sueWeekInPeriod}`;
+  return `${date.sueYear} · ${date.suePeriodName} · day ${date.sueDayInPeriod} · week ${date.sueWeekInPeriod}`;
 }
 
-export function formatGregorianLong(iso: string, locale = "es"): string {
+export function formatGregorianLong(iso: string, locale = "en"): string {
   const { year, month, day } = parseISODate(iso);
   return new Intl.DateTimeFormat(locale, {
     weekday: "long",
@@ -250,7 +200,7 @@ export function formatGregorianLong(iso: string, locale = "es"): string {
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
-export function formatGregorianShort(iso: string, locale = "es"): string {
+export function formatGregorianShort(iso: string, locale = "en"): string {
   const { year, month, day } = parseISODate(iso);
   return new Intl.DateTimeFormat(locale, {
     day: "numeric",

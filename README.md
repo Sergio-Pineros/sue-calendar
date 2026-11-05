@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SÚE
 
-## Getting Started
+Open-source, local-first **year planning** on a 13 × 28 calendar.
 
-First, run the development server:
+Thirteen periods of 28 days = 364, plus **Year Day** and (in leap years) **Leap Day** — International Fixed Calendar style — with the moon as a layer, not as the period itself.
+
+SÚE is built for Sergio Piñeros. It is English-first, customizable, and honest about what is history, what is astronomy, and what is a planning framework.
+
+## Screenshots
+
+Saved from this repo’s v1 pass (mobile + desktop):
+
+- Year wheel (Ancient Wood)
+- Sprint plan
+- Settings
+- Themes: Ancient Wood, Solarpunk Mecha, Night Ritual, Moss Circuit
+
+See the pull request artifacts for the latest captures.
+
+## What it is
+
+- A **rotating year wheel** — carved wood/stone mood, today large at the top, drag/flick with spring return
+- **Period names** you can switch: Roman numerals (default), numbers, International Fixed Calendar, Comte’s Positivist calendar, Graves’s Celtic Tree (1948), folk full-moon names, or your own 13
+- **Weekdays** you can rename, renumber (Sergio’s default is Sunday = −1 … Saturday = 5), and start on any day
+- **Moon-based sprints** — push / light / rest as a rhythm, not science
+- **Google Calendar** read + write (when you set a client ID)
+- **Apple / iCloud Calendar** via CalDAV (Apple ID + app-specific password)
+- **`.ics` import/export** as the universal fallback
+- Works with **zero accounts** (pure local mode)
+
+## What it is not
+
+SÚE does not claim a lost universal 13-month calendar, or that 13 × 28 is a true lunar month (a synodic month is about 29.53 days). The Research page labels each note as fact, calculation, or interpretation.
+
+The early Roman calendar had 10 months, then 12. There is no “13 months from before the Romans changed it” preset.
+
+## Stack
+
+Next.js 16 · React 19 · Tailwind 4. All personal data stays in `localStorage` on this device.
+
+## Run locally
 
 ```bash
+npm install
+cp .env.example .env.local   # optional
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test:calendar
+npm run lint
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Google Calendar (read + write)
 
-## Learn More
+1. In [Google Cloud Console](https://console.cloud.google.com/) create a project.
+2. Enable the **Google Calendar API**.
+3. Create an **OAuth 2.0 Client ID** (Web application).
+4. Authorized JavaScript origins: `http://localhost:3000` (and your deployed origin).
+5. Put the client ID in `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+6. Restart `npm run dev`. In Settings, connect Google, pick calendars, pull events. You can also **create** events from a day view.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Without a client ID, Google is hidden and local / `.ics` / Apple still work.
 
-## Deploy on Vercel
+## Apple / iCloud Calendar (CalDAV)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+iCloud has no public OAuth API. SÚE uses CalDAV at `caldav.icloud.com` through a thin Next.js route (`/api/caldav`).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Turn on two-factor authentication for the Apple ID.
+2. Create an [app-specific password](https://appleid.apple.com/) (Sign-In and Security → App-Specific Passwords).
+3. In Settings → Apple / iCloud Calendar, enter the Apple ID and that password.
+4. List calendars, pull events, optionally create events from a day view.
+
+Credentials are sent **per request**. They are **never stored on the server**. Check “Remember on this device” only if you want them in this browser’s `localStorage`.
+
+`.ics` export from Apple Calendar remains the zero-proxy fallback.
+
+## Themes
+
+Tokens live in `src/app/globals.css`. Register a theme in `src/lib/themes.ts`.
+
+| ID | Mood |
+| --- | --- |
+| `ancient-wood` | Default. Carved slab, warm grain, brass engraving. |
+| `solarpunk-mecha` | Light greenhouse HUD: moss, brass, hairlines. |
+| `night-ritual` | Dark starfield, violet ink. |
+| `moss-circuit` | Forest phosphor, living circuit traces. |
+
+## Naming presets
+
+See `src/lib/naming.ts`. Each preset has an origin line shown in Settings.
+
+| ID | Origin |
+| --- | --- |
+| `roman` | Default. I–XIII. |
+| `numbered` | 1–13. |
+| `ifc` | Moses B. Cotsworth, 1902. |
+| `comte` | Auguste Comte, Positivist Calendar, 1849. |
+| `celtic` | Robert Graves, *The White Goddess*, 1948. |
+| `folk` | Traditional almanac full-moon names + Blue Moon. |
+| `custom` | Your 13 names, local only. |
+
+## License
+
+MIT. See [LICENSE](./LICENSE) and [CONTRIBUTING.md](./CONTRIBUTING.md).

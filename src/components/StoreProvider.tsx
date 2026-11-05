@@ -16,7 +16,10 @@ import type {
   PersonalCycle,
   Reflection,
   RestBlock,
+  Sprint,
+  SueSettings,
   SueState,
+  ThemeId,
 } from "@/lib/types";
 import { emptyState, loadState, newGoal, saveState } from "@/lib/storage";
 import { nextPeriodRef } from "@/lib/sue-calendar";
@@ -24,7 +27,10 @@ import { nextPeriodRef } from "@/lib/sue-calendar";
 type StoreContextValue = {
   ready: boolean;
   state: SueState;
+  updateSettings: (patch: Partial<SueSettings>) => void;
   setNaming: (naming: NamingSystem) => void;
+  setCustomPeriodNames: (names: string[]) => void;
+  setTheme: (theme: ThemeId) => void;
   setLayer: (key: LayerKey, value: boolean) => void;
   setViewYear: (year: number) => void;
   completeOnboarding: () => void;
@@ -41,8 +47,13 @@ type StoreContextValue = {
   addCycle: (cycle: PersonalCycle) => void;
   removeCycle: (id: string) => void;
   upsertReflection: (reflection: Reflection) => void;
+  addSprint: (sprint: Sprint) => void;
+  updateSprint: (sprint: Sprint) => void;
+  removeSprint: (id: string) => void;
+  addEvent: (event: ExternalEvent) => void;
   replaceImportedEvents: (events: ExternalEvent[]) => void;
   mergeGoogleEvents: (events: ExternalEvent[], calendarIds: string[]) => void;
+  mergeAppleEvents: (events: ExternalEvent[], calendarIds: string[]) => void;
   replaceState: (next: SueState) => void;
 };
 
@@ -75,10 +86,22 @@ function patch(updater: (prev: SueState) => SueState) {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const state = useSyncExternalStore(subscribe, snapshot, () => SERVER_STATE);
 
-  const setNaming = useCallback(
-    (naming: NamingSystem) =>
-      patch((s) => ({ ...s, settings: { ...s.settings, naming } })),
+  const updateSettings = useCallback(
+    (next: Partial<SueSettings>) =>
+      patch((s) => ({ ...s, settings: { ...s.settings, ...next } })),
     [],
+  );
+  const setNaming = useCallback(
+    (naming: NamingSystem) => updateSettings({ naming }),
+    [updateSettings],
+  );
+  const setCustomPeriodNames = useCallback(
+    (customPeriodNames: string[]) => updateSettings({ customPeriodNames }),
+    [updateSettings],
+  );
+  const setTheme = useCallback(
+    (theme: ThemeId) => updateSettings({ theme }),
+    [updateSettings],
   );
   const setLayer = useCallback(
     (key: LayerKey, value: boolean) =>
@@ -92,20 +115,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [],
   );
   const setViewYear = useCallback(
-    (year: number) =>
-      patch((s) => ({ ...s, settings: { ...s.settings, viewYear: year } })),
-    [],
+    (year: number) => updateSettings({ viewYear: year }),
+    [updateSettings],
   );
   const completeOnboarding = useCallback(
-    () => patch((s) => ({ ...s, settings: { ...s.settings, onboarded: true } })),
-    [],
+    () => updateSettings({ onboarded: true }),
+    [updateSettings],
   );
 
   const value = useMemo<StoreContextValue>(
     () => ({
       ready: true,
       state,
+      updateSettings,
       setNaming,
+      setCustomPeriodNames,
+      setTheme,
       setLayer,
       setViewYear,
       completeOnboarding,
@@ -218,11 +243,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               : [...s.reflections, reflection],
           };
         }),
+      addSprint: (sprint) =>
+        patch((s) => ({ ...s, sprints: [...s.sprints, sprint] })),
+      updateSprint: (sprint) =>
+        patch((s) => ({
+          ...s,
+          sprints: s.sprints.map((item) => (item.id === sprint.id ? sprint : item)),
+        })),
+      removeSprint: (id) =>
+        patch((s) => ({
+          ...s,
+          sprints: s.sprints.filter((item) => item.id !== id),
+        })),
+      addEvent: (event) =>
+        patch((s) => ({
+          ...s,
+          events: [...s.events.filter((item) => item.id !== event.id), event],
+        })),
       replaceImportedEvents: (events) =>
         patch((s) => ({
           ...s,
           events: [
-            ...s.events.filter((event) => event.source === "google"),
+            ...s.events.filter(
+              (event) => event.source === "google" || event.source === "apple" || event.source === "local",
+            ),
             ...events,
           ],
           settings: {
@@ -243,6 +287,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             lastSyncedAt: new Date().toISOString(),
           },
         })),
+      mergeAppleEvents: (events, calendarIds) =>
+        patch((s) => ({
+          ...s,
+          events: [
+            ...s.events.filter((event) => event.source !== "demo" && event.source !== "apple"),
+            ...events,
+          ],
+          settings: {
+            ...s.settings,
+            appleCalendarIds: calendarIds,
+            lastSyncedAt: new Date().toISOString(),
+          },
+        })),
       replaceState: (next) =>
         patch(() => ({
           ...emptyState(),
@@ -250,7 +307,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           settings: { ...emptyState().settings, ...next.settings },
         })),
     }),
-    [completeOnboarding, setLayer, setNaming, setViewYear, state],
+    [completeOnboarding, setCustomPeriodNames, setLayer, setNaming, setTheme, setViewYear, state, updateSettings],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

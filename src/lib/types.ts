@@ -1,4 +1,21 @@
-export type NamingSystem = "numbered" | "ifc" | "sue";
+export type NamingSystem =
+  | "roman"
+  | "numbered"
+  | "ifc"
+  | "comte"
+  | "celtic"
+  | "folk"
+  | "custom";
+
+export type WeekdayNamePreset = "long" | "short" | "custom";
+
+export type WeekdayNumberPreset = "none" | "one" | "sergio" | "custom";
+
+export type ThemeId =
+  | "ancient-wood"
+  | "solarpunk-mecha"
+  | "night-ritual"
+  | "moss-circuit";
 
 export type EvidenceType =
   | "fact"
@@ -59,7 +76,9 @@ export type LayerKey =
   | "rest"
   | "moon"
   | "seasons"
-  | "personal";
+  | "personal"
+  | "sabbats"
+  | "sprints";
 
 export type GoalStatus = "planned" | "active" | "carried" | "complete";
 
@@ -97,9 +116,11 @@ export type PersonalCycle = {
   visibility: "private";
 };
 
+export type EventSource = "google" | "ics" | "demo" | "apple" | "local";
+
 export type ExternalEvent = {
   id: string;
-  source: "google" | "ics" | "demo";
+  source: EventSource;
   sourceEventId: string;
   calendarId: string;
   calendarName: string;
@@ -139,16 +160,53 @@ export type ConnectedCalendar = {
   id: string;
   name: string;
   color: string;
-  source: "google" | "ics";
+  source: "google" | "ics" | "apple";
+};
+
+export type SprintStyle =
+  | "lunar-full"
+  | "lunar-waxing"
+  | "lunar-waning"
+  | "period"
+  | "seasonal"
+  | "custom";
+
+export type SprintIntensity = "push" | "light" | "rest";
+
+export type SprintDay = {
+  date: string;
+  recommended: SprintIntensity;
+  override?: SprintIntensity;
+  note: string;
+};
+
+export type Sprint = {
+  id: string;
+  title: string;
+  style: SprintStyle;
+  startDate: string;
+  endDate: string;
+  deadline: string | null;
+  days: SprintDay[];
+  createdAt: string;
 };
 
 export type SueSettings = {
   naming: NamingSystem;
+  customPeriodNames: string[];
+  weekStart: number;
+  weekdayNamePreset: WeekdayNamePreset;
+  weekdayNames: string[];
+  weekdayShortNames: string[];
+  weekdayNumberPreset: WeekdayNumberPreset;
+  weekdayNumbers: number[];
+  theme: ThemeId;
   timezone: string;
   layers: Record<LayerKey, boolean>;
   onboarded: boolean;
   viewYear: number;
   selectedCalendarIds: string[];
+  appleCalendarIds: string[];
   lastSyncedAt: string | null;
 };
 
@@ -160,4 +218,10 @@ export type SueState = {
   restBlocks: RestBlock[];
   personalCycles: PersonalCycle[];
   reflections: Reflection[];
+  sprints: Sprint[];
+};
+
+export type NamingContext = {
+  preset: NamingSystem;
+  customNames?: string[];
 };

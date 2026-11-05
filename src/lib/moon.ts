@@ -1,5 +1,6 @@
 import type { MoonPhaseName } from "./types";
 import { parseISODate } from "./iso-date";
+import { copy } from "./copy";
 
 /** Mean synodic month in days. Source: USNO / astronomical convention. */
 export const SYNODIC_MONTH = 29.530588853;
@@ -18,16 +19,11 @@ const PHASES: { name: MoonPhaseName; from: number }[] = [
   { name: "waning-crescent", from: 24.6846 },
 ];
 
-export const MOON_LABELS_ES: Record<MoonPhaseName, string> = {
-  new: "Luna nueva",
-  "waxing-crescent": "Creciente",
-  "first-quarter": "Cuarto creciente",
-  "waxing-gibbous": "Gibosa creciente",
-  full: "Luna llena",
-  "waning-gibbous": "Gibosa menguante",
-  "last-quarter": "Cuarto menguante",
-  "waning-crescent": "Menguante",
-};
+export const MOON_LABELS = copy.moon;
+
+export function moonLabel(name: MoonPhaseName): string {
+  return MOON_LABELS[name];
+}
 
 export function moonForDate(iso: string): {
   name: MoonPhaseName;
@@ -55,3 +51,14 @@ export function isMajorMoonPhase(name: MoonPhaseName): boolean {
     name === "last-quarter"
   );
 }
+
+export const ASCII_MOON: Record<MoonPhaseName, string> = {
+  new: "(   )",
+  "waxing-crescent": "(  |)",
+  "first-quarter": "(  |)",
+  "waxing-gibbous": "( '|)",
+  full: "( * )",
+  "waning-gibbous": "(|' )",
+  "last-quarter": "(|  )",
+  "waning-crescent": "(|  )",
+};

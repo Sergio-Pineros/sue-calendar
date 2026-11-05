@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { TodayStrip } from "@/components/TodayStrip";
+import { YearWheel } from "@/components/YearWheel";
 import { useSueStore } from "@/components/StoreProvider";
 import {
   datesInWeek,
@@ -10,7 +11,6 @@ import {
   gregorianToSue,
   periodName,
   todayISO,
-  WEEKDAY_SHORT_ES,
 } from "@/lib/sue-calendar";
 import {
   eventTimeLabel,
@@ -21,6 +21,10 @@ import {
 import { newHabit, newRest } from "@/lib/storage";
 import { MoonGlyph } from "@/components/MoonGlyph";
 import { isMajorMoonPhase } from "@/lib/moon";
+import { weekdayShortLabel } from "@/lib/weekdays";
+import { copy } from "@/lib/copy";
+import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
+import { HudFrame } from "./Hud";
 
 export function TodayHome() {
   const {
@@ -33,8 +37,12 @@ export function TodayHome() {
   } = useSueStore();
   const [focusTitle, setFocusTitle] = useState("");
   const [habitTitle, setHabitTitle] = useState("");
+  const naming = {
+    preset: state.settings.naming,
+    customNames: state.settings.customPeriodNames,
+  };
   const today = todayISO();
-  const mapped = gregorianToSue(today, state.settings.naming);
+  const mapped = gregorianToSue(today, naming);
   const period = mapped.suePeriod ?? 1;
   const week = mapped.sueWeekInPeriod ?? 1;
   const dates = mapped.isSpecialDay
@@ -52,31 +60,41 @@ export function TodayHome() {
     : [];
   const live = hasLiveCalendar(state.events);
   const restToday = state.restBlocks.find((block) => block.date === today);
+  const sprintToday = activeSprintsOn(state.sprints, today)[0];
+  const intensity = sprintToday
+    ? sprintIntensityOn(sprintToday, today)
+    : null;
 
   return (
     <div className="space-y-8">
+      <YearWheel compact />
       <TodayStrip />
 
       {!live && (
-        <p className="rounded-2xl border border-line bg-card px-4 py-3 text-sm text-ink-soft">
-          Estás viendo eventos de ejemplo.{" "}
+        <p className="hud-frame rounded-2xl px-4 py-3 text-sm text-ink-soft">
+          {copy.today.demoBanner}{" "}
           <Link href="/settings" className="text-brass underline-offset-4 hover:underline">
-            Conecta Google o importa un .ics
-          </Link>{" "}
-          para overlayar tu calendario real.
+            {copy.today.connect}
+          </Link>
         </p>
       )}
 
-      <section className="rounded-3xl border border-line bg-card/80 p-5">
+      {intensity && sprintToday && (
+        <HudFrame label={copy.sprints.active}>
+          <p className={`display text-2xl intensity-${intensity}`}>
+            {copy.intensity[intensity]} · {sprintToday.title}
+          </p>
+        </HudFrame>
+      )}
+
+      <HudFrame label={copy.today.focus}>
         <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          Foco de {periodName(period, state.settings.naming)}
+          {periodName(period, naming)}
         </p>
         {focus ? (
           <p className="display mt-2 text-3xl">{focus.title}</p>
         ) : (
-          <p className="mt-2 text-sm text-ink-soft">
-            Una meta para estas cuatro semanas. El resto cabe alrededor.
-          </p>
+          <p className="mt-2 text-sm text-ink-soft">{copy.today.focusHint}</p>
         )}
         <form
           className="mt-4 flex gap-2"
@@ -90,49 +108,45 @@ export function TodayHome() {
           <input
             value={focusTitle}
             onChange={(event) => setFocusTitle(event.target.value)}
-            placeholder={focus ? "Cambiar foco" : "Escribe el foco del periodo"}
-            className="flex-1 rounded-full border border-line bg-paper px-4 py-2 text-sm outline-none focus:border-ink"
+            placeholder={focus ? copy.today.changeFocus : copy.today.focusPlaceholder}
+            className="flex-1 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-ink"
           />
-          <button className="rounded-full bg-ink px-4 py-2 text-sm text-paper">
-            Guardar
+          <button className="rounded-full bg-ink px-4 text-sm text-paper">
+            {copy.today.save}
           </button>
         </form>
-      </section>
+      </HudFrame>
 
       {state.settings.layers.rest && (
-        <section className="rounded-3xl border border-line bg-card/80 p-5">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-            Descanso primero
-          </p>
-          <p className="mt-2 text-sm">
+        <HudFrame label={copy.today.restFirst}>
+          <p className="text-sm">
             {load.restDays === 0
-              ? "Esta semana no tiene descanso marcado. Colócalo antes de llenar el resto."
-              : `${load.restDays} día${load.restDays === 1 ? "" : "s"} de descanso esta semana.`}
+              ? copy.today.noRest
+              : copy.today.restCount(load.restDays)}
           </p>
           {restToday ? (
             <button
               type="button"
-              className="mt-3 rounded-full border border-rest px-4 py-2 text-sm text-rest"
+              className="mt-3 rounded-full border border-rest px-4 text-sm text-rest"
               onClick={() => removeRest(restToday.id)}
             >
-              Quitar descanso de hoy
+              {copy.today.unmarkRest}
             </button>
           ) : (
             <button
               type="button"
-              className="mt-3 rounded-full border border-line px-4 py-2 text-sm"
-              onClick={() => addRest(newRest(today, "Descanso"))}
+              className="mt-3 rounded-full border border-line px-4 text-sm"
+              onClick={() => addRest(newRest(today))}
             >
-              Marcar hoy como descanso
+              {copy.today.markRest}
             </button>
           )}
-        </section>
+        </HudFrame>
       )}
 
       {load.overloaded && (
         <p className="rounded-2xl border border-year-day/40 bg-year-day/10 px-4 py-3 text-sm">
-          Esta semana está densa ({load.total} eventos). SÚE no te pide más
-          productividad: considera rest o mover algo al siguiente ciclo.
+          {copy.today.overloaded(load.total)}
         </p>
       )}
 
@@ -140,27 +154,30 @@ export function TodayHome() {
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-              Esta semana
+              {copy.today.thisWeek}
             </p>
             <h2 className="display text-3xl">
               {mapped.isSpecialDay
                 ? mapped.suePeriodName
-                : `Semana ${week} / 4`}
+                : copy.today.weekOf(week)}
             </h2>
           </div>
           <Link
             href={`/period/${period}`}
             className="text-sm text-brass underline-offset-4 hover:underline"
           >
-            Periodo completo
+            {copy.today.fullPeriod}
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-7">
           {dates.map((iso) => {
-            const day = gregorianToSue(iso, state.settings.naming);
+            const day = gregorianToSue(iso, naming);
             const count = eventsOnDate(state.events, iso).length;
             const rest = state.restBlocks.some((block) => block.date === iso);
             const isToday = iso === today;
+            const dayIntensity = sprintToday
+              ? sprintIntensityOn(sprintToday, iso)
+              : null;
             return (
               <Link
                 key={iso}
@@ -168,13 +185,13 @@ export function TodayHome() {
                 className={`min-h-[110px] rounded-2xl border p-3 ${
                   isToday
                     ? "border-ink bg-ink text-paper"
-                    : rest
+                    : rest || dayIntensity === "rest"
                       ? "border-rest/40 bg-rest/10"
                       : "border-line bg-card/80 hover:border-ink/40"
                 }`}
               >
                 <div className="flex items-center justify-between font-mono text-[11px]">
-                  <span>{WEEKDAY_SHORT_ES[day.weekdayIndex]}</span>
+                  <span>{weekdayShortLabel(day.weekdayIndex, state.settings)}</span>
                   {state.settings.layers.moon &&
                     isMajorMoonPhase(day.moon.name) && (
                       <MoonGlyph name={day.moon.name} size={14} />
@@ -185,7 +202,7 @@ export function TodayHome() {
                   {formatGregorianShort(iso)}
                 </p>
                 <p className="mt-2 text-[11px] opacity-80">
-                  {count === 0 ? "Libre" : `${count} evento${count === 1 ? "" : "s"}`}
+                  {count === 0 ? copy.today.free : copy.year.events(count)}
                 </p>
               </Link>
             );
@@ -195,17 +212,15 @@ export function TodayHome() {
 
       {state.settings.layers.events && (
         <section>
-          <h2 className="display text-2xl">Hoy en el calendario</h2>
+          <h2 className="display text-2xl">{copy.today.eventsToday}</h2>
           {todayEvents.length === 0 ? (
-            <p className="mt-2 text-sm text-ink-soft">
-              Nada sincronizado para hoy. El overlay está vacío a propósito.
-            </p>
+            <p className="mt-2 text-sm text-ink-soft">{copy.today.noEvents}</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {todayEvents.map((event) => (
                 <li
                   key={event.id}
-                  className="rounded-2xl border border-line bg-card px-4 py-3"
+                  className="hud-frame rounded-2xl px-4 py-3"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium">{event.title}</p>
@@ -223,10 +238,10 @@ export function TodayHome() {
 
       {state.settings.layers.habits && (
         <section>
-          <h2 className="display text-2xl">Hábitos de hoy</h2>
+          <h2 className="display text-2xl">{copy.today.habits}</h2>
           <ul className="mt-3 space-y-2">
             {state.habits.map((habit) => (
-              <li key={habit.id} className="flex items-center gap-3">
+              <li key={habit.id} className="flex min-h-11 items-center gap-3">
                 <input
                   type="checkbox"
                   checked={Boolean(habit.checkIns[today])}
@@ -249,11 +264,11 @@ export function TodayHome() {
             <input
               value={habitTitle}
               onChange={(event) => setHabitTitle(event.target.value)}
-              placeholder="Añadir hábito"
-              className="flex-1 rounded-full border border-line bg-card px-4 py-2 text-sm outline-none focus:border-ink"
+              placeholder={copy.today.addHabit}
+              className="flex-1 rounded-full border border-line bg-card px-4 text-sm outline-none focus:border-ink"
             />
-            <button className="rounded-full bg-ink px-4 py-2 text-sm text-paper">
-              Añadir
+            <button className="rounded-full bg-ink px-4 text-sm text-paper">
+              {copy.today.add}
             </button>
           </form>
         </section>
@@ -264,16 +279,16 @@ export function TodayHome() {
           href="/reflect"
           className="block rounded-2xl border border-brass/40 px-4 py-3 text-sm"
         >
-          Estás en la última semana del periodo. Cierra el ciclo en Revisión.
+          {copy.today.closePrompt}
         </Link>
       )}
 
       <div className="flex flex-wrap gap-4 text-sm">
         <Link href="/year" className="text-brass underline-offset-4 hover:underline">
-          Ver el mapa del año
+          {copy.today.yearMap}
         </Link>
         <Link href="/research" className="text-ink-soft underline-offset-4 hover:underline">
-          Qué es SÚE, y qué no es
+          {copy.today.whatIs}
         </Link>
       </div>
     </div>

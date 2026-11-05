@@ -1,55 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   addDays,
   formatGregorianLong,
   formatSueLabel,
   gregorianToSue,
 } from "@/lib/sue-calendar";
-import { MOON_LABELS_ES } from "@/lib/moon";
-import { SEASON_LABELS_ES } from "@/lib/seasons";
+import { moonLabel } from "@/lib/moon";
+import { seasonLabel } from "@/lib/seasons";
 import { eventsOnDate, newHabit, newRest } from "@/lib/storage";
 import { cyclePosition } from "@/lib/cycles";
 import { useSueStore } from "./StoreProvider";
 import { MoonGlyph } from "./MoonGlyph";
 import { SourceBadge } from "./SourceBadge";
+import { EventComposer } from "./EventComposer";
+import { copy } from "@/lib/copy";
+import { weekdayLabel, weekdayNumber, formatWeekdayNumber } from "@/lib/weekdays";
+import { activeSprintsOn, applySprintOverride, sprintIntensityOn } from "@/lib/sprints";
+import type { SprintIntensity } from "@/lib/types";
 
 export function DayView({ iso }: { iso: string }) {
-  const { state, toggleHabit, addHabit, addRest, removeRest, removeHabit } = useSueStore();
+  const { state, toggleHabit, addHabit, addRest, removeRest, removeHabit, updateSprint } =
+    useSueStore();
   const [habitTitle, setHabitTitle] = useState("");
-  const mapped = useMemo(
-    () => gregorianToSue(iso, state.settings.naming),
-    [iso, state.settings.naming],
-  );
+  const naming = {
+    preset: state.settings.naming,
+    customNames: state.settings.customPeriodNames,
+  };
+  const mapped = gregorianToSue(iso, naming);
   const events = state.settings.layers.events
     ? eventsOnDate(state.events, iso)
     : [];
   const rest = state.restBlocks.find((r) => r.date === iso);
+  const number = weekdayNumber(mapped.weekdayIndex, state.settings);
+  const sprints = activeSprintsOn(state.sprints, iso);
 
   return (
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-            Día
+            {copy.day.kicker}
           </p>
-          <h1 className="display text-4xl capitalize">
+          <h1 className="display text-4xl">
             {formatGregorianLong(iso)}
           </h1>
           <p className="mt-2 text-ink-soft">{formatSueLabel(mapped)}</p>
+          <p className="mt-1 font-mono text-xs text-ink-soft">
+            {weekdayLabel(mapped.weekdayIndex, state.settings)}
+            {number !== null ? ` · ${formatWeekdayNumber(number)}` : ""}
+          </p>
         </div>
         <div className="flex gap-2 font-mono text-sm">
           <Link
             href={`/day/${addDays(iso, -1)}`}
-            className="rounded-full border border-line px-3 py-1"
+            className="tap rounded-full border border-line px-3"
           >
             ←
           </Link>
           <Link
             href={`/day/${addDays(iso, 1)}`}
-            className="rounded-full border border-line px-3 py-1"
+            className="tap rounded-full border border-line px-3"
           >
             →
           </Link>
@@ -57,25 +70,25 @@ export function DayView({ iso }: { iso: string }) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <InfoCard label="Gregoriano" badge="fact">
-          {iso} · {mapped.weekday}
+        <InfoCard label={copy.day.gregorian} badge="fact">
+          {iso} · {weekdayLabel(mapped.weekdayIndex, state.settings)}
         </InfoCard>
-        <InfoCard label="SÚE" badge="interpretation">
+        <InfoCard label={copy.day.sue} badge="interpretation">
           {mapped.isSpecialDay
             ? mapped.suePeriodName
-            : `${mapped.suePeriodName} · d${mapped.sueDayInPeriod} · s${mapped.sueWeekInPeriod}`}
+            : `${mapped.suePeriodName} · d${mapped.sueDayInPeriod} · w${mapped.sueWeekInPeriod}`}
         </InfoCard>
-        <InfoCard label="Cielo" badge="calculation">
+        <InfoCard label={copy.day.sky} badge="calculation">
           <span className="inline-flex items-center gap-2">
             {state.settings.layers.moon && (
               <>
                 <MoonGlyph name={mapped.moon.name} />
-                {MOON_LABELS_ES[mapped.moon.name]}
+                {moonLabel(mapped.moon.name)}
               </>
             )}
             {state.settings.layers.seasons && (
               <span className="text-ink-soft">
-                · {SEASON_LABELS_ES[mapped.season]}
+                · {seasonLabel(mapped.season)}
               </span>
             )}
           </span>
@@ -84,31 +97,66 @@ export function DayView({ iso }: { iso: string }) {
 
       {mapped.isYearDay && (
         <p className="rounded-2xl border border-year-day/40 bg-year-day/10 px-4 py-3 text-sm">
-          Year Day queda fuera de los 13 periodos. Úsalo como revisión anual, no como un día más de la semana.
+          {copy.day.yearDay}
         </p>
       )}
       {mapped.isLeapDay && (
         <p className="rounded-2xl border border-brass/40 bg-brass/10 px-4 py-3 text-sm">
-          Leap Day se inserta después del periodo 6 y antes de Umbral / Sol. No forma parte de ningún periodo de 28 días.
+          {copy.day.leapDay}
         </p>
+      )}
+
+      {sprints.length > 0 && (
+        <section className="hud-frame rounded-2xl p-4">
+          <h2 className="display text-2xl">{copy.day.sprint}</h2>
+          {sprints.map((sprint) => {
+            const intensity = sprintIntensityOn(sprint, iso);
+            return (
+              <div key={sprint.id} className="mt-3 space-y-2">
+                <p className={`font-medium intensity-${intensity}`}>
+                  {sprint.title} · {intensity ? copy.intensity[intensity] : ""}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(["push", "light", "rest"] as SprintIntensity[]).map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className="rounded-full border border-line px-3 text-xs"
+                      onClick={() =>
+                        updateSprint(applySprintOverride(sprint, iso, key))
+                      }
+                    >
+                      {copy.intensity[key]}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="rounded-full border border-line px-3 text-xs"
+                    onClick={() =>
+                      updateSprint(applySprintOverride(sprint, iso, undefined))
+                    }
+                  >
+                    {copy.sprints.clearOverride}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </section>
       )}
 
       {state.settings.layers.events && (
         <section>
-          <h2 className="display text-2xl">Eventos sincronizados</h2>
-          <p className="mb-3 mt-1 text-sm text-ink-soft">
-            Siguen viviendo en Google o Apple. SÚE solo los muestra.
-          </p>
+          <h2 className="display text-2xl">{copy.day.events}</h2>
+          <p className="mb-3 mt-1 text-sm text-ink-soft">{copy.day.eventsHint}</p>
           {events.length === 0 ? (
-            <p className="text-sm text-ink-soft">
-              No hay eventos este día. Importa un .ics o conecta Google en Ajustes.
-            </p>
+            <p className="text-sm text-ink-soft">{copy.day.noEvents}</p>
           ) : (
             <ul className="space-y-2">
               {events.map((event) => (
                 <li
                   key={event.id}
-                  className="rounded-2xl border border-line bg-card px-4 py-3"
+                  className="hud-frame rounded-2xl px-4 py-3"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium">{event.title}</p>
@@ -117,7 +165,7 @@ export function DayView({ iso }: { iso: string }) {
                     </span>
                   </div>
                   <p className="text-sm text-ink-soft">
-                    {event.allDay ? "Todo el día" : event.start.slice(11, 16)}
+                    {event.allDay ? copy.day.allDay : event.start.slice(11, 16)}
                     {event.location ? ` · ${event.location}` : ""}
                   </p>
                 </li>
@@ -127,12 +175,14 @@ export function DayView({ iso }: { iso: string }) {
         </section>
       )}
 
+      <EventComposer iso={iso} />
+
       {state.settings.layers.habits && (
         <section>
-          <h2 className="display text-2xl">Hábitos</h2>
+          <h2 className="display text-2xl">{copy.day.habits}</h2>
           <ul className="mt-3 space-y-2">
             {state.habits.map((habit) => (
-              <li key={habit.id} className="flex items-center gap-3">
+              <li key={habit.id} className="flex min-h-11 items-center gap-3">
                 <input
                   type="checkbox"
                   checked={Boolean(habit.checkIns[iso])}
@@ -145,7 +195,7 @@ export function DayView({ iso }: { iso: string }) {
                   className="text-xs text-ink-soft"
                   onClick={() => removeHabit(habit.id)}
                 >
-                  Quitar
+                  {copy.day.remove}
                 </button>
               </li>
             ))}
@@ -162,11 +212,11 @@ export function DayView({ iso }: { iso: string }) {
             <input
               value={habitTitle}
               onChange={(e) => setHabitTitle(e.target.value)}
-              placeholder="Añadir hábito"
-              className="flex-1 rounded-full border border-line bg-card px-4 py-2 text-sm outline-none focus:border-ink"
+              placeholder={copy.today.addHabit}
+              className="flex-1 rounded-full border border-line bg-card px-4 text-sm outline-none focus:border-ink"
             />
-            <button className="rounded-full bg-ink px-4 py-2 text-sm text-paper">
-              Añadir
+            <button className="rounded-full bg-ink px-4 text-sm text-paper">
+              {copy.today.add}
             </button>
           </form>
         </section>
@@ -174,22 +224,22 @@ export function DayView({ iso }: { iso: string }) {
 
       {state.settings.layers.rest && (
         <section>
-          <h2 className="display text-2xl">Descanso</h2>
+          <h2 className="display text-2xl">{copy.day.rest}</h2>
           {rest ? (
             <button
               type="button"
               onClick={() => removeRest(rest.id)}
-              className="mt-2 rounded-full border border-rest px-4 py-2 text-sm text-rest"
+              className="mt-2 rounded-full border border-rest px-4 text-sm text-rest"
             >
-              Quitar bloque de descanso
+              {copy.day.unmarkRest}
             </button>
           ) : (
             <button
               type="button"
-              onClick={() => addRest(newRest(iso, "Descanso"))}
-              className="mt-2 rounded-full border border-line px-4 py-2 text-sm"
+              onClick={() => addRest(newRest(iso))}
+              className="mt-2 rounded-full border border-line px-4 text-sm"
             >
-              Marcar este día como descanso
+              {copy.day.markRest}
             </button>
           )}
         </section>
@@ -197,14 +247,14 @@ export function DayView({ iso }: { iso: string }) {
 
       {state.settings.layers.personal && state.personalCycles.length > 0 && (
         <section>
-          <h2 className="display text-2xl">Ciclo propio</h2>
+          <h2 className="display text-2xl">{copy.day.ownCycle}</h2>
           <SourceBadge type="personal" />
           <ul className="mt-2 space-y-1 text-sm">
             {state.personalCycles.map((cycle) => {
               const pos = cyclePosition(cycle, iso);
               return (
                 <li key={cycle.id}>
-                  {cycle.name}: día {pos.dayInCycle}/{cycle.length} · {pos.phase}
+                  {copy.day.cycleDay(cycle.name, pos.dayInCycle, cycle.length, pos.phase)}
                 </li>
               );
             })}
@@ -217,7 +267,7 @@ export function DayView({ iso }: { iso: string }) {
           href={`/period/${mapped.suePeriod}`}
           className="inline-block text-brass underline-offset-4 hover:underline"
         >
-          Volver al periodo {mapped.suePeriodName}
+          {copy.day.backToPeriod(mapped.suePeriodName)}
         </Link>
       )}
     </div>
@@ -234,7 +284,7 @@ function InfoCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-card p-4">
+    <div className="hud-frame rounded-2xl p-4">
       <div className="mb-2 flex items-center justify-between">
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
           {label}

@@ -1,5 +1,6 @@
 import type { ExternalEvent } from "./types";
 import { addDays, parseISODate, toISODate } from "./iso-date";
+import { copy } from "./copy";
 
 function unfold(value: string): string {
   return value.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "");
@@ -161,7 +162,7 @@ function expandRRule(
  */
 export function parseIcs(
   text: string,
-  calendarName = "Importado",
+  calendarName = "Imported",
   rangeYear = new Date().getFullYear(),
 ): ExternalEvent[] {
   const unfolded = unfold(text.replace(/\r\n/g, "\n"));
@@ -204,7 +205,7 @@ export function parseIcs(
         sourceEventId: uid,
         calendarId: calendarName,
         calendarName,
-        title: get("SUMMARY") || "Sin título",
+        title: get("SUMMARY") || copy.event.untitled,
         description: get("DESCRIPTION"),
         start: occurrence.start,
         end: occurrence.end,
@@ -217,4 +218,79 @@ export function parseIcs(
   });
 
   return events;
+}
+
+function icsEscape(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function stamp(iso: string, allDay: boolean): string {
+  if (allDay || iso.length <= 10) {
+    return iso.replace(/-/g, "").slice(0, 8);
+  }
+  return iso.replace(/[-:]/g, "").replace("T", "T").slice(0, 15);
+}
+
+export function exportIcs(
+  events: ExternalEvent[],
+  calendarName = "SÚE",
+): string {
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//SUE//EN",
+    `X-WR-CALNAME:${icsEscape(calendarName)}`,
+  ];
+  for (const event of events) {
+    if (event.source === "demo") continue;
+    const uid = event.sourceEventId || event.id;
+    const allDay = event.allDay || event.start.length <= 10;
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:${uid}`);
+    lines.push(`SUMMARY:${icsEscape(event.title)}`);
+    if (event.description) {
+      lines.push(`DESCRIPTION:${icsEscape(event.description)}`);
+    }
+    if (event.location) {
+      lines.push(`LOCATION:${icsEscape(event.location)}`);
+    }
+    if (allDay) {
+      lines.push(`DTSTART;VALUE=DATE:${stamp(event.start, true)}`);
+      lines.push(`DTEND;VALUE=DATE:${stamp(event.end, true)}`);
+    } else {
+      lines.push(`DTSTART:${stamp(event.start, false)}`);
+      lines.push(`DTEND:${stamp(event.end, false)}`);
+    }
+    lines.push("END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+export function sprintBlockIcs(
+  title: string,
+  date: string,
+  description: string,
+): string {
+  return exportIcs([
+    {
+      id: `sprint-${date}`,
+      source: "local",
+      sourceEventId: `sprint-${date}`,
+      calendarId: "sue",
+      calendarName: "SÚE",
+      title,
+      description,
+      start: date,
+      end: addDays(date, 1),
+      timezone: "local",
+      allDay: true,
+      location: "",
+      color: "",
+    },
+  ]);
 }

@@ -39,18 +39,18 @@ export function MoonGlyph({
           <circle cx={cx} cy={cy} r={r} />
         </clipPath>
       </defs>
-      <circle cx={cx} cy={cy} r={r} fill="#140c1f" />
+      <circle cx={cx} cy={cy} r={r} fill="var(--paper-deep)" />
       {name !== "new" && name !== "full" && (
         <circle
           cx={cx + dx}
           cy={cy}
           r={r}
-          fill="#e8d4fa"
+          fill="var(--lunar)"
           clipPath={`url(#${clip})`}
         />
       )}
-      {name === "full" && <circle cx={cx} cy={cy} r={r} fill="#e8d4fa" />}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#c9b0e4" strokeWidth="1" />
+      {name === "full" && <circle cx={cx} cy={cy} r={r} fill="var(--lunar)" />}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--engrave)" strokeWidth="1" />
     </svg>
   );
 }

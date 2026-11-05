@@ -1,11 +1,5 @@
 import type { EvidenceType } from "@/lib/types";
-
-const LABELS: Record<EvidenceType, string> = {
-  fact: "Hecho",
-  calculation: "Cálculo",
-  interpretation: "Interpretación",
-  personal: "Personal",
-};
+import { copy } from "@/lib/copy";
 
 const CLASS: Record<EvidenceType, string> = {
   fact: "source-fact",
@@ -19,7 +13,7 @@ export function SourceBadge({ type }: { type: EvidenceType }) {
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${CLASS[type]}`}
     >
-      {LABELS[type]}
+      {copy.evidence[type]}
     </span>
   );
 }

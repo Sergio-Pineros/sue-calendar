@@ -1,6 +1,7 @@
 import type { ExternalEvent } from "./types";
+import { copy } from "./copy";
 
-const SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+const SCOPE = "https://www.googleapis.com/auth/calendar";
 
 type TokenClient = {
   requestAccessToken: (override?: { prompt?: string }) => void;
@@ -11,6 +12,15 @@ export type GoogleCalendarInfo = {
   summary: string;
   backgroundColor: string;
   primary: boolean;
+};
+
+export type GoogleEventDraft = {
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
+  allDay: boolean;
+  location?: string;
 };
 
 let accessToken: string | null = null;
@@ -31,7 +41,7 @@ function loadGis(): Promise<void> {
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () =>
-      reject(new Error("No se pudo cargar Google Identity"));
+      reject(new Error("Could not load Google Identity"));
     document.head.appendChild(script);
   });
 }
@@ -41,28 +51,38 @@ export function googleClientId(): string | undefined {
   return value || undefined;
 }
 
-async function googleJson<T>(url: string, token: string): Promise<T> {
+async function googleJson<T>(
+  url: string,
+  token: string,
+  init?: RequestInit,
+): Promise<T> {
   const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...init?.headers,
+    },
   });
   if (!res.ok) {
     if (res.status === 401) accessToken = null;
-    throw new Error(`Google Calendar respondió ${res.status}`);
+    throw new Error(`Google Calendar responded ${res.status}`);
   }
+  if (res.status === 204) return {} as T;
   return res.json() as Promise<T>;
 }
 
-export async function requestGoogleToken(): Promise<string> {
+export async function requestGoogleToken(force = false): Promise<string> {
   const clientId = googleClientId();
   if (!clientId) {
-    throw new Error("Falta NEXT_PUBLIC_GOOGLE_CLIENT_ID");
+    throw new Error("Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID");
   }
   await loadGis();
   const google = window.google;
   if (!google?.accounts?.oauth2) {
-    throw new Error("Google Identity no está disponible");
+    throw new Error("Google Identity is not available");
   }
-  if (accessToken) return accessToken;
+  if (accessToken && !force) return accessToken;
 
   return new Promise((resolve, reject) => {
     const client: TokenClient = google.accounts.oauth2.initTokenClient({
@@ -70,14 +90,14 @@ export async function requestGoogleToken(): Promise<string> {
       scope: SCOPE,
       callback: (response: { access_token?: string; error?: string }) => {
         if (!response.access_token) {
-          reject(new Error(response.error || "Sin token de Google"));
+          reject(new Error(response.error || "No Google token"));
           return;
         }
         accessToken = response.access_token;
         resolve(response.access_token);
       },
     });
-    client.requestAccessToken();
+    client.requestAccessToken(force ? { prompt: "consent" } : undefined);
   });
 }
 
@@ -98,7 +118,7 @@ export async function listGoogleCalendars(
   return (list.items ?? []).map((item) => ({
     id: item.id,
     summary: item.summary || item.id,
-    backgroundColor: item.backgroundColor || "#D4B8F0",
+    backgroundColor: item.backgroundColor || "#C4A574",
     primary: Boolean(item.primary),
   }));
 }
@@ -168,7 +188,7 @@ async function readCalendarEvents(
         sourceEventId: item.id,
         calendarId: calendar.id,
         calendarName: calendar.summary,
-        title: item.summary || "Sin título",
+        title: item.summary || copy.event.untitled,
         description: item.description || "",
         start,
         end,
@@ -182,6 +202,58 @@ async function readCalendarEvents(
   } while (pageToken);
 
   return events;
+}
+
+export async function createGoogleEvent(
+  calendarId: string,
+  draft: GoogleEventDraft,
+  calendarName = "Google",
+  color = "#C4A574",
+): Promise<ExternalEvent> {
+  const access = await requestGoogleToken();
+  const body = draft.allDay
+    ? {
+        summary: draft.title,
+        description: draft.description ?? "",
+        location: draft.location ?? "",
+        start: { date: draft.start.slice(0, 10) },
+        end: { date: draft.end.slice(0, 10) },
+      }
+    : {
+        summary: draft.title,
+        description: draft.description ?? "",
+        location: draft.location ?? "",
+        start: { dateTime: draft.start },
+        end: { dateTime: draft.end },
+      };
+
+  const created = await googleJson<{
+    id?: string;
+    start?: { date?: string; dateTime?: string; timeZone?: string };
+    end?: { date?: string; dateTime?: string };
+  }>(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
+    access,
+    { method: "POST", body: JSON.stringify(body) },
+  );
+
+  const start = created.start?.date || created.start?.dateTime || draft.start;
+  const end = created.end?.date || created.end?.dateTime || draft.end;
+  return {
+    id: `gcal-${calendarId}-${created.id ?? draft.title}`,
+    source: "google",
+    sourceEventId: created.id ?? "",
+    calendarId,
+    calendarName,
+    title: draft.title,
+    description: draft.description ?? "",
+    start,
+    end,
+    timezone: created.start?.timeZone || "UTC",
+    allDay: draft.allDay,
+    location: draft.location ?? "",
+    color,
+  };
 }
 
 declare global {

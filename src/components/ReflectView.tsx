@@ -2,18 +2,16 @@
 
 import { useState } from "react";
 import { useSueStore } from "@/components/StoreProvider";
-import {
-  gregorianToSue,
-  todayISO,
-} from "@/lib/sue-calendar";
+import { gregorianToSue, todayISO } from "@/lib/sue-calendar";
 import { newReflection } from "@/lib/storage";
+import { copy } from "@/lib/copy";
 
 const PROMPTS: { key: keyof ReturnType<typeof emptyAnswers>; label: string }[] = [
-  { key: "repeated", label: "¿Qué se repitió?" },
-  { key: "moved", label: "¿Qué avanzó?" },
-  { key: "rest", label: "¿Qué necesita descanso?" },
-  { key: "carry", label: "¿Qué atraviesa al siguiente ciclo?" },
-  { key: "data", label: "¿Qué mostraron tus datos personales?" },
+  { key: "repeated", label: copy.reflect.repeated },
+  { key: "moved", label: copy.reflect.moved },
+  { key: "rest", label: copy.reflect.rest },
+  { key: "carry", label: copy.reflect.carry },
+  { key: "data", label: copy.reflect.data },
 ];
 
 function emptyAnswers() {
@@ -22,7 +20,11 @@ function emptyAnswers() {
 
 export function ReflectView() {
   const { state, upsertReflection, carryFocus } = useSueStore();
-  const today = gregorianToSue(todayISO(), state.settings.naming);
+  const naming = {
+    preset: state.settings.naming,
+    customNames: state.settings.customPeriodNames,
+  };
+  const today = gregorianToSue(todayISO(), naming);
   const existing = state.reflections.find(
     (r) =>
       r.scope === "period" &&
@@ -53,15 +55,10 @@ export function ReflectView() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-        Revisión
+        {copy.reflect.kicker}
       </p>
-      <h1 className="display text-4xl">
-        Cierre de {today.suePeriodName}
-      </h1>
-      <p className="text-ink-soft">
-        Sin racha. Sin culpa. Solo un borde claro entre un ciclo de cuatro
-        semanas y el siguiente.
-      </p>
+      <h1 className="display text-4xl">{copy.reflect.title(today.suePeriodName)}</h1>
+      <p className="text-ink-soft">{copy.reflect.intro}</p>
       {PROMPTS.map((prompt) => (
         <label key={prompt.key} className="block">
           <span className="text-sm font-medium">{prompt.label}</span>
@@ -77,22 +74,20 @@ export function ReflectView() {
       ))}
       <button
         type="button"
-        className="rounded-full bg-ink px-5 py-2 text-sm text-paper"
+        className="rounded-full bg-ink px-5 text-sm text-paper"
         onClick={save}
       >
-        Guardar revisión
+        {copy.reflect.save}
       </button>
       {saved && (
         <p className="text-sm text-brass">
-          Guardado.
-          {answers.carry.trim()
-            ? " Lo que atraviesa ya está como foco del siguiente periodo."
-            : ""}
+          {copy.reflect.saved}
+          {answers.carry.trim() ? copy.reflect.carried : ""}
         </p>
       )}
       {today.isYearDay && (
         <p className="rounded-2xl border border-year-day/40 bg-year-day/10 p-4 text-sm">
-          Hoy es Year Day: un borde anual, no un día más del periodo.
+          {copy.reflect.yearDay}
         </p>
       )}
     </div>

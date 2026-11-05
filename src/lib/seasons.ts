@@ -1,12 +1,12 @@
 import type { SeasonName } from "./types";
 import { gregorianDayOfYear, parseISODate } from "./iso-date";
+import { copy } from "./copy";
 
-export const SEASON_LABELS_ES: Record<SeasonName, string> = {
-  winter: "Invierno",
-  spring: "Primavera",
-  summer: "Verano",
-  autumn: "Otoño",
-};
+export const SEASON_LABELS = copy.seasons;
+
+export function seasonLabel(name: SeasonName): string {
+  return SEASON_LABELS[name];
+}
 
 export function seasonForDate(iso: string): {
   season: SeasonName;
@@ -41,9 +41,9 @@ export function seasonMarkers(year: number): {
   name: string;
 }[] {
   return [
-    { iso: `${year}-03-20`, kind: "equinox", name: "Equinoccio de marzo" },
-    { iso: `${year}-06-21`, kind: "solstice", name: "Solsticio de junio" },
-    { iso: `${year}-09-22`, kind: "equinox", name: "Equinoccio de septiembre" },
-    { iso: `${year}-12-21`, kind: "solstice", name: "Solsticio de diciembre" },
+    { iso: `${year}-03-20`, kind: "equinox", name: copy.seasons.marchEquinox },
+    { iso: `${year}-06-21`, kind: "solstice", name: copy.seasons.juneSolstice },
+    { iso: `${year}-09-22`, kind: "equinox", name: copy.seasons.septemberEquinox },
+    { iso: `${year}-12-21`, kind: "solstice", name: copy.seasons.decemberSolstice },
   ];
 }

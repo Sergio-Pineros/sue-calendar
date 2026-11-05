@@ -5,9 +5,13 @@ import {
   isLeapYear,
   leapDayISO,
   nextPeriodRef,
+  periodName,
   sueToGregorian,
   yearDayISO,
 } from "./sue-calendar";
+import "./naming.test";
+import "./weekdays.test";
+import "./sprints.test";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -16,9 +20,9 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 function run(): void {
-  const p1 = gregorianToSue("2026-01-01", "sue");
+  const p1 = gregorianToSue("2026-01-01", "roman");
   assert(p1.suePeriod === 1 && p1.sueDayInPeriod === 1, "2026-01-01 should be P1 D1");
-  assert(p1.suePeriodName === "Alba", "SÚE name for period 1 is Alba");
+  assert(p1.suePeriodName === "I", "Roman name for period 1 is I");
   assert(!p1.isYearDay && !p1.isLeapDay, "Jan 1 is a regular day");
 
   const lastRegular = gregorianToSue("2026-12-30", "numbered");
@@ -26,10 +30,12 @@ function run(): void {
     lastRegular.suePeriod === 13 && lastRegular.sueDayInPeriod === 28,
     "2026-12-30 should be P13 D28",
   );
+  assert(lastRegular.suePeriodName === "13", "numbered period 13");
 
   const yearDay = gregorianToSue("2026-12-31");
   assert(yearDay.isYearDay && yearDay.suePeriod === null, "2026-12-31 is Year Day");
   assert(yearDayISO(2026) === "2026-12-31", "Year Day ISO for 2026");
+  assert(periodName(null, "roman", "year-day") === "Year Day", "Year Day periodName");
 
   assert(!isLeapYear(2026) && isLeapYear(2024) && isLeapYear(2000) && !isLeapYear(1900), "leap years");
 
@@ -59,7 +65,7 @@ function run(): void {
   const next = nextPeriodRef(2026, 13);
   assert(next.year === 2027 && next.period === 1, "period 13 carries into next year");
 
-  const todayLike = gregorianToSue("2026-08-19", "sue");
+  const todayLike = gregorianToSue("2026-08-19", "roman");
   assert(todayLike.suePeriod === 9, `2026-08-19 should be period 9, got ${todayLike.suePeriod}`);
   assert(todayLike.weekday === "Wednesday", "2026-08-19 is Wednesday");
 
