@@ -53,10 +53,7 @@ export function ReflectView() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-        {copy.reflect.kicker}
-      </p>
+    <div className="mx-auto max-w-2xl space-y-10">
       <h1 className="display text-4xl">{copy.reflect.title(today.suePeriodName)}</h1>
       {PROMPTS.map((prompt) => (
         <label key={prompt.key} className="block">

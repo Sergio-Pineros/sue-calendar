@@ -2,69 +2,69 @@ import type { PeriodColorPreset } from "./types";
 
 export const PERIOD_COUNT = 13;
 
-/** Deep violet stones — low lightness, low chroma. */
+/** Near-monochrome violet-charcoal — hue is a whisper. */
 export const AMETHYST_PERIOD_COLORS = [
-  "#14101c",
-  "#1a1424",
-  "#20182c",
-  "#261c34",
-  "#2c203c",
-  "#322444",
-  "#38284c",
-  "#3e2c54",
-  "#44305c",
-  "#4a3464",
-  "#50386c",
-  "#563c74",
-  "#5c407c",
+  "#121018",
+  "#14111a",
+  "#16121c",
+  "#18131e",
+  "#1a1520",
+  "#1c1722",
+  "#1e1924",
+  "#201b26",
+  "#221d28",
+  "#241f2a",
+  "#26212c",
+  "#28232e",
+  "#2a2530",
 ] as const;
 
 export const SEASONS_PERIOD_COLORS = [
-  "#141820",
-  "#161c28",
-  "#182030",
-  "#14241c",
-  "#182820",
-  "#1c2c24",
-  "#2a2414",
-  "#302818",
-  "#2c1c14",
-  "#281814",
-  "#20141c",
-  "#1a1420",
-  "#161018",
+  "#121418",
+  "#14161a",
+  "#16181c",
+  "#141814",
+  "#161a16",
+  "#181c18",
+  "#1c1a14",
+  "#1e1c16",
+  "#1c1814",
+  "#1a1614",
+  "#161418",
+  "#141218",
+  "#121016",
 ] as const;
 
 export const MOON_PERIOD_COLORS = [
-  "#0e0c12",
-  "#141018",
-  "#1a1620",
-  "#201c28",
-  "#262430",
-  "#2c2a38",
-  "#343240",
-  "#2e2c3a",
-  "#262432",
-  "#201c2a",
-  "#1a1622",
-  "#141018",
-  "#0e0c12",
+  "#100e12",
+  "#121014",
+  "#141216",
+  "#161418",
+  "#18161a",
+  "#1a181c",
+  "#1c1a1e",
+  "#1a181c",
+  "#18161a",
+  "#161418",
+  "#141216",
+  "#121014",
+  "#100e12",
 ] as const;
 
 export const SPECTRUM_PERIOD_COLORS = [
-  "#24141c",
-  "#261418",
-  "#261814",
-  "#241c14",
-  "#202014",
-  "#182014",
-  "#142018",
-  "#141c20",
-  "#141824",
-  "#181424",
-  "#1c1422",
-  "#20141e",
-  "#241418",
+  "#1a1416",
+  "#1a1514",
+  "#1a1614",
+  "#181614",
+  "#161614",
+  "#141614",
+  "#141616",
+  "#141618",
+  "#141518",
+  "#161418",
+  "#181416",
+  "#1a1416",
+  "#1a1415",
 ] as const;
 
 export const PERIOD_COLOR_PRESETS: {
@@ -76,51 +76,51 @@ export const PERIOD_COLOR_PRESETS: {
   {
     id: "amethyst",
     label: "Amethyst",
-    origin: "Default. Deep violet stones — never pale.",
+    origin: "Default. Near-monochrome violet-charcoal.",
     colors: AMETHYST_PERIOD_COLORS,
   },
   {
     id: "seasons",
     label: "Seasons",
-    origin: "Dark winter indigo through moss, brass, and russet.",
+    origin: "A quiet walk through winter, moss, brass, and russet.",
     colors: SEASONS_PERIOD_COLORS,
   },
   {
     id: "moon",
     label: "Moon",
-    origin: "New-moon dark to a muted full, then waning back to night.",
+    origin: "New-moon dark to a muted full, then back to night.",
     colors: MOON_PERIOD_COLORS,
   },
   {
     id: "spectrum",
     label: "Spectrum",
-    origin: "A hue walk that stays in the dark.",
+    origin: "A hue walk that stays almost grey.",
     colors: SPECTRUM_PERIOD_COLORS,
   },
 ];
 
-/** Curated swatches — every chip is a dark, muted stone. */
+/** Curated swatches — every chip is a near-mono dark stone. */
 export const PERIOD_SWATCHES = [
-  "#14101c",
-  "#261c34",
-  "#38284c",
-  "#4a3464",
-  "#5c407c",
-  "#0e0c12",
-  "#201c28",
-  "#343240",
-  "#141820",
-  "#182820",
-  "#2a2414",
-  "#2c1c14",
-  "#24141c",
-  "#261814",
-  "#142018",
-  "#141824",
-  "#1c1422",
-  "#2a1c24",
-  "#1c1410",
-  "#302818",
+  "#121018",
+  "#18131e",
+  "#201b26",
+  "#2a2530",
+  "#100e12",
+  "#161418",
+  "#1c1a1e",
+  "#121418",
+  "#161a16",
+  "#1c1a14",
+  "#1c1814",
+  "#1a1416",
+  "#141614",
+  "#141616",
+  "#141618",
+  "#181416",
+  "#1a1614",
+  "#161416",
+  "#141214",
+  "#1e1c16",
 ] as const;
 
 const HEX = /^#([0-9a-fA-F]{6})$/;
@@ -209,9 +209,9 @@ export function blendPeriodColors(colors: string[], position: number): string {
   return mixHex(colors[i], colors[j], p - i);
 }
 
-/** Page wash: keep the period hue, crush it into the night paper. */
-export function mutePageTone(hex: string, paper = "#100c16"): string {
-  return mixHex(paper, isHexColor(hex) ? hex : paper, 0.28);
+/** Page wash: keep a hint of period hue, stay in night charcoal. */
+export function mutePageTone(hex: string, paper = "#0e0d10"): string {
+  return mixHex(paper, isHexColor(hex) ? hex : paper, 0.12);
 }
 
 function parseHex(value: string): [number, number, number] {

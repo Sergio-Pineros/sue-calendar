@@ -38,17 +38,14 @@ export function DayView({ iso }: { iso: string }) {
   const sprints = activeSprintsOn(state.sprints, iso);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-            {copy.day.kicker}
-          </p>
           <h1 className="display text-4xl">
             {formatGregorianLong(iso)}
           </h1>
           <p className="mt-2 text-ink-soft">{formatSueLabel(mapped)}</p>
-          <p className="mt-1 font-mono text-xs text-ink-soft">
+          <p className="mt-1 text-xs text-ink-soft">
             {weekdayLabel(mapped.weekdayIndex, state.settings)}
             {number !== null ? ` · ${formatWeekdayNumber(number)}` : ""}
           </p>
@@ -277,20 +274,18 @@ export function DayView({ iso }: { iso: string }) {
 
 function InfoCard({
   label,
-  badge,
   children,
 }: {
   label: string;
-  badge: "fact" | "calculation" | "interpretation";
+  badge?: "fact" | "calculation" | "interpretation";
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-soft">
+      <div className="mb-2">
+        <p className="text-xs text-ink-soft">
           {label}
         </p>
-        <SourceBadge type={badge} />
       </div>
       <div className="text-sm">{children}</div>
     </div>

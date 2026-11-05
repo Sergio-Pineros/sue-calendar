@@ -21,7 +21,6 @@ import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
 import { copy } from "@/lib/copy";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { weekdayShortLabel, weekdayNumber, formatWeekdayNumber } from "@/lib/weekdays";
-import { AsciiMoon } from "./Ascii";
 
 function polar(cx: number, cy: number, r: number, deg: number) {
   const a = ((deg - 90) * Math.PI) / 180;
@@ -90,7 +89,6 @@ export function YearWheel({
   const stageRef = useRef<HTMLDivElement | null>(null);
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
-  const ornamentRef = useRef(0);
   const interactingRef = useRef(false);
   const pinTodayRef = useRef(false);
   const draggingRef = useRef(false);
@@ -105,7 +103,6 @@ export function YearWheel({
   const degRef = useRef(degreesPerDay);
   const rotationRef = useRef(0);
   const [offset, setOffset] = useState(0);
-  const [ornament, setOrnament] = useState(0);
 
   useEffect(() => {
     dimRef.current = dim;
@@ -146,10 +143,6 @@ export function YearWheel({
       const dt = Math.min(0.032, (t - last) / 1000);
       lastTRef.current = t;
 
-      if (!reduced) {
-        ornamentRef.current = (ornamentRef.current + dt * 4) % 360;
-      }
-
       if (!driven && !interactingRef.current) {
         if (Math.abs(velocityRef.current) > 8) {
           offsetRef.current = clampOffset(offsetRef.current + velocityRef.current * dt);
@@ -160,8 +153,8 @@ export function YearWheel({
             offsetRef.current = target;
             velocityRef.current = 0;
           } else {
-            const k = 28;
-            const c = 10;
+            const k = 12;
+            const c = 8;
             const force = -k * (offsetRef.current - target) - c * velocityRef.current;
             velocityRef.current += force * dt;
             offsetRef.current += velocityRef.current * dt;
@@ -174,7 +167,6 @@ export function YearWheel({
       }
 
       if (!driven) setOffset(offsetRef.current);
-      setOrnament(ornamentRef.current);
       frame = window.requestAnimationFrame(tick);
     };
     frame = window.requestAnimationFrame(tick);
@@ -329,10 +321,7 @@ export function YearWheel({
 
   return (
     <div ref={stageRef} className="wheel-stage relative mx-auto w-full max-w-[720px]">
-      {!hideChrome && <div className="mb-3 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {isToday ? copy.wheel.today : focused.gregorianDate}
-        </p>
+      {!hideChrome && <div className="mb-6 text-center">
         <button
           type="button"
           className="display text-4xl md:text-5xl"
@@ -341,13 +330,11 @@ export function YearWheel({
           {focused.suePeriodName}
           {focused.sueDayInPeriod ? ` · ${focused.sueDayInPeriod}` : ""}
         </button>
-        <p className="mt-1 text-sm text-ink-soft">
-          {formatGregorianLong(focused.gregorianDate)}
+        <p className="mt-2 text-sm text-ink-soft">
+          {isToday ? copy.wheel.today : formatGregorianLong(focused.gregorianDate)}
           {" · "}
           {weekdayShortLabel(focused.weekdayIndex, state.settings)}
           {weekdayN !== null ? ` ${formatWeekdayNumber(weekdayN)}` : ""}
-          {" · "}
-          <AsciiMoon name={focused.moon.name} />
         </p>
       </div>}
       <svg
@@ -361,52 +348,8 @@ export function YearWheel({
         role="img"
         aria-label={`Year wheel for ${year}. ${copy.wheel.drag}`}
       >
-        <defs>
-          <filter id="wood-grain" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" />
-            <feColorMatrix type="saturate" values="0.2" />
-            <feComponentTransfer>
-              <feFuncA type="table" tableValues="0 0.35" />
-            </feComponentTransfer>
-          </filter>
-          <radialGradient id="wood-fill" cx="50%" cy="45%" r="55%">
-            <stop offset="0%" stopColor="var(--wood)" />
-            <stop offset="70%" stopColor="var(--wood-deep)" />
-            <stop offset="100%" stopColor="var(--paper-deep)" />
-          </radialGradient>
-        </defs>
-        <circle cx={cx} cy={cy} r={396} fill="var(--paper-deep)" opacity="0.55" />
-        <circle cx={cx} cy={cy} r={392} fill="url(#wood-fill)" />
-        <circle cx={cx} cy={cy} r={392} filter="url(#wood-grain)" fill="var(--wood)" opacity="0.55" />
-        <circle cx={cx} cy={cy} r={390} fill="none" stroke="var(--brass)" strokeWidth="10" opacity="0.55" />
-        <circle cx={cx} cy={cy} r={384} fill="none" stroke="var(--engrave)" strokeWidth="3" />
-        <circle cx={cx} cy={cy} r={356} fill="none" stroke="var(--engrave)" strokeWidth="0.7" strokeOpacity="0.55" />
-        <circle cx={cx} cy={cy} r={226} fill="none" stroke="var(--engrave)" strokeWidth="0.7" strokeOpacity="0.45" />
-        <circle cx={cx} cy={cy} r={176} fill="none" stroke="var(--engrave)" strokeWidth="0.8" />
-        <g
-          style={{
-            transform: `rotate(${ornament}deg)`,
-            transformOrigin: "400px 400px",
-            willChange: "transform",
-          }}
-        >
-          {Array.from({ length: 24 }, (_, i) => {
-            const a = (i * 360) / 24;
-            const p0 = polar(cx, cy, 372, a);
-            const p1 = polar(cx, cy, 382, a);
-            return (
-              <line
-                key={i}
-                x1={p0.x}
-                y1={p0.y}
-                x2={p1.x}
-                y2={p1.y}
-                stroke="var(--engrave)"
-                strokeWidth="1.1"
-              />
-            );
-          })}
-        </g>
+        <circle cx={cx} cy={cy} r={392} fill="var(--paper-deep)" />
+        <circle cx={cx} cy={cy} r={390} fill="none" stroke="var(--engrave)" strokeWidth="1.2" opacity="0.45" />
         <g
           ref={rotorRef}
           style={{
@@ -427,26 +370,10 @@ export function YearWheel({
                 <path
                   d={donut(cx, cy, 228, 348, a0, a1)}
                   fill={periodColor(period)}
-                  fillOpacity={active ? 0.95 : 0.62 + Math.min(densities[i], 6) * 0.04}
-                  stroke={active ? "var(--ink)" : "color-mix(in oklab, var(--engrave) 45%, transparent)"}
-                  strokeWidth={active ? 2.4 : 0.7}
+                  fillOpacity={active ? 0.72 : 0.42 + Math.min(densities[i], 6) * 0.02}
+                  stroke={active ? "color-mix(in oklab, var(--ink) 35%, transparent)" : "transparent"}
+                  strokeWidth={active ? 1.2 : 0}
                 />
-                {Array.from({ length: 3 }, (_, mark) => {
-                  const groove = polar(cx, cy, 348 - mark * 8, a0);
-                  const groove2 = polar(cx, cy, 228 + mark * 6, a0);
-                  return (
-                    <line
-                      key={mark}
-                      x1={groove.x}
-                      y1={groove.y}
-                      x2={groove2.x}
-                      y2={groove2.y}
-                      stroke="var(--engrave)"
-                      strokeOpacity="0.35"
-                      strokeWidth="0.6"
-                    />
-                  );
-                })}
                 <text
                   x={label.x}
                   y={label.y}
@@ -552,51 +479,10 @@ export function YearWheel({
           strokeWidth="1.2"
           className="cursor-pointer"
         />
-        <g
-          style={{
-            transform: `rotate(${-ornament}deg)`,
-            transformOrigin: "400px 400px",
-          }}
-        >
-          <path
-            d="M400 268 C448 318 486 348 486 400 C486 452 448 482 400 532 C352 482 314 452 314 400 C314 348 352 318 400 268 Z"
-            fill="none"
-            stroke="var(--engrave)"
-            strokeWidth="1.6"
-          />
-          <path
-            d="M338 338 C368 308 432 308 462 338 C492 368 492 432 462 462 C432 492 368 492 338 462 C308 432 308 368 338 338 Z"
-            fill="none"
-            stroke="var(--engrave)"
-            strokeWidth="1.1"
-          />
-          <circle cx={cx} cy={cy} r={52} fill="none" stroke="var(--engrave)" strokeWidth="1.1" />
-          <path
-            d="M400 348 C424 364 440 380 440 400 C440 420 424 436 400 452 C376 436 360 420 360 400 C360 380 376 364 400 348 Z"
-            fill="none"
-            stroke="var(--brass)"
-            strokeWidth="1.3"
-          />
-          {Array.from({ length: 8 }, (_, i) => {
-            const a = i * 45;
-            const p0 = polar(cx, cy, 58, a);
-            const p1 = polar(cx, cy, 78, a);
-            return (
-              <line
-                key={i}
-                x1={p0.x}
-                y1={p0.y}
-                x2={p1.x}
-                y2={p1.y}
-                stroke="var(--brass)"
-                strokeWidth="0.8"
-              />
-            );
-          })}
-        </g>
         <polygon
           points="400,214 394,228 406,228"
-          fill="var(--brass)"
+          fill="var(--engrave)"
+          opacity="0.7"
         />
         <text
           x={cx}

@@ -57,16 +57,11 @@ export function LandingPage() {
 
   return (
     <div className="landing">
-      <header className="landing-bar">
-        <p className="display text-2xl">{copy.app.name}</p>
-      </header>
-
       <section className="landing-hero" aria-hidden="true">
         <YearWheel compact hideChrome />
       </section>
 
       <div className="landing-copy">
-        <p className="kicker">{copy.landing.kicker}</p>
         <h1 className="display">{copy.app.name}</h1>
         <p className="landing-pitch">{copy.app.tagline}</p>
         <button type="button" className="btn-fill landing-cta" onClick={openApp}>

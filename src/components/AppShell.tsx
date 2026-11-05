@@ -6,7 +6,6 @@ import { useEffect, useSyncExternalStore } from "react";
 import { gregorianToSue, todayISO } from "@/lib/sue-calendar";
 import { copy } from "@/lib/copy";
 import { useSueStore } from "./StoreProvider";
-import { GlyphScramble, AsciiVine } from "./Ascii";
 
 const NAV = [
   { href: "/app", label: copy.nav.today },
@@ -41,24 +40,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  if (!isClient) {
+  if (!isClient || (!state.settings.onboarded && !onboarding)) {
     return (
       <div className="app-loading">
-        <div className="text-center">
-          <AsciiVine />
-          <div>{copy.app.loading}</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!state.settings.onboarded && !onboarding) {
-    return (
-      <div className="app-loading">
-        <div className="text-center">
-          <AsciiVine />
-          <div>{copy.app.loading}</div>
-        </div>
+        <div>{copy.app.loading}</div>
       </div>
     );
   }
@@ -83,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="chrome-top">
         <div className="chrome-top-inner">
           <Link href="/year" className="display text-2xl">
-            <GlyphScramble text={copy.app.name} />
+            {copy.app.name}
           </Link>
           <nav className="chrome-desk">
             {NAV.map((item) => {
@@ -102,15 +87,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-          <div className="chrome-year">
-            <button type="button" onClick={() => setViewYear(state.settings.viewYear - 1)}>
-              ←
-            </button>
-            <span>{state.settings.viewYear}</span>
-            <button type="button" onClick={() => setViewYear(state.settings.viewYear + 1)}>
-              →
-            </button>
-          </div>
+          {pathname === "/year" && (
+            <div className="chrome-year">
+              <button type="button" onClick={() => setViewYear(state.settings.viewYear - 1)}>
+                ←
+              </button>
+              <span>{state.settings.viewYear}</span>
+              <button type="button" onClick={() => setViewYear(state.settings.viewYear + 1)}>
+                →
+              </button>
+            </div>
+          )}
         </div>
       </header>
       <main className={pathname === "/year" ? "page-year" : "page"}>

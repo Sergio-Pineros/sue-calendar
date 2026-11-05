@@ -11,9 +11,6 @@ export function ResearchView() {
   return (
     <div className="space-y-8">
       <header className="max-w-2xl">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.research.kicker}
-        </p>
         <h1 className="display text-4xl">{copy.research.title}</h1>
         <p className="mt-3 text-ink-soft">
           {copy.research.intro(SYNODIC_MONTH.toFixed(2))}

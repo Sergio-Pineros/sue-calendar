@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { PeriodGrid } from "@/components/PeriodGrid";
-import { LayerToggles } from "@/components/LayerToggles";
+import { LayersDisclosure } from "@/components/LayerToggles";
 import { useSueStore } from "@/components/StoreProvider";
 import { periodName } from "@/lib/sue-calendar";
 import { copy } from "@/lib/copy";
@@ -25,16 +25,16 @@ export function PeriodPage({ period }: { period: number }) {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div className="flex items-center justify-between">
-        <Link href={`/period/${prev}`} className="font-mono text-sm text-ink-soft">
+        <Link href={`/period/${prev}`} className="text-sm text-ink-soft">
           ← {periodName(prev, naming)}
         </Link>
-        <Link href={`/period/${next}`} className="font-mono text-sm text-ink-soft">
+        <Link href={`/period/${next}`} className="text-sm text-ink-soft">
           {periodName(next, naming)} →
         </Link>
       </div>
-      <LayerToggles />
+      <LayersDisclosure />
       <PeriodGrid period={period} />
       <form
         className="flex gap-2"

@@ -174,20 +174,17 @@ export function SettingsView() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-10">
+    <div className="mx-auto max-w-2xl space-y-14">
       <header>
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.settings.kicker}
-        </p>
         <h1 className="display text-4xl">{copy.settings.kicker}</h1>
         <button
           type="button"
-          className="ghost-action mt-4"
+          className="ghost-action mt-6"
           onClick={() => router.push("/onboarding")}
         >
           {copy.settings.setup}
         </button>
-        <p className="mt-1 text-sm text-ink-soft">{copy.settings.setupHint}</p>
+        <p className="mt-2 text-sm text-ink-soft">{copy.settings.setupHint}</p>
       </header>
 
       <section className="space-y-3">
@@ -203,9 +200,6 @@ export function SettingsView() {
               }`}
             >
               <p className="font-medium">{theme.label}</p>
-              <p className="mt-1 text-xs text-ink-soft">
-                {theme.origin}
-              </p>
             </button>
           ))}
         </div>
@@ -230,9 +224,6 @@ export function SettingsView() {
             {preset.label}
           </button>
         ))}
-        <p className="text-xs text-ink-soft">
-          {PERIOD_PRESETS.find((item) => item.id === state.settings.naming)?.origin}
-        </p>
         {state.settings.naming === "custom" && (
           <div className="grid gap-2 sm:grid-cols-2">
             {state.settings.customPeriodNames.map((name, index) => (

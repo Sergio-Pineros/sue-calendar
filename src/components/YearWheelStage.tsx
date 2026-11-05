@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useSueStore } from "./StoreProvider";
 import { YearWheel } from "./YearWheel";
-import { LayerToggles } from "./LayerToggles";
+import { LayersDisclosure } from "./LayerToggles";
 import { copy } from "@/lib/copy";
 import {
   daysInGregorianYear,
@@ -181,15 +181,8 @@ export function YearWheelStage() {
         aria-label={`Year wheel for ${year}`}
       >
         <div className="year-stage-bar">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-              {copy.year.kicker}
-            </p>
-            <h1 className="display text-3xl md:text-4xl">{year}</h1>
-          </div>
-          <div className="hidden md:block">
-            <LayerToggles />
-          </div>
+          <h1 className="display text-3xl md:text-4xl">{year}</h1>
+          <LayersDisclosure />
         </div>
 
         <div className="year-copy">
@@ -214,7 +207,7 @@ export function YearWheelStage() {
                   {periodName(period, naming)}
                 </button>
                 <p className="mt-2 text-sm text-ink-soft">
-                  {range.start.slice(5)} → {range.end.slice(5)} · {copy.period.weeks}
+                  {range.start.slice(5)} → {range.end.slice(5)}
                 </p>
               </div>
             );
@@ -239,7 +232,7 @@ export function YearWheelStage() {
             <defs>
               <path id={`${ringId}p`} d={RING_PATH} />
             </defs>
-            <circle r={R_LINE} fill="none" stroke="var(--engrave)" strokeWidth="0.35" opacity="0.55" />
+            <circle r={R_LINE} fill="none" stroke="var(--engrave)" strokeWidth="0.25" opacity="0.28" />
             <g
               ref={dot}
               className="year-dot"

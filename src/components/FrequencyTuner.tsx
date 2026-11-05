@@ -162,7 +162,7 @@ export function FrequencyTuner() {
       const prev = lastT.current || now;
       const dt = Math.min(0.032, (now - prev) / 1000 || 1 / 60);
       lastT.current = now;
-      const next = springStep(current, targetT, v, dt, damping, 0.4);
+      const next = springStep(current, targetT, v, dt, damping, 0.62);
       current = next.value;
       v = next.velocity;
       velRef.current = v;
@@ -248,7 +248,6 @@ export function FrequencyTuner() {
   return (
     <div className="tuner">
       <header className="tuner-head">
-        <p className="kicker">{copy.tune.kicker}</p>
         <p className="tuner-safety">{copy.tune.safety}</p>
       </header>
 
@@ -266,24 +265,15 @@ export function FrequencyTuner() {
           aria-valuenow={Math.round(hz)}
           aria-label={copy.tune.dial}
         >
-          <defs>
-            <radialGradient id="tuner-stone" cx="46%" cy="38%" r="62%">
-              <stop offset="0%" stopColor="var(--wood)" />
-              <stop offset="68%" stopColor="var(--wood-deep)" />
-              <stop offset="100%" stopColor="var(--paper-deep)" />
-            </radialGradient>
-          </defs>
-          <circle cx="160" cy="160" r="154" fill="var(--paper-deep)" />
-          <circle cx="160" cy="160" r="146" fill="url(#tuner-stone)" />
-          <circle cx="160" cy="160" r="150" fill="none" stroke="var(--brass)" strokeWidth="10" />
-          <circle cx="160" cy="160" r="138" fill="none" stroke="var(--brass-soft)" strokeWidth="1.2" opacity="0.45" />
-          <circle cx="160" cy="160" r="88" fill="var(--paper-deep)" opacity="0.55" />
+          <circle cx="160" cy="160" r="150" fill="var(--paper-deep)" />
+          <circle cx="160" cy="160" r="148" fill="none" stroke="var(--engrave)" strokeWidth="1.2" opacity="0.4" />
+          <circle cx="160" cy="160" r="88" fill="var(--paper)" opacity="0.4" />
           <path
             d={`M ${polar(160, 160, 126, START).x} ${polar(160, 160, 126, START).y} A 126 126 0 1 1 ${polar(160, 160, 126, START + ARC).x} ${polar(160, 160, 126, START + ARC).y}`}
             fill="none"
-            stroke="var(--brass)"
-            strokeWidth="3.2"
-            opacity="0.88"
+            stroke="var(--engrave)"
+            strokeWidth="2"
+            opacity="0.55"
           />
           {Array.from({ length: 25 }, (_, i) => {
             const a = START + (i / 24) * ARC;
@@ -296,9 +286,9 @@ export function FrequencyTuner() {
                 y1={p0.y}
                 x2={p1.x}
                 y2={p1.y}
-                stroke="var(--brass)"
-                strokeWidth={i % 4 === 0 ? 2.1 : 1}
-                opacity={i % 4 === 0 ? 0.95 : 0.42}
+                stroke="var(--engrave)"
+                strokeWidth={i % 4 === 0 ? 1.6 : 0.8}
+                opacity={i % 4 === 0 ? 0.55 : 0.22}
               />
             );
           })}
@@ -307,14 +297,14 @@ export function FrequencyTuner() {
             className="tuner-scope"
             d="M 80 160 A 80 80 0 1 1 240 160"
             fill="none"
-            stroke="var(--brass)"
-            strokeWidth="1.15"
-            opacity="0.42"
+            stroke="var(--engrave)"
+            strokeWidth="1"
+            opacity="0.22"
           />
           <g style={{ transform: `rotate(${needle}deg)`, transformOrigin: "160px 160px" }}>
-            <line x1="160" y1="160" x2="160" y2="42" stroke="var(--brass-soft)" strokeWidth="3.4" strokeLinecap="round" />
+            <line x1="160" y1="160" x2="160" y2="42" stroke="var(--ink-soft)" strokeWidth="2.4" strokeLinecap="round" />
           </g>
-          <circle cx="160" cy="160" r="11" fill="var(--brass)" />
+          <circle cx="160" cy="160" r="8" fill="var(--ink-soft)" />
         </svg>
       </section>
 

@@ -44,7 +44,7 @@ export function InstallHint() {
 
   return (
     <section className="landing-install">
-      <p className="kicker">{copy.landing.install}</p>
+      <p className="text-sm text-ink-soft">{copy.landing.install}</p>
       {promptEvent ? (
         <button type="button" className="btn-fill landing-cta" onClick={() => void install()}>
           {copy.landing.installAction}

@@ -2,193 +2,193 @@
 
 :root,
 [data-theme="ancient-amethyst"] {
-  --paper: #100c16;
-  --paper-deep: #08060c;
-  --card: #18141e;
-  --ink: #d6d0dc;
-  --ink-soft: #9a92a6;
-  --line: #2a2434;
-  --brass: #b8aea4;
-  --brass-soft: #c8c0b6;
-  --lunar: #a8a2b0;
-  --rest: #8a8494;
-  --year-day: #c4b4aa;
-  --focus: #1a1620;
-  --hud: rgba(180, 172, 186, 0.18);
-  --moss: #4a4454;
-  --wood: #2a2434;
-  --wood-deep: #16121c;
-  --engrave: #8a8494;
-  --page-top: #141018;
-  --page-bottom: #0a0810;
-  --wash-a: rgba(160, 152, 170, 0.1);
-  --wash-b: rgba(70, 60, 90, 0.16);
+  --paper: #0e0d10;
+  --paper-deep: #09080b;
+  --card: #141318;
+  --ink: #d2cfc8;
+  --ink-soft: #8a8782;
+  --line: #1c1b20;
+  --brass: #9a9690;
+  --brass-soft: #aea9a4;
+  --lunar: #9a979c;
+  --rest: #7a787c;
+  --year-day: #a8a49e;
+  --focus: #121116;
+  --hud: rgba(210, 207, 200, 0.08);
+  --moss: #3a383c;
+  --wood: #1c1a20;
+  --wood-deep: #121016;
+  --engrave: #6a686c;
+  --page-top: #0e0d10;
+  --page-bottom: #09080b;
+  --wash-a: transparent;
+  --wash-b: transparent;
   --scheme: dark;
-  --period-1: #14101c;
-  --period-2: #1a1424;
-  --period-3: #20182c;
-  --period-4: #261c34;
-  --period-5: #2c203c;
-  --period-6: #322444;
-  --period-7: #38284c;
-  --period-8: #3e2c54;
-  --period-9: #44305c;
-  --period-10: #4a3464;
-  --period-11: #50386c;
-  --period-12: #563c74;
-  --period-13: #5c407c;
+  --period-1: #121018;
+  --period-2: #14111a;
+  --period-3: #16121c;
+  --period-4: #18131e;
+  --period-5: #1a1520;
+  --period-6: #1c1722;
+  --period-7: #1e1924;
+  --period-8: #201b26;
+  --period-9: #221d28;
+  --period-10: #241f2a;
+  --period-11: #26212c;
+  --period-12: #28232e;
+  --period-13: #2a2530;
 }
 
 [data-theme="ancient-wood"] {
-  --paper: #14100c;
-  --paper-deep: #0c0806;
-  --card: #1c1814;
-  --ink: #d8d0c4;
-  --ink-soft: #9a9080;
-  --line: #32281c;
-  --brass: #b4a488;
-  --brass-soft: #c4b69a;
-  --lunar: #b0a898;
-  --rest: #8a7c68;
-  --year-day: #c0a890;
-  --focus: #181410;
-  --hud: rgba(180, 164, 136, 0.16);
-  --moss: #3a3824;
-  --wood: #2a2218;
-  --wood-deep: #16120c;
-  --engrave: #8a7c68;
-  --page-top: #181410;
-  --page-bottom: #0c0806;
-  --wash-a: rgba(160, 140, 100, 0.1);
-  --wash-b: rgba(80, 56, 32, 0.16);
+  --paper: #100e0c;
+  --paper-deep: #0a0807;
+  --card: #161412;
+  --ink: #d0cbc4;
+  --ink-soft: #8a857e;
+  --line: #1e1b18;
+  --brass: #9a948c;
+  --brass-soft: #aea89f;
+  --lunar: #9a9690;
+  --rest: #7a7670;
+  --year-day: #a8a298;
+  --focus: #141210;
+  --hud: rgba(208, 203, 196, 0.08);
+  --moss: #3a3834;
+  --wood: #1e1a16;
+  --wood-deep: #12100e;
+  --engrave: #6a6660;
+  --page-top: #100e0c;
+  --page-bottom: #0a0807;
+  --wash-a: transparent;
+  --wash-b: transparent;
   --scheme: dark;
-  --period-1: #1c1410;
-  --period-2: #201810;
-  --period-3: #241c14;
-  --period-4: #2a2018;
-  --period-5: #30241c;
-  --period-6: #362820;
-  --period-7: #3c2c24;
-  --period-8: #423028;
-  --period-9: #48342c;
-  --period-10: #4e3830;
-  --period-11: #543c34;
-  --period-12: #5a4038;
-  --period-13: #60443c;
+  --period-1: #141210;
+  --period-2: #161412;
+  --period-3: #181614;
+  --period-4: #1a1816;
+  --period-5: #1c1a16;
+  --period-6: #1e1c18;
+  --period-7: #201e1a;
+  --period-8: #22201c;
+  --period-9: #24221e;
+  --period-10: #262420;
+  --period-11: #282622;
+  --period-12: #2a2824;
+  --period-13: #2c2a26;
 }
 
 [data-theme="solarpunk-mecha"] {
-  --paper: #0c120e;
-  --paper-deep: #060a07;
-  --card: #121a14;
-  --ink: #d0d8d0;
-  --ink-soft: #8a9488;
-  --line: #243028;
-  --brass: #a8a880;
-  --brass-soft: #b8b890;
-  --lunar: #8a9a88;
-  --rest: #6a7a68;
-  --year-day: #b8a888;
-  --focus: #101610;
-  --hud: rgba(168, 168, 128, 0.16);
-  --moss: #2a3a2c;
-  --wood: #1c281c;
-  --wood-deep: #101810;
-  --engrave: #7a8a74;
-  --page-top: #101610;
-  --page-bottom: #060a07;
-  --wash-a: rgba(140, 150, 110, 0.1);
-  --wash-b: rgba(40, 70, 48, 0.16);
+  --paper: #0c0e0c;
+  --paper-deep: #080908;
+  --card: #121412;
+  --ink: #c8ccc8;
+  --ink-soft: #828682;
+  --line: #1a1c1a;
+  --brass: #949890;
+  --brass-soft: #a8aca4;
+  --lunar: #909490;
+  --rest: #727672;
+  --year-day: #a4a89e;
+  --focus: #101210;
+  --hud: rgba(200, 204, 200, 0.08);
+  --moss: #343834;
+  --wood: #161816;
+  --wood-deep: #0e100e;
+  --engrave: #646864;
+  --page-top: #0c0e0c;
+  --page-bottom: #080908;
+  --wash-a: transparent;
+  --wash-b: transparent;
   --scheme: dark;
-  --period-1: #101810;
-  --period-2: #141c14;
-  --period-3: #182014;
-  --period-4: #1c2418;
-  --period-5: #20281c;
-  --period-6: #242c20;
-  --period-7: #283024;
-  --period-8: #2c3428;
-  --period-9: #30382c;
-  --period-10: #343c30;
-  --period-11: #384034;
-  --period-12: #3c4438;
-  --period-13: #40483c;
+  --period-1: #101210;
+  --period-2: #121412;
+  --period-3: #141614;
+  --period-4: #161816;
+  --period-5: #181a18;
+  --period-6: #1a1c1a;
+  --period-7: #1c1e1c;
+  --period-8: #1e201e;
+  --period-9: #202220;
+  --period-10: #222422;
+  --period-11: #242624;
+  --period-12: #262826;
+  --period-13: #282a28;
 }
 
 [data-theme="night-ritual"] {
-  --paper: #0a0810;
-  --paper-deep: #06040a;
-  --card: #14101a;
-  --ink: #d4ced8;
-  --ink-soft: #9690a0;
-  --line: #282430;
-  --brass: #b4aeb8;
-  --brass-soft: #c4bec8;
-  --lunar: #a49eac;
-  --rest: #868090;
-  --year-day: #c0b0b4;
-  --focus: #121018;
-  --hud: rgba(180, 172, 186, 0.14);
-  --moss: #3a3448;
-  --wood: #1c1824;
-  --wood-deep: #100c16;
-  --engrave: #8a8494;
-  --page-top: #100c16;
-  --page-bottom: #06040a;
-  --wash-a: rgba(150, 144, 164, 0.1);
-  --wash-b: rgba(50, 40, 70, 0.18);
+  --paper: #0c0b0e;
+  --paper-deep: #08070a;
+  --card: #131216;
+  --ink: #d0cdc8;
+  --ink-soft: #888582;
+  --line: #1b1a1e;
+  --brass: #989490;
+  --brass-soft: #aca8a4;
+  --lunar: #98969a;
+  --rest: #78767a;
+  --year-day: #a6a29e;
+  --focus: #111016;
+  --hud: rgba(208, 205, 200, 0.08);
+  --moss: #38363a;
+  --wood: #1a1820;
+  --wood-deep: #100e14;
+  --engrave: #68666a;
+  --page-top: #0c0b0e;
+  --page-bottom: #08070a;
+  --wash-a: transparent;
+  --wash-b: transparent;
   --scheme: dark;
-  --period-1: #120e18;
-  --period-2: #181420;
-  --period-3: #1e1828;
-  --period-4: #241c30;
-  --period-5: #2a2038;
-  --period-6: #302440;
-  --period-7: #362848;
-  --period-8: #3c2c50;
-  --period-9: #423058;
-  --period-10: #483460;
-  --period-11: #4e3868;
-  --period-12: #543c70;
-  --period-13: #5a4078;
+  --period-1: #100e14;
+  --period-2: #121016;
+  --period-3: #141218;
+  --period-4: #16141a;
+  --period-5: #18161c;
+  --period-6: #1a181e;
+  --period-7: #1c1a20;
+  --period-8: #1e1c22;
+  --period-9: #201e24;
+  --period-10: #222026;
+  --period-11: #242228;
+  --period-12: #26242a;
+  --period-13: #28262c;
 }
 
 [data-theme="moss-circuit"] {
-  --paper: #0a100c;
-  --paper-deep: #060806;
-  --card: #101610;
-  --ink: #d0d8d0;
-  --ink-soft: #8a9488;
-  --line: #243028;
-  --brass: #a4ac88;
-  --brass-soft: #b4bc98;
-  --lunar: #8a9a88;
-  --rest: #6a7a68;
-  --year-day: #b8b090;
-  --focus: #0c140e;
-  --hud: rgba(164, 172, 136, 0.14);
-  --moss: #2a3a2c;
-  --wood: #182418;
-  --wood-deep: #0c140e;
-  --engrave: #7a8a74;
-  --page-top: #0c140e;
-  --page-bottom: #060806;
-  --wash-a: rgba(140, 150, 110, 0.1);
-  --wash-b: rgba(40, 70, 48, 0.16);
+  --paper: #0c0e0c;
+  --paper-deep: #080908;
+  --card: #101210;
+  --ink: #c8ccc8;
+  --ink-soft: #828682;
+  --line: #1a1c1a;
+  --brass: #949890;
+  --brass-soft: #a8aca4;
+  --lunar: #909490;
+  --rest: #727672;
+  --year-day: #a4a89e;
+  --focus: #0e100e;
+  --hud: rgba(200, 204, 200, 0.08);
+  --moss: #343834;
+  --wood: #141614;
+  --wood-deep: #0c0e0c;
+  --engrave: #646864;
+  --page-top: #0c0e0c;
+  --page-bottom: #080908;
+  --wash-a: transparent;
+  --wash-b: transparent;
   --scheme: dark;
-  --period-1: #0c140e;
-  --period-2: #101810;
-  --period-3: #141c14;
-  --period-4: #182018;
-  --period-5: #1c241c;
-  --period-6: #202820;
-  --period-7: #242c24;
-  --period-8: #283028;
-  --period-9: #2c342c;
-  --period-10: #303830;
-  --period-11: #343c34;
-  --period-12: #384038;
-  --period-13: #3c443c;
+  --period-1: #0e100e;
+  --period-2: #101210;
+  --period-3: #121412;
+  --period-4: #141614;
+  --period-5: #161816;
+  --period-6: #181a18;
+  --period-7: #1a1c1a;
+  --period-8: #1c1e1c;
+  --period-9: #1e201e;
+  --period-10: #202220;
+  --period-11: #222422;
+  --period-12: #242624;
+  --period-13: #262826;
 }
 
 @theme inline {
@@ -226,28 +226,7 @@ body {
 }
 
 body {
-  background-image:
-    radial-gradient(1100px 680px at 8% -12%, var(--wash-a), transparent 52%),
-    radial-gradient(900px 560px at 100% 8%, var(--wash-b), transparent 48%),
-    linear-gradient(180deg, var(--page-top) 0%, var(--paper) 42%, var(--page-bottom) 100%);
-  background-attachment: fixed;
-}
-
-body::before {
-  content: "";
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  opacity: 0.07;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 3px,
-      color-mix(in oklab, var(--ink) 18%, transparent) 3px,
-      color-mix(in oklab, var(--ink) 18%, transparent) 4px
-    );
-  mix-blend-mode: multiply;
+  background: var(--paper);
 }
 
 h1,
@@ -370,15 +349,11 @@ a:active {
 
 .sprint-tile {
   display: flex;
-  min-height: 176px;
+  min-height: 120px;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 28px 14px 18px;
-  background:
-    radial-gradient(90% 80% at 8% 0%, color-mix(in oklab, var(--brass) 24%, transparent), transparent 58%),
-    radial-gradient(80% 70% at 100% 110%, color-mix(in oklab, var(--moss) 18%, transparent), transparent 62%);
-  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--brass) 26%, transparent);
+  gap: 8px;
+  padding: 32px 8px 12px;
 }
 
 .sprint-tile:active,
@@ -460,9 +435,7 @@ a:active {
   position: absolute;
   inset: 0;
   overflow: auto;
-  background:
-    radial-gradient(900px 480px at 50% -10%, var(--wash-a), transparent 55%),
-    linear-gradient(180deg, var(--page-top) 0%, var(--paper) 46%, var(--page-bottom) 100%);
+  background: var(--paper);
   transform: translateY(100%);
 }
 
@@ -497,12 +470,9 @@ a:active {
   margin: 0 auto;
 }
 
-.sprint-ring {
-  filter: drop-shadow(0 16px 22px color-mix(in oklab, var(--paper-deep) 70%, transparent));
-}
-
+.sprint-ring,
 .wheel-stage svg {
-  filter: drop-shadow(0 22px 28px color-mix(in oklab, var(--paper-deep) 80%, transparent));
+  filter: none;
 }
 
 html[data-year-blend] body {
@@ -512,17 +482,15 @@ html[data-year-blend] body {
 
 .period-preset {
   display: flex;
-  min-height: 96px;
+  min-height: 88px;
   flex-direction: column;
   justify-content: flex-end;
   gap: 8px;
-  padding: 12px 10px 10px;
+  padding: 16px 8px 10px;
   border: 0;
-  background:
-    radial-gradient(90% 80% at 10% 0%, color-mix(in oklab, var(--brass) 18%, transparent), transparent 60%);
+  background: transparent;
   color: inherit;
   text-align: left;
-  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--brass) 22%, transparent);
 }
 
 .period-preset.is-active {
@@ -627,7 +595,7 @@ html[data-year-blend] body {
   align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
-  padding: 18px 20px 0;
+  padding: 28px 28px 0;
 }
 
 .year-copy {
@@ -689,6 +657,7 @@ html[data-year-blend] body {
   pointer-events: auto;
   cursor: pointer;
   font-weight: 500;
+  opacity: 0.55;
 }
 
 .year-name-ring .year-dot {
@@ -705,8 +674,8 @@ html[data-year-blend] body {
   width: 100%;
   max-width: 72rem;
   margin: 0 auto;
-  padding: 24px max(20px, env(safe-area-inset-right, 0px)) 32px
-    max(20px, env(safe-area-inset-left, 0px));
+  padding: 40px max(28px, env(safe-area-inset-right, 0px)) 48px
+    max(28px, env(safe-area-inset-left, 0px));
 }
 
 .page-year {
@@ -719,8 +688,8 @@ html[data-year-blend] body {
   z-index: 40;
   padding-top: env(safe-area-inset-top, 0px);
   background: color-mix(in srgb, var(--paper) 48%, transparent);
-  backdrop-filter: blur(22px) saturate(120%);
-  -webkit-backdrop-filter: blur(22px) saturate(120%);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
   mask-image: linear-gradient(180deg, #000 78%, transparent);
 }
 
@@ -781,9 +750,8 @@ html[data-year-blend] body {
   padding: 6px;
   border-radius: 22px;
   background: color-mix(in srgb, var(--paper) 56%, transparent);
-  backdrop-filter: blur(24px) saturate(120%);
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
-  box-shadow: 0 16px 40px color-mix(in srgb, var(--paper-deep) 46%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 @media (min-width: 768px) {
@@ -802,7 +770,8 @@ html[data-year-blend] body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 28px;
+  padding-top: 12px;
 }
 
 .tuner-head {
@@ -827,7 +796,6 @@ html[data-year-blend] body {
   width: 100%;
   touch-action: none;
   cursor: grab;
-  filter: drop-shadow(0 22px 48px color-mix(in srgb, var(--wood-deep) 58%, transparent));
 }
 
 .tuner-dial:active {
@@ -886,17 +854,16 @@ html[data-year-blend] body {
   min-height: 64px;
   border: 0;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
   color: var(--ink);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
 .tuner-play.is-on {
-  background: color-mix(in srgb, var(--brass) 22%, var(--paper));
+  background: color-mix(in srgb, var(--ink) 14%, var(--paper));
   color: var(--ink);
 }
 
@@ -983,9 +950,8 @@ html[data-year-blend] body {
 }
 
 .btn-fill {
-  background: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
 .day-cell {
@@ -995,9 +961,8 @@ html[data-year-blend] body {
 }
 
 .day-cell.is-today {
-  background: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  background: color-mix(in srgb, var(--ink) 8%, var(--paper));
   color: var(--ink);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 .day-cell.is-rest {
@@ -1031,8 +996,8 @@ html[data-year-blend] body {
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   border-radius: 28px 28px 0 0;
   background: color-mix(in srgb, var(--paper) 78%, transparent);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   transform: translateY(100%);
 }
 
@@ -1069,10 +1034,10 @@ html[data-year-blend] body {
 
 .landing {
   min-height: 100svh;
-  padding: calc(12px + env(safe-area-inset-top, 0px))
-    max(20px, env(safe-area-inset-right, 0px))
-    calc(32px + env(safe-area-inset-bottom, 0px))
-    max(20px, env(safe-area-inset-left, 0px));
+  padding: calc(28px + env(safe-area-inset-top, 0px))
+    max(28px, env(safe-area-inset-right, 0px))
+    calc(40px + env(safe-area-inset-bottom, 0px))
+    max(28px, env(safe-area-inset-left, 0px));
 }
 
 .landing-wait {
@@ -1086,8 +1051,8 @@ html[data-year-blend] body {
 }
 
 .landing-hero {
-  width: min(78vw, 340px);
-  margin: 12px auto 8px;
+  width: min(72vw, 320px);
+  margin: 28px auto 36px;
   pointer-events: none;
 }
 
@@ -1098,7 +1063,7 @@ html[data-year-blend] body {
 }
 
 .landing-copy h1 {
-  margin: 8px 0 12px;
+  margin: 0 0 16px;
   font-size: clamp(3.2rem, 14vw, 5rem);
 }
 
@@ -1108,27 +1073,28 @@ html[data-year-blend] body {
 }
 
 .landing-cta {
-  margin-top: 20px;
+  margin-top: 28px;
   min-height: 48px;
   padding: 0 22px;
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.04em;
 }
 
 .landing-beats {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
-  margin: 32px 0 0;
+  gap: 8px 22px;
+  margin: 48px 0 0;
   padding: 0;
   list-style: none;
   color: var(--ink-soft);
-  font-weight: 500;
+  font-weight: 400;
+  opacity: 0.72;
 }
 
 .landing-install {
-  margin-top: 40px;
+  margin-top: 56px;
 }
 
 .landing-hint {
@@ -1141,7 +1107,7 @@ html[data-year-blend] body {
 }
 
 .landing-foot {
-  margin-top: 48px;
+  margin-top: 64px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px 20px;
@@ -1155,6 +1121,60 @@ html[data-year-blend] body {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  padding: 8px 0 24px;
+}
+
+.home-date {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 500;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  min-height: 44px;
+  padding: 0;
+}
+
+.home-detail {
+  width: 100%;
+  max-width: 36rem;
+  display: grid;
+  gap: 28px;
+  color: var(--ink-soft);
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 28px;
+}
+
+.home-actions a,
+.home-actions button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  padding: 0 4px;
+}
+
+.layers-toggle {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 0;
 }
 
 @media (prefers-reduced-transparency: reduce) {

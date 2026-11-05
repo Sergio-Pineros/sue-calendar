@@ -17,7 +17,7 @@ export function OnboardingFlow() {
   const [step, setStep] = useState(0);
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
+    <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-8 py-24">
       <div className="sticky top-0 z-10 flex justify-end bg-paper/80 py-2 backdrop-blur-md">
         <button
           type="button"
@@ -31,7 +31,7 @@ export function OnboardingFlow() {
         </button>
       </div>
       <p className="display text-center text-5xl tracking-[-0.04em]">{copy.app.name}</p>
-      <div className="mx-auto mt-8 flex gap-2">
+      <div className="mx-auto mt-12 flex gap-2">
         {copy.onboarding.steps.map((label, i) => (
           <span
             key={label}
@@ -158,12 +158,11 @@ export function OnboardingFlow() {
 function Choice({
   active,
   title,
-  body,
   onClick,
 }: {
   active: boolean;
   title: string;
-  body: string;
+  body?: string;
   onClick: () => void;
 }) {
   return (
@@ -173,9 +172,6 @@ function Choice({
       className={`w-full py-3 text-left ${active ? "text-ink" : "text-ink-soft"}`}
     >
       <p className="font-medium">{title}</p>
-      <p className="mt-1 text-sm text-ink-soft">
-        {body}
-      </p>
     </button>
   );
 }

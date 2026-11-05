@@ -12,7 +12,8 @@ import {
 } from "@/lib/period-colors";
 import type { PeriodColorPreset } from "@/lib/types";
 
-export function PeriodColorStudio({ compact = false }: { compact?: boolean }) {
+export function PeriodColorStudio({ compact }: { compact?: boolean } = {}) {
+  void compact;
   const { state, updateSettings } = useSueStore();
   const naming = {
     preset: state.settings.naming,
@@ -40,7 +41,7 @@ export function PeriodColorStudio({ compact = false }: { compact?: boolean }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
+        <p className="mb-4 text-sm text-ink-soft">
           {copy.settings.colorPresets}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -61,9 +62,6 @@ export function PeriodColorStudio({ compact = false }: { compact?: boolean }) {
                   ))}
                 </span>
                 <span className="display text-xl leading-none">{preset.label}</span>
-                {!compact && (
-                  <span className="text-xs text-ink-soft">{preset.origin}</span>
-                )}
               </button>
             );
           })}
@@ -71,7 +69,7 @@ export function PeriodColorStudio({ compact = false }: { compact?: boolean }) {
       </div>
 
       <div>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
+        <p className="mb-4 text-sm text-ink-soft">
           {copy.settings.pickPeriod}
         </p>
         <div className="period-discs">
@@ -99,8 +97,8 @@ export function PeriodColorStudio({ compact = false }: { compact?: boolean }) {
       </div>
 
       <div>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-          {periodName(focus, naming)} · {copy.settings.colorSwatches}
+        <p className="mb-4 text-sm text-ink-soft">
+          {periodName(focus, naming)}
         </p>
         <div className="period-swatches">
           {PERIOD_SWATCHES.map((hex) => (

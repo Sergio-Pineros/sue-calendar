@@ -39,7 +39,7 @@ export function springStep(
   velocity: number,
   dt: number,
   damping = 1,
-  response = 0.4,
+  response = 0.62,
 ): { value: number; velocity: number } {
   const omega = (2 * Math.PI) / Math.max(0.08, response);
   const zeta = damping;

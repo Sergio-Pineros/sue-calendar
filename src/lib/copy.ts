@@ -79,6 +79,9 @@ export const copy = {
       n === 1 ? "1 rest day this week." : `${n} rest days this week.`,
     markRest: "Mark today as rest",
     unmarkRest: "Clear today's rest",
+    rest: "Rest",
+    clear: "Clear",
+    focusAction: "Focus",
     overloaded: (total: number) =>
       `This week is dense (${total} events). SÚE is not asking for more output — consider rest or moving something to the next cycle.`,
     thisWeek: "This week",
@@ -102,6 +105,7 @@ export const copy = {
   },
   year: {
     kicker: "Year map",
+    layers: "Layers",
     honesty:
       "28 days are not a lunar month. Moon phases sit on top as a calculation, not as the period's name.",
     events: (n: number) => (n === 1 ? "1 event" : `${n} events`),
@@ -287,7 +291,7 @@ export const copy = {
   },
   sprints: {
     kicker: "Sprints",
-    title: "Moon-based sprints",
+    title: "Sprints",
     honesty:
       "Recommendations are a rhythm — a framework for when to push, work lightly, or rest. They are not science and they do not predict outcomes.",
     create: "New sprint",

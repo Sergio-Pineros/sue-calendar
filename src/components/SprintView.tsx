@@ -20,15 +20,6 @@ import { createGoogleEvent, googleClientId } from "@/lib/google-calendar";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import type { Sprint, SprintIntensity, SprintStyle } from "@/lib/types";
 
-const GLYPH: Record<SprintStyle, string> = {
-  "lunar-full": "( @ )",
-  "lunar-waxing": "  |) ",
-  "lunar-waning": " (|  ",
-  period: "[IIII]",
-  seasonal: " /\\\\ ",
-  custom: " + + ",
-};
-
 function intensityColor(intensity: SprintIntensity): string {
   if (intensity === "push") return "var(--year-day)";
   if (intensity === "light") return "var(--brass)";
@@ -66,16 +57,8 @@ function SprintRing({
 
   return (
     <svg viewBox="0 0 400 400" className="sprint-ring mx-auto w-full max-w-[420px]" role="img" aria-label={sprint.title}>
-      <defs>
-        <radialGradient id="sprint-stone" cx="50%" cy="42%" r="58%">
-          <stop offset="0%" stopColor="var(--wood)" />
-          <stop offset="70%" stopColor="var(--wood-deep)" />
-          <stop offset="100%" stopColor="var(--paper-deep)" />
-        </radialGradient>
-      </defs>
-      <circle cx={cx} cy={cy} r={198} fill="url(#sprint-stone)" />
-      <circle cx={cx} cy={cy} r={196} fill="none" stroke="var(--brass)" strokeWidth="8" opacity="0.55" />
-      <circle cx={cx} cy={cy} r={188} fill="none" stroke="var(--engrave)" strokeWidth="2" />
+      <circle cx={cx} cy={cy} r={198} fill="var(--paper-deep)" />
+      <circle cx={cx} cy={cy} r={188} fill="none" stroke="var(--engrave)" strokeWidth="1" opacity="0.4" />
       {sprint.days.map((day, index) => {
         const intensity = sprintIntensityOn(sprint, day.date) ?? day.recommended;
         const a0 = index * sweep + 0.45;
@@ -86,10 +69,10 @@ function SprintRing({
           <g key={day.date}>
             <path
               d={wedge(cx, cy, 104, 178, a0, a1)}
-              fill={`color-mix(in oklab, ${intensityColor(intensity)} 38%, var(--paper-deep))`}
-              fillOpacity={active ? 1 : intensity === "rest" ? 0.7 : 0.88}
-              stroke={active ? "var(--ink)" : "color-mix(in oklab, var(--paper-deep) 35%, transparent)"}
-              strokeWidth={active ? 2.2 : 0.4}
+              fill={`color-mix(in oklab, ${intensityColor(intensity)} 18%, var(--paper-deep))`}
+              fillOpacity={active ? 1 : intensity === "rest" ? 0.55 : 0.72}
+              stroke={active ? "color-mix(in oklab, var(--ink) 28%, transparent)" : "transparent"}
+              strokeWidth={active ? 1.2 : 0}
               className="cursor-pointer"
               onClick={() => onPick(day.date)}
             />
@@ -114,23 +97,14 @@ function SprintRing({
           d="M44 200 A156 156 0 0 1 356 200"
           fill="none"
           stroke="var(--lunar)"
-          strokeWidth="2.4"
-          strokeOpacity="0.7"
+          strokeWidth="1.2"
+          strokeOpacity="0.35"
         />
       )}
-      <circle cx={cx} cy={cy} r={94} fill="var(--paper-deep)" stroke="var(--engrave)" strokeWidth="1.2" />
+      <circle cx={cx} cy={cy} r={94} fill="var(--paper-deep)" />
       <text
         x={cx}
-        y={cy - 10}
-        textAnchor="middle"
-        fill="var(--brass)"
-        style={{ fontSize: 13, letterSpacing: "0.14em", fontWeight: 500 }}
-      >
-        {GLYPH[sprint.style]}
-      </text>
-      <text
-        x={cx}
-        y={cy + 18}
+        y={cy + 6}
         textAnchor="middle"
         fill="var(--ink)"
         style={{ fontSize: 20, fontWeight: 500, letterSpacing: "-0.03em" }}
@@ -291,7 +265,6 @@ function SprintSheet({
           onPointerCancel={onHandleUp}
         >
           <span />
-          <p>{copy.sprints.dismiss}</p>
         </div>
         <div className="sprint-sheet-body">
           <input
@@ -300,7 +273,7 @@ function SprintSheet({
             aria-label={copy.sprints.project}
             className="sprint-ghost-input display w-full text-4xl"
           />
-          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">
+          <p className="mt-3 text-sm text-ink-soft">
             {SPRINT_STYLES.find((item) => item.id === live.style)?.label} · {live.startDate} → {live.endDate}
           </p>
           <p className="text-sm text-ink-soft">
@@ -411,18 +384,12 @@ export function SprintView() {
   const open = state.sprints.find((item) => item.id === openId) ?? null;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-14">
       <header>
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.sprints.kicker}
-        </p>
         <h1 className="display text-4xl">{copy.sprints.title}</h1>
       </header>
 
       <section>
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.sprints.pick}
-        </p>
         <div className="sprint-picker">
           {SPRINT_STYLES.map((item) => (
             <button
@@ -431,9 +398,6 @@ export function SprintView() {
               className="sprint-tile"
               onClick={() => openStyle(item.id)}
             >
-              <span className="sprint-glyph" aria-hidden>
-                {GLYPH[item.id]}
-              </span>
               <span className="display text-2xl leading-none">{item.label}</span>
             </button>
           ))}
@@ -441,9 +405,6 @@ export function SprintView() {
       </section>
 
       <section>
-        <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.22em] text-ink-soft">
-          {copy.sprints.yours}
-        </p>
         {state.sprints.length === 0 && (
           <p className="text-sm text-ink-soft">{copy.sprints.empty}</p>
         )}
@@ -457,9 +418,6 @@ export function SprintView() {
                 className="sprint-row"
                 onClick={() => setOpenId(sprint.id)}
               >
-                <span className="sprint-glyph" aria-hidden>
-                  {GLYPH[sprint.style]}
-                </span>
                 <span className="min-w-0 flex-1 text-left">
                   <span className="display block text-2xl">{sprint.title}</span>
                   <span className="block text-sm text-ink-soft">
