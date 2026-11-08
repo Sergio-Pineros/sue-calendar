@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { YearWheel } from "@/components/YearWheel";
+import { MoonBackdrop } from "@/components/MoonBackdrop";
 import { useSueStore } from "@/components/StoreProvider";
+import { useLocalDateISO } from "@/hooks/useLocalDateISO";
 import {
   datesInWeek,
   formatGregorianLong,
   formatSueLabel,
   gregorianToSue,
-  todayISO,
 } from "@/lib/sue-calendar";
 import { eventsOnDate } from "@/lib/planning";
 import { newHabit, newRest } from "@/lib/storage";
@@ -39,7 +40,7 @@ export function TodayHome() {
     preset: state.settings.naming,
     customNames: state.settings.customPeriodNames,
   };
-  const today = todayISO();
+  const today = useLocalDateISO();
   const mapped = gregorianToSue(today, naming);
   const period = mapped.suePeriod ?? 1;
   const week = mapped.sueWeekInPeriod ?? 1;
@@ -69,7 +70,10 @@ export function TodayHome() {
 
   return (
     <div className="home">
-      <YearWheel compact hideChrome />
+      <div className="home-wheel">
+        <MoonBackdrop iso={today} />
+        <YearWheel compact hideChrome pinToday />
+      </div>
 
       <button
         type="button"

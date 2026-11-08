@@ -1,13 +1,18 @@
+import { gregorianToSue } from "./sue-calendar";
 import {
   clamp,
+  dayMarkerAngle,
   doyFromProgress,
+  isAtTwelve,
   lerpAt,
+  offsetAfterDateChange,
   offsetFromDoy,
   pathOffset,
   periodIndexFromDoy,
   periodStartDayOfYear,
   positionAt,
   progressFromDoy,
+  restRotationForToday,
   ringAngles,
   scrollFor,
   snapProgressToNearestDay,
@@ -49,6 +54,46 @@ export function runWheelScrubTests(): void {
   const dim = 365;
   assert(offsetFromDoy(1, 1, dim) === 0, "today at doy 1 has no offset");
   assert(offsetFromDoy(2, 1, dim) < 0, "later day needs a negative offset");
+
+  const cases: { iso: string; dim: number; label: string }[] = [
+    { iso: "2026-01-01", dim: 365, label: "Jan 1" },
+    { iso: "2026-11-05", dim: 365, label: "a mid-year day" },
+    { iso: "2026-12-31", dim: 365, label: "Year Day" },
+    { iso: "2024-06-16", dim: 366, label: "day before Leap Day" },
+    { iso: "2024-06-17", dim: 366, label: "Leap Day" },
+    { iso: "2024-06-18", dim: 366, label: "day after Leap Day" },
+    { iso: "2024-12-31", dim: 366, label: "leap Year Day" },
+  ];
+  for (const item of cases) {
+    const mapped = gregorianToSue(item.iso);
+    const angle = dayMarkerAngle(mapped.dayOfYear, mapped.dayOfYear, item.dim, 0);
+    assert(isAtTwelve(angle), `${item.label} sits at 12 o'clock when offset is 0 (got ${angle})`);
+    assert(
+      Math.abs(
+        restRotationForToday(mapped.dayOfYear, item.dim) +
+          (mapped.dayOfYear - 0.5) * (360 / item.dim),
+      ) < 1e-9,
+      `rest rotation for ${item.label}`,
+    );
+  }
+  assert(gregorianToSue("2026-12-31").isYearDay, "2026-12-31 is Year Day");
+  assert(gregorianToSue("2024-06-17").isLeapDay, "2024-06-17 is Leap Day");
+
+  const beforeMidnight = dayMarkerAngle(100, 100, 365, 0);
+  const afterMidnight = dayMarkerAngle(101, 101, 365, 0);
+  assert(isAtTwelve(beforeMidnight) && isAtTwelve(afterMidnight), "midnight keeps today at 12 o'clock");
+
+  const drifted = dayMarkerAngle(100, 100, 365, 12);
+  assert(!isAtTwelve(drifted), "a dragged offset moves today off the top");
+  assert(
+    offsetAfterDateChange(0, 100, 101, 365, true) === 0,
+    "pinned wheel stays on the new today after midnight",
+  );
+  const held = offsetAfterDateChange(-5 * (360 / 365), 100, 101, 365, false);
+  assert(
+    Math.abs(dayMarkerAngle(105, 101, 365, held)) < 1e-6,
+    "unpinned wheel keeps the same focused day across midnight",
+  );
 
   console.log("wheel-scrub: all checks passed");
 }

@@ -28,6 +28,7 @@ import {
   periodIndexFromDoy,
   periodStartDayOfYear,
   progressFromDoy,
+  restRotationForToday,
   ringAngles,
   snapProgressToNearestDay,
 } from "@/lib/wheel-scrub";
@@ -79,7 +80,7 @@ export function YearWheelStage() {
   function apply(progress: number) {
     const doy = doyFromProgress(progress, year);
     const nextOffset = offsetFromDoy(doy, todayDoy, dim);
-    const restRotation = -(todayDoy - 0.5) * (360 / dim);
+    const restRotation = restRotationForToday(todayDoy, dim);
     const periodIndex = periodIndexFromDoy(doy, year);
     const start = periodStartDayOfYear(year, periodIndex + 1);
     const mixPos = Math.min(12, periodIndex + (doy - start) / 28);

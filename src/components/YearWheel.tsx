@@ -10,7 +10,6 @@ import {
   gregorianToSue,
   leapDayISO,
   periodName,
-  todayISO,
   yearDayISO,
 } from "@/lib/sue-calendar";
 import { periodColor } from "@/lib/palette";
@@ -19,7 +18,10 @@ import { seasonMarkers } from "@/lib/seasons";
 import { sabbatsForYear } from "@/lib/wheel-of-year";
 import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
 import { copy } from "@/lib/copy";
+import { parseISODate } from "@/lib/iso-date";
+import { restRotationForToday, offsetAfterDateChange } from "@/lib/wheel-scrub";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { useLocalDateISO } from "@/hooks/useLocalDateISO";
 import { weekdayShortLabel, weekdayNumber, formatWeekdayNumber } from "@/lib/weekdays";
 
 function polar(cx: number, cy: number, r: number, deg: number) {
@@ -55,6 +57,7 @@ export function YearWheel({
   compact = false,
   hideChrome = false,
   driven = false,
+  pinToday = false,
   rotorRef,
   activePeriod,
   onRotate,
@@ -63,6 +66,7 @@ export function YearWheel({
   compact?: boolean;
   hideChrome?: boolean;
   driven?: boolean;
+  pinToday?: boolean;
   rotorRef?: Ref<SVGGElement>;
   activePeriod?: number | null;
   onRotate?: (deltaDeg: number, ended: boolean) => void;
@@ -71,18 +75,18 @@ export function YearWheel({
   const router = useRouter();
   const { state } = useSueStore();
   const reduced = usePrefersReducedMotion();
-  const year = state.settings.viewYear;
+  const today = useLocalDateISO();
   const naming = {
     preset: state.settings.naming,
     customNames: state.settings.customPeriodNames,
   };
-  const today = todayISO();
   const todayDate = gregorianToSue(today, naming);
+  const year = pinToday ? parseISODate(today).year : state.settings.viewYear;
   const leap = leapDayISO(year);
   const yearDay = yearDayISO(year);
   const dim = daysInGregorianYear(year);
   const degreesPerDay = 360 / dim;
-  const todayInYear = todayDate.sueYear === year;
+  const todayInYear = parseISODate(today).year === year;
   const todayDoy = todayInYear ? todayDate.dayOfYear : 1;
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -90,7 +94,7 @@ export function YearWheel({
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
   const interactingRef = useRef(false);
-  const pinTodayRef = useRef(false);
+  const pinTodayRef = useRef(Boolean(pinToday));
   const draggingRef = useRef(false);
   const didDragRef = useRef(false);
   const lastAngleRef = useRef(0);
@@ -104,11 +108,13 @@ export function YearWheel({
   const rotationRef = useRef(0);
   const [offset, setOffset] = useState(0);
 
+  const liveTodayDoyRef = useRef(todayDoy);
+
   useEffect(() => {
     dimRef.current = dim;
-    todayDoyRef.current = todayDoy;
     degRef.current = degreesPerDay;
-  }, [dim, todayDoy, degreesPerDay]);
+    liveTodayDoyRef.current = todayDoy;
+  }, [dim, degreesPerDay, todayDoy]);
 
   function clampOffset(value: number) {
     const minOffset = (todayDoyRef.current - dimRef.current) * degRef.current;
@@ -142,6 +148,18 @@ export function YearWheel({
       const last = lastTRef.current || t;
       const dt = Math.min(0.032, (t - last) / 1000);
       lastTRef.current = t;
+
+      const liveToday = liveTodayDoyRef.current;
+      if (todayDoyRef.current !== liveToday) {
+        offsetRef.current = offsetAfterDateChange(
+          offsetRef.current,
+          todayDoyRef.current,
+          liveToday,
+          dimRef.current,
+          pinTodayRef.current,
+        );
+        todayDoyRef.current = liveToday;
+      }
 
       if (!driven && !interactingRef.current) {
         if (Math.abs(velocityRef.current) > 8) {
@@ -198,7 +216,7 @@ export function YearWheel({
   }, [driven]);
 
   const displayOffset = offset;
-  const restRotation = -(todayDoy - 0.5) * degreesPerDay;
+  const restRotation = restRotationForToday(todayDoy, dim);
   const rotation = restRotation + displayOffset;
 
   useEffect(() => {
@@ -397,21 +415,24 @@ export function YearWheel({
             const hasEvent =
               state.settings.layers.events &&
               eventsOnDate(state.events, iso).length > 0;
-            const fill = intensity
-              ? intensity === "rest"
-                ? "var(--rest)"
-                : intensity === "push"
-                  ? "var(--year-day)"
-                  : "var(--brass)"
-              : hasEvent
-                ? "var(--brass)"
-                : "color-mix(in oklab, var(--engrave) 50%, transparent)";
+            const isTodayDot = iso === today;
+            const fill = isTodayDot
+              ? "var(--ink)"
+              : intensity
+                ? intensity === "rest"
+                  ? "var(--rest)"
+                  : intensity === "push"
+                    ? "var(--year-day)"
+                    : "var(--brass)"
+                : hasEvent
+                  ? "var(--brass)"
+                  : "color-mix(in oklab, var(--engrave) 50%, transparent)";
             return (
               <circle
                 key={iso}
                 cx={p.x}
                 cy={p.y}
-                r={intensity === "rest" ? 2.6 : hasEvent ? 2.1 : 1.15}
+                r={isTodayDot ? 2.5 : intensity === "rest" ? 2.6 : hasEvent ? 2.1 : 1.15}
                 fill={fill}
               />
             );

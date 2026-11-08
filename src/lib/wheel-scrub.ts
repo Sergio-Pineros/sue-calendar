@@ -68,9 +68,48 @@ export function snapProgressToNearestDay(progress: number, year: number): number
   return progressFromDoy(doyFromProgress(progress, year), year);
 }
 
+export function degreesPerDay(dim: number): number {
+  return 360 / Math.max(1, dim);
+}
+
+/**
+ * Rotor angle that puts the current day's marker at 12 o'clock.
+ * Day markers sit at (doy - 0.5) * step, 0° = north.
+ */
+export function restRotationForToday(todayDoy: number, dim: number): number {
+  return -(todayDoy - 0.5) * degreesPerDay(dim);
+}
+
+/** Clockwise degrees from 12 o'clock of a day's marker. */
+export function dayMarkerAngle(
+  doy: number,
+  todayDoy: number,
+  dim: number,
+  offset = 0,
+): number {
+  const step = degreesPerDay(dim);
+  const raw = (doy - 0.5) * step + restRotationForToday(todayDoy, dim) + offset;
+  return ((raw % 360) + 360) % 360;
+}
+
+export function isAtTwelve(angle: number, epsilon = 1e-6): boolean {
+  return angle <= epsilon || angle >= 360 - epsilon;
+}
+
 export function offsetFromDoy(doy: number, todayDoy: number, dim: number): number {
-  const degreesPerDay = 360 / dim;
-  return (todayDoy - clamp(doy, 1, dim)) * degreesPerDay;
+  return (todayDoy - clamp(doy, 1, dim)) * degreesPerDay(dim);
+}
+
+/** Keep a pinned wheel on today, or hold the same focused day across midnight. */
+export function offsetAfterDateChange(
+  offset: number,
+  previousTodayDoy: number,
+  nextTodayDoy: number,
+  dim: number,
+  pinnedToToday: boolean,
+): number {
+  if (pinnedToToday) return 0;
+  return offset + (nextTodayDoy - previousTodayDoy) * degreesPerDay(dim);
 }
 
 export function dimOf(year: number): number {

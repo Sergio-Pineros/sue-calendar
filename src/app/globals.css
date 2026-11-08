@@ -1131,6 +1131,80 @@ html[data-year-blend] body {
   padding: 8px 0 24px;
 }
 
+.home-wheel {
+  position: relative;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+}
+
+.home-wheel .wheel-stage {
+  position: relative;
+  z-index: 1;
+}
+
+.moon-backdrop {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: min(158vw, 820px);
+  height: min(158vw, 820px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  contain: layout paint;
+}
+
+.moon-atmosphere {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at var(--moon-light-x, 50%) 44%,
+    color-mix(in oklab, var(--lunar) 22%, transparent),
+    transparent 68%
+  );
+  opacity: 0.18;
+}
+
+.moon-disc {
+  width: 84%;
+  height: 84%;
+  opacity: 0.16;
+  filter: blur(22px);
+  transform: translateZ(0);
+}
+
+.moon-body {
+  fill: var(--paper-deep);
+}
+
+.moon-lit {
+  fill: var(--lunar);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .moon-disc {
+    filter: none;
+    opacity: 0.1;
+  }
+
+  .moon-atmosphere {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moon-atmosphere,
+  .moon-disc {
+    transition: none;
+    animation: none;
+  }
+}
+
 .home-date {
   border: 0;
   background: transparent;
@@ -1184,5 +1258,14 @@ html[data-year-blend] body {
     background: var(--paper);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+
+  .moon-disc {
+    filter: none;
+    opacity: 0.1;
+  }
+
+  .moon-atmosphere {
+    display: none;
   }
 }

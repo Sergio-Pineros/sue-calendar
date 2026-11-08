@@ -58,7 +58,7 @@ export function LandingPage() {
   return (
     <div className="landing">
       <section className="landing-hero" aria-hidden="true">
-        <YearWheel compact hideChrome />
+        <YearWheel compact hideChrome pinToday />
       </section>
 
       <div className="landing-copy">

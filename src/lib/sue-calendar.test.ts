@@ -14,6 +14,7 @@ import "./weekdays.test";
 import "./sprints.test";
 import "./period-colors.test";
 import "./wheel-scrub.test";
+import "./moon.test";
 import "./frequency.test";
 import "./spring.test";
 import "./caldav.test";
