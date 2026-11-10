@@ -4,7 +4,8 @@
 
 # SÚE
 
-An open-source 13-month calendar that plans your year with the moon.
+An open-source 13-month calendar that plans your year with the moon, in a calm
+light-by-default interface.
 
 **[Live demo](#)** — *URL coming soon.*
 
@@ -22,7 +23,8 @@ An open-source 13-month calendar that plans your year with the moon.
 
   <img src="docs/feature-tuner.png" alt="Frequency tuner" width="280" />
 
-- **Themes** — Ancient Amethyst (default), Ancient Wood, Solarpunk Mecha, Night Ritual, Moss Circuit.
+- **Themes** — Pearl light (default), Follow system, or one of the dark skins:
+  Ancient Amethyst, Ancient Wood, Solarpunk Mecha, Night Ritual, and Moss Circuit.
 
   <img src="docs/feature-themes.png" alt="Themes" width="280" />
 
@@ -34,7 +36,7 @@ An open-source 13-month calendar that plans your year with the moon.
 
   <img src="docs/feature-home.png" alt="Home" width="280" />
 
-Works with **zero accounts**. Google, Apple, and `.ics` are optional. Onboarding can be skipped — Roman names, Sunday = −1, Amethyst dark. Reopen it from Settings.
+Works with **zero accounts**. Google, Apple, and `.ics` are optional. Onboarding can be skipped — Roman names, Sunday = −1, Pearl light. Reopen it from Settings.
 
 ## Quick start
 

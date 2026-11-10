@@ -60,7 +60,7 @@ export function defaultSettings(): SueSettings {
     weekdayShortNames: [...WEEKDAY_SHORT],
     weekdayNumberPreset: "sergio",
     weekdayNumbers: [...SERGIO_WEEKDAY_NUMBERS],
-    theme: "ancient-amethyst",
+    theme: "pearl-light",
     periodColorPreset: "amethyst",
     periodColorOverrides: emptyPeriodColorOverrides(),
     timezone:
@@ -79,7 +79,7 @@ export function defaultSettings(): SueSettings {
   };
 }
 
-/** Skip onboarding: Roman names, Sergio week, Amethyst dark palette. */
+/** Skip onboarding: Roman names, Sergio week, Pearl light palette. */
 export function applySkippedOnboarding(settings: SueSettings): SueSettings {
   const defaults = defaultSettings();
   return {

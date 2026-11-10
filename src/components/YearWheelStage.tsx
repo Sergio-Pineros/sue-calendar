@@ -34,6 +34,7 @@ import {
 } from "@/lib/wheel-scrub";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { periodNamesFor } from "@/lib/naming";
+import { themeMeta } from "@/lib/themes";
 
 const R_TEXT = 92.8;
 const R_LINE = 87;
@@ -84,7 +85,16 @@ export function YearWheelStage() {
     const periodIndex = periodIndexFromDoy(doy, year);
     const start = periodStartDayOfYear(year, periodIndex + 1);
     const mixPos = Math.min(12, periodIndex + (doy - start) / 28);
-    const mixed = mutePageTone(blendPeriodColors(colors, mixPos));
+    const scheme = themeMeta(state.settings.theme).scheme;
+    const dark =
+      scheme === "dark" ||
+      (scheme === "system" &&
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const mixed = mutePageTone(
+      blendPeriodColors(colors, mixPos),
+      dark ? "#0e0d10" : "#f5f0e8",
+    );
     if (root.current) root.current.style.backgroundColor = mixed;
     document.documentElement.style.setProperty("--year-blend", mixed);
     if (rotor.current) {
@@ -145,7 +155,7 @@ export function YearWheelStage() {
     };
     // apply reads latest colors/year from this render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, reduced, colors.join(","), todayDoy, dim]);
+  }, [year, reduced, colors.join(","), todayDoy, dim, state.settings.theme]);
 
   function goToProgress(progress: number) {
     const st = trigger.current;

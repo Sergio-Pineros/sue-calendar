@@ -39,8 +39,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e0d10",
-  colorScheme: "dark",
+  themeColor: "#f5f0e8",
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-theme="ancient-amethyst"
+      data-theme="pearl-light"
       className={`${sans.variable} ${sans.className} h-full antialiased`}
     >
       <body className="min-h-full">

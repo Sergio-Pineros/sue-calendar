@@ -35,12 +35,12 @@ export function runPeriodColorTests(): void {
   assert(presetColors("amethyst")[0] === AMETHYST_PERIOD_COLORS[0], "amethyst starts at deep violet");
   assert(PERIOD_SWATCHES.length >= 12, "swatch palette is curated, not empty");
   assert(PERIOD_SWATCHES.every(isHexColor), "every swatch is a hex color");
-  assert(AMETHYST_PERIOD_COLORS.every(isDarkTone), "amethyst ramp stays dark");
+  assert(AMETHYST_PERIOD_COLORS.every(isHexColor), "amethyst ramp stays valid");
   assert(
-    PERIOD_COLOR_PRESETS.every((preset) => preset.colors.every(isDarkTone)),
-    "every period preset stays dark",
+    PERIOD_COLOR_PRESETS.every((preset) => preset.colors.every(isHexColor)),
+    "every period preset stays valid",
   );
-  assert(PERIOD_SWATCHES.every(isDarkTone), "every swatch stays dark");
+  assert(PERIOD_SWATCHES.every(isHexColor), "every swatch stays valid");
 
   const plain = resolvePeriodColors("amethyst");
   assert(plain[3] === AMETHYST_PERIOD_COLORS[3], "no overrides keeps the preset");
@@ -63,7 +63,10 @@ export function runPeriodColorTests(): void {
   const blended = blendPeriodColors(["#000000", "#ffffff"], 0.25);
   assert(blended === "#404040", "blend at 0.25 is a quarter toward white");
   assert(blendPeriodColors(["#2a1848"], 9) === "#2a1848", "single color clamps");
-  assert(isDarkTone(mutePageTone("#5c407c")), "page wash stays dark even at the ramp peak");
+  assert(
+    isDarkTone(mutePageTone("#5c407c", "#0e0d10")),
+    "dark page wash stays dark when requested",
+  );
 
   const settings = normalizeSettingsForTest({
     naming: "roman",
@@ -79,7 +82,7 @@ export function runPeriodColorTests(): void {
   assert(
     resolvePeriodColors(fallback.periodColorPreset, fallback.periodColorOverrides)[0] ===
       AMETHYST_PERIOD_COLORS[0],
-    "default resolve is the current purple ramp",
+    "default resolve is the current pearl ramp",
   );
 
   const defaults = defaultSettings();

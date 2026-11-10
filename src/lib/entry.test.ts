@@ -21,7 +21,7 @@ dirty.onboarded = false;
 
 const skipped = applySkippedOnboarding(dirty);
 assert(skipped.naming === "roman", "skip restores Roman names");
-assert(skipped.theme === "ancient-amethyst", "skip restores Amethyst");
+assert(skipped.theme === "pearl-light", "skip restores Pearl light");
 assert(skipped.weekdayNumberPreset === "sergio", "skip restores Sunday = −1");
 assert(skipped.weekdayNumbers[0] === -1, "Sunday is −1");
 assert(skipped.weekStart === 0, "week starts Sunday");

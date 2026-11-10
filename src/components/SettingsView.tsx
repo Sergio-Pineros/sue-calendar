@@ -192,6 +192,7 @@ export function SettingsView() {
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.theme}</h2>
+        <p className="text-sm text-ink-soft">{copy.settings.themeHint}</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {THEMES.map((theme) => (
             <button

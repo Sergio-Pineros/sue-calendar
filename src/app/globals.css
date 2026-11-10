@@ -1,6 +1,45 @@
 @import "tailwindcss";
 
 :root,
+[data-theme="pearl-light"],
+[data-theme="system"] {
+  --paper: #f5f0e8;
+  --paper-deep: #e7dfd5;
+  --card: #fffdf9;
+  --ink: #24232a;
+  --ink-soft: #6d6870;
+  --line: #ded8d0;
+  --brass: #b46f4d;
+  --brass-soft: #8d5844;
+  --lunar: #7d79a5;
+  --rest: #756f7b;
+  --year-day: #b86c43;
+  --focus: #f0e8de;
+  --hud: rgba(255, 255, 255, 0.58);
+  --moss: #748d78;
+  --wood: #e8ddd2;
+  --wood-deep: #ddd0c3;
+  --engrave: #9e9690;
+  --page-top: #faf7f2;
+  --page-bottom: #eee7de;
+  --wash-a: rgba(224, 211, 236, 0.36);
+  --wash-b: rgba(210, 232, 226, 0.3);
+  --scheme: light;
+  --period-1: #f1e8e3;
+  --period-2: #e8e5ef;
+  --period-3: #dedff0;
+  --period-4: #d9e8ef;
+  --period-5: #d9eee8;
+  --period-6: #e1eee0;
+  --period-7: #eef0d7;
+  --period-8: #f4edcf;
+  --period-9: #f5e3cf;
+  --period-10: #f2dcd5;
+  --period-11: #eadce7;
+  --period-12: #e3e0ed;
+  --period-13: #eee8e1;
+}
+
 [data-theme="ancient-amethyst"] {
   --paper: #0e0d10;
   --paper-deep: #09080b;
@@ -191,6 +230,44 @@
   --period-13: #262826;
 }
 
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --paper: #0e0d10;
+    --paper-deep: #09080b;
+    --card: #141318;
+    --ink: #d2cfc8;
+    --ink-soft: #8a8782;
+    --line: #1c1b20;
+    --brass: #9a9690;
+    --brass-soft: #aea9a4;
+    --lunar: #9a979c;
+    --rest: #7a787c;
+    --year-day: #a8a49e;
+    --focus: #121116;
+    --hud: rgba(210, 207, 200, 0.08);
+    --moss: #3a383c;
+    --wood: #1c1a20;
+    --wood-deep: #121016;
+    --engrave: #6a686c;
+    --page-top: #0e0d10;
+    --page-bottom: #09080b;
+    --scheme: dark;
+    --period-1: #121018;
+    --period-2: #14111a;
+    --period-3: #16121c;
+    --period-4: #18131e;
+    --period-5: #1a1520;
+    --period-6: #1c1722;
+    --period-7: #1e1924;
+    --period-8: #201b26;
+    --period-9: #221d28;
+    --period-10: #241f2a;
+    --period-11: #26212c;
+    --period-12: #28232e;
+    --period-13: #2a2530;
+  }
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-paper-deep: var(--paper-deep);
@@ -218,7 +295,7 @@ body {
   min-height: 100%;
   background: var(--paper);
   color: var(--ink);
-  color-scheme: dark;
+  color-scheme: var(--scheme);
   font-family: var(--font-geist), system-ui, sans-serif;
   font-optical-sizing: auto;
   font-feature-settings: "ss01", "cv11";
@@ -1195,6 +1272,151 @@ html[data-year-blend] body {
   .moon-atmosphere {
     display: none;
   }
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 8%, var(--wash-a), transparent 32rem),
+    radial-gradient(circle at 88% 18%, var(--wash-b), transparent 36rem),
+    linear-gradient(145deg, var(--page-top), var(--page-bottom));
+  background-attachment: fixed;
+}
+
+[data-theme="ancient-amethyst"] body,
+[data-theme="ancient-wood"] body,
+[data-theme="solarpunk-mecha"] body,
+[data-theme="night-ritual"] body,
+[data-theme="moss-circuit"] body {
+  background: var(--paper);
+}
+
+.app-root {
+  position: relative;
+  isolation: isolate;
+}
+
+.chrome-top {
+  background: color-mix(in srgb, var(--paper) 74%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 74%, transparent);
+}
+
+.chrome-tab {
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  box-shadow: 0 -12px 32px color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.home {
+  position: relative;
+  isolation: isolate;
+  gap: 22px;
+}
+
+.home::before {
+  position: absolute;
+  z-index: -1;
+  top: -8rem;
+  left: 50%;
+  width: min(120vw, 860px);
+  height: min(120vw, 860px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 48% 42%, color-mix(in srgb, var(--lunar) 12%, transparent), transparent 47%),
+    radial-gradient(circle at 18% 64%, color-mix(in srgb, var(--brass) 10%, transparent), transparent 42%),
+    radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--moss) 9%, transparent), transparent 42%);
+  content: "";
+  opacity: 0.78;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.home-wheel {
+  min-height: min(94vw, 720px);
+  max-width: 760px;
+  padding: 16px;
+}
+
+.home-wheel .wheel-stage {
+  filter: drop-shadow(0 26px 28px color-mix(in srgb, var(--ink) 14%, transparent));
+}
+
+.tuner {
+  position: relative;
+}
+
+.tuner-dial {
+  filter: drop-shadow(0 15px 18px color-mix(in srgb, var(--ink) 14%, transparent));
+}
+
+[data-theme="pearl-light"] .moon-disc {
+  opacity: 0.24;
+  filter: blur(14px);
+}
+
+[data-theme="pearl-light"] .moon-body {
+  fill: #c8c0ca;
+}
+
+[data-theme="pearl-light"] .moon-lit {
+  fill: #fffaf0;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] .moon-disc {
+    opacity: 0.24;
+    filter: blur(14px);
+  }
+
+  [data-theme="system"] .moon-body {
+    fill: #c8c0ca;
+  }
+
+  [data-theme="system"] .moon-lit {
+    fill: #fffaf0;
+  }
+}
+
+.landing {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--moss) 18%, transparent), transparent 32rem),
+    radial-gradient(circle at 90% 8%, color-mix(in srgb, var(--lunar) 18%, transparent), transparent 34rem),
+    linear-gradient(145deg, var(--page-top), var(--page-bottom));
+}
+
+.landing::before {
+  position: absolute;
+  right: -12rem;
+  bottom: -16rem;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--brass) 12%, transparent);
+  filter: blur(24px);
+  content: "";
+  pointer-events: none;
+}
+
+.landing-hero,
+.landing-copy,
+.landing-beats,
+.landing-install,
+.landing-foot {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-copy h1 {
+  font-size: clamp(4rem, 18vw, 8rem);
+  text-shadow: 0 8px 30px color-mix(in srgb, var(--lunar) 18%, transparent);
+}
+
+.landing-cta,
+.btn-fill {
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  box-shadow:
+    0 10px 22px color-mix(in srgb, var(--ink) 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 70%, transparent);
 }
 
 .companion-settings {

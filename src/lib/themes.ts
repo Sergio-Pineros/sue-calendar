@@ -4,14 +4,26 @@ export type ThemeMeta = {
   id: ThemeId;
   label: string;
   origin: string;
-  scheme: "dark";
+  scheme: "light" | "dark" | "system";
 };
 
 export const THEMES: ThemeMeta[] = [
   {
+    id: "pearl-light",
+    label: "Pearl light",
+    origin: "Default. Warm cream, soft period color, and a moonlit pearl surface.",
+    scheme: "light",
+  },
+  {
+    id: "system",
+    label: "Follow system",
+    origin: "Light in the day, dark when your device asks for night.",
+    scheme: "system",
+  },
+  {
     id: "ancient-amethyst",
     label: "Ancient Amethyst",
-    origin: "Default. Deep violet stone — the original SÚE purple, kept in the dark.",
+    origin: "Deep violet stone — the original SÚE purple, kept in the dark.",
     scheme: "dark",
   },
   {

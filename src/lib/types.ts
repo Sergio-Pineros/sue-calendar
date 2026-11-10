@@ -12,6 +12,8 @@ export type WeekdayNamePreset = "long" | "short" | "custom";
 export type WeekdayNumberPreset = "none" | "one" | "sergio" | "custom";
 
 export type ThemeId =
+  | "pearl-light"
+  | "system"
   | "ancient-amethyst"
   | "ancient-wood"
   | "solarpunk-mecha"
