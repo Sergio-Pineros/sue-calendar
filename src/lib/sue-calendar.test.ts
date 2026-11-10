@@ -17,6 +17,7 @@ import "./wheel-scrub.test";
 import "./moon.test";
 import "./frequency.test";
 import "./spring.test";
+import "./period-spiral.test";
 import "./caldav.test";
 import "./entry.test";
 import "./companion-calendars.test";

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { YearWheel } from "@/components/YearWheel";
 import { MoonBackdrop } from "@/components/MoonBackdrop";
+import { PeriodSpiral } from "@/components/PeriodSpiral";
 import { useSueStore } from "@/components/StoreProvider";
 import { useLocalDateISO } from "@/hooks/useLocalDateISO";
 import {
@@ -73,7 +73,19 @@ export function TodayHome() {
     <div className="home">
       <div className="home-wheel">
         <MoonBackdrop iso={today} />
-        <YearWheel compact hideChrome pinToday />
+        <PeriodSpiral
+          year={mapped.sueYear}
+          period={mapped.suePeriod ?? (mapped.isLeapDay ? 6 : 13)}
+          currentDay={mapped.sueDayInPeriod}
+          currentIso={today}
+          specialLabel={
+            mapped.isYearDay
+              ? copy.year.yearDay
+              : mapped.isLeapDay
+                ? copy.year.leapDay
+                : null
+          }
+        />
       </div>
 
       <button
