@@ -1,45 +1,68 @@
 import {
+  PERIOD_SPIRAL_DAYS,
+  SPIRAL_CENTER,
+  SPIRAL_HIT_RADIUS,
+  SPIRAL_HUB_RADIUS,
   dayLightProgress,
   periodSpiralGlow,
-  periodSpiralPoint,
-  periodSpiralPoints,
+  periodSpiralSlots,
+  spiralDayOpacity,
+  spiralPaths,
+  spiralTurnDegrees,
 } from "./period-spiral";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-const current = periodSpiralPoint(28, 28);
-const first = periodSpiralPoint(1, 28);
-const next = periodSpiralPoint(3, 2);
-const previous = periodSpiralPoint(1, 2);
-const nearCenter = periodSpiralPoint(7, 6);
-const farFuture = periodSpiralPoint(28, 14);
-const fadingPast = periodSpiralPoint(5, 6);
-const outerPast = periodSpiralPoint(1, 6);
+const slots = periodSpiralSlots();
 
-assert(current.relative === 0 && current.radius === 0, "current day stays at the spiral center");
-assert(first.relative === -27, "period day 1 is the outer past day at day 28");
-assert(first.radius > next.radius && first.radius > previous.radius, "outer days sit farther out");
-assert(next.relative === 1 && previous.relative === -1, "adjacent days straddle the current day");
-assert(nearCenter.radius > 100, "the nearest day clears the center disc");
-assert(farFuture.radius > nearCenter.radius, "the spiral fills outward across a middle period");
-assert(fadingPast.opacity < outerPast.opacity, "past days fade as they approach the center");
-for (let currentDay = 1; currentDay <= 28; currentDay += 1) {
-  const positions = periodSpiralPoints(currentDay);
-  const center = positions.find((point) => point.day === currentDay);
-  const nearest = Math.min(
-    ...positions
-      .filter((point) => point.day !== currentDay)
-      .map((point) => point.radius),
-  );
-  assert(center?.radius === 0 && nearest > 100, `day ${currentDay} keeps a clear hub halo`);
+assert(slots.length === PERIOD_SPIRAL_DAYS, "every period day has one slot");
+assert(slots[0].day === 1 && slots[27].day === 28, "slots run in calendar order");
+for (let i = 1; i < slots.length; i += 1) {
+  assert(slots[i].radius < slots[i - 1].radius, `day ${i + 1} sits inside day ${i}`);
+  assert(slots[i].theta > slots[i - 1].theta, `day ${i + 1} continues the same clockwise path`);
+  assert(slots[i].size < slots[i - 1].size, `day ${i + 1} is smaller than day ${i}`);
 }
-assert(
-  periodSpiralPoints(2).length === 28 &&
-    periodSpiralPoints(2).find((point) => point.day === 2)?.radius === 0,
-  "every regular period day gets one spiral position",
-);
+assert(slots[27].theta > Math.PI * 4, "the period winds more than two full turns");
+
+for (const slot of slots) {
+  assert(
+    slot.radius - SPIRAL_HIT_RADIUS > SPIRAL_HUB_RADIUS,
+    `day ${slot.day} tap target clears the center disc`,
+  );
+}
+for (let i = 0; i < slots.length; i += 1) {
+  for (let j = i + 1; j < slots.length; j += 1) {
+    const gap = Math.hypot(slots[i].x - slots[j].x, slots[i].y - slots[j].y);
+    assert(
+      gap > SPIRAL_HIT_RADIUS * 1.9,
+      `days ${i + 1} and ${j + 1} keep separate tap targets`,
+    );
+  }
+}
+
+for (let day = 1; day <= PERIOD_SPIRAL_DAYS; day += 1) {
+  const slot = slots[day - 1];
+  const screen = slot.theta + (spiralTurnDegrees(day) * Math.PI) / 180;
+  const x = Math.cos(screen) * slot.radius;
+  const y = Math.sin(screen) * slot.radius;
+  assert(Math.abs(x) < 1e-6 && y < 0, `day ${day} is parked at 12 o'clock`);
+}
+for (let day = 1; day < PERIOD_SPIRAL_DAYS; day += 1) {
+  const step = spiralTurnDegrees(day + 1) - spiralTurnDegrees(day);
+  assert(step < 0 && step > -60, `day ${day + 1} arrives with a small counter-clockwise turn`);
+}
+assert(spiralTurnDegrees(null) === spiralTurnDegrees(28), "special days rest after day 28");
+
+assert(spiralDayOpacity(5, 6) < spiralDayOpacity(7, 6), "lived days are quieter than days ahead");
+assert(spiralDayOpacity(1, 6) < spiralDayOpacity(5, 6), "older lived days fade further");
+assert(spiralDayOpacity(7, 6) > spiralDayOpacity(28, 6), "tomorrow is the brightest day ahead");
+
+const sixth = spiralPaths(6);
+assert(sixth.traveled.startsWith("M") && sixth.ahead.startsWith("M"), "the path splits at today");
+assert(spiralPaths(null).ahead === "", "special days have no days ahead in the period");
+assert(SPIRAL_CENTER === 400, "the spiral is centered in its view box");
 
 assert(dayLightProgress(0) === 0, "midnight starts the light circuit");
 assert(dayLightProgress(43_200) === 0.5, "noon is halfway through the light circuit");

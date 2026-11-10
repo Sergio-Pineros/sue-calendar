@@ -2,18 +2,23 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type PointerEvent } from "react";
 import {
+  SPIRAL_CENTER,
+  SPIRAL_HIT_RADIUS,
+  SPIRAL_HUB_RADIUS,
   dayLightProgress,
   periodSpiralGlow,
-  periodSpiralPoints,
+  periodSpiralSlots,
+  spiralDayOpacity,
+  spiralPaths,
+  spiralTurnDegrees,
 } from "@/lib/period-spiral";
 import { datesInPeriod, gregorianToSue } from "@/lib/sue-calendar";
 import { eventsOnDate } from "@/lib/planning";
 import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
-import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { useSueStore } from "./StoreProvider";
 
-const CX = 400;
-const CY = 400;
+const CX = SPIRAL_CENTER;
+const CY = SPIRAL_CENTER;
 
 type PeriodSpiralProps = {
   year: number;
@@ -33,12 +38,6 @@ function secondsSinceMidnight(): number {
   );
 }
 
-function spiralPath(points: ReturnType<typeof periodSpiralPoints>): string {
-  return points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
-}
-
 export function PeriodSpiral({
   year,
   period,
@@ -47,14 +46,11 @@ export function PeriodSpiral({
   specialLabel = null,
 }: PeriodSpiralProps) {
   const { state } = useSueStore();
-  const reduced = usePrefersReducedMotion();
   const gradientId = useId().replace(/:/g, "");
   const day = currentDay ?? 28;
   const [progress, setProgress] = useState(0);
   const [rotation, setRotation] = useState(0);
-  const [turning, setTurning] = useState(false);
-  const previousDayKey = useRef(`${specialLabel ?? "day"}:${day}`);
-  const turnTimer = useRef<number | null>(null);
+  const [dragging, setDragging] = useState(false);
   const drag = useRef({
     active: false,
     startX: 0,
@@ -62,11 +58,12 @@ export function PeriodSpiral({
     startRotation: 0,
   });
 
+  const slots = periodSpiralSlots();
   const dates = useMemo(() => datesInPeriod(year, period), [period, year]);
-  const points = useMemo(() => periodSpiralPoints(day), [day]);
-  const path = useMemo(() => spiralPath(points), [points]);
+  const paths = useMemo(() => spiralPaths(currentDay), [currentDay]);
+  const turn = spiralTurnDegrees(currentDay) + rotation;
   const glow = periodSpiralGlow(progress);
-  const dayKey = `${specialLabel ?? "day"}:${day}`;
+  const nowSlot = currentDay === null ? null : slots[day - 1];
 
   useEffect(() => {
     const update = () => setProgress(dayLightProgress(secondsSinceMidnight()));
@@ -74,19 +71,6 @@ export function PeriodSpiral({
     const timer = window.setInterval(update, 30_000);
     return () => window.clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    if (previousDayKey.current === dayKey) return;
-    previousDayKey.current = dayKey;
-    if (reduced) return;
-    const frame = window.requestAnimationFrame(() => setTurning(true));
-    if (turnTimer.current !== null) window.clearTimeout(turnTimer.current);
-    turnTimer.current = window.setTimeout(() => setTurning(false), 760);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      if (turnTimer.current !== null) window.clearTimeout(turnTimer.current);
-    };
-  }, [dayKey, reduced]);
 
   function onPointerDown(event: PointerEvent<SVGSVGElement>) {
     const target = event.target;
@@ -97,7 +81,7 @@ export function PeriodSpiral({
       startY: event.clientY,
       startRotation: rotation,
     };
-    setTurning(false);
+    setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -115,6 +99,7 @@ export function PeriodSpiral({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    setDragging(false);
     setRotation(0);
   }
 
@@ -122,16 +107,13 @@ export function PeriodSpiral({
     <div className="period-spiral">
       <svg
         viewBox="0 0 800 800"
-        className={`period-spiral-svg ${turning ? "is-turning" : ""}`}
+        className="period-spiral-svg"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         role="img"
         aria-label="Twenty-eight day period spiral"
-        style={{
-          ["--spiral-rotation" as string]: `${rotation}deg`,
-        }}
       >
         <defs>
           <radialGradient id={`period-glow-${gradientId}`}>
@@ -141,28 +123,35 @@ export function PeriodSpiral({
           </radialGradient>
         </defs>
 
-        <g className="period-spiral-rotor">
-          <path d={path} className="period-spiral-line" />
-          <circle
-            cx={CX + glow.x}
-            cy={CY + glow.y}
-            r={72 * glow.scale}
-            fill={`url(#period-glow-${gradientId})`}
-            className="period-spiral-glow"
-            opacity={glow.opacity}
-          />
+        <g
+          key={`${year}-${period}`}
+          className={`period-spiral-rotor ${dragging ? "is-dragging" : ""}`}
+          style={{ ["--spiral-turn" as string]: `${turn}deg` }}
+        >
+          <path d={paths.tail} className="period-spiral-line is-tail" />
+          <path d={paths.traveled} className="period-spiral-line is-traveled" />
+          <path d={paths.ahead} className="period-spiral-line" />
 
-          {points.map((point) => {
-            if (point.day === day) return null;
-            const iso = dates[point.day - 1];
+          {nowSlot && (
+            <circle
+              cx={nowSlot.x}
+              cy={nowSlot.y}
+              r="9"
+              className="period-spiral-now"
+              aria-hidden="true"
+            />
+          )}
+
+          {slots.map((slot) => {
+            if (currentDay !== null && slot.day === day) return null;
+            const iso = dates[slot.day - 1];
             const mapped = gregorianToSue(iso, state.settings.naming);
             const sprint = activeSprintsOn(state.sprints, iso)[0];
             const intensity = sprint ? sprintIntensityOn(sprint, iso) : null;
             const hasEvent =
               state.settings.layers.events && eventsOnDate(state.events, iso).length > 0;
             const hasRest = state.restBlocks.some((block) => block.date === iso);
-            const size = 18 + Math.abs(point.relative) * 0.62;
-            const safeSize = Math.max(18, size);
+            const isPast = currentDay === null || slot.day < day;
             const status =
               hasRest || intensity === "rest"
                 ? "rest"
@@ -177,49 +166,66 @@ export function PeriodSpiral({
             return (
               <g
                 key={iso}
-                className={`period-spiral-day ${point.relative < 0 ? "is-past" : ""}`}
-                transform={`translate(${point.x} ${point.y})`}
+                className={`period-spiral-day ${isPast ? "is-past" : ""}`}
+                transform={`translate(${slot.x.toFixed(2)} ${slot.y.toFixed(2)})`}
                 style={{
-                  opacity: point.opacity,
-                  ["--spiral-day-size" as string]: `${safeSize}px`,
+                  opacity: spiralDayOpacity(slot.day, currentDay),
+                  ["--spiral-day-size" as string]: `${slot.size.toFixed(1)}px`,
                 }}
               >
-                <a href={`/day?iso=${iso}`} aria-label={`Day ${point.day}, ${iso}`}>
-                  <circle r="24" fill="transparent" />
-                  <text
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className={`period-spiral-number ${status}`}
-                  >
-                    {point.day}
-                  </text>
-                  {(status || mapped.moon.name === "new" || mapped.moon.name === "full") && (
-                    <circle
-                      cy={safeSize * 0.72}
-                      r="2.5"
-                      className={`period-spiral-status ${status}`}
-                    />
-                  )}
-                </a>
+                <g className="period-spiral-upright">
+                  <a href={`/day?iso=${iso}`} aria-label={`Day ${slot.day}, ${iso}`}>
+                    <circle r={SPIRAL_HIT_RADIUS} fill="transparent" />
+                    <text
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      className={`period-spiral-number ${status}`}
+                    >
+                      {slot.day}
+                    </text>
+                    {(status || mapped.moon.name === "new" || mapped.moon.name === "full") && (
+                      <circle
+                        cy={slot.size * 0.72}
+                        r="3"
+                        className={`period-spiral-status ${status}`}
+                      />
+                    )}
+                  </a>
+                </g>
               </g>
             );
           })}
-
-          <a href={`/day?iso=${currentIso}`} aria-label={specialLabel ?? `Day ${day}, ${currentIso}`}>
-            <circle cx={CX} cy={CY} r="82" fill="var(--paper-deep)" className="period-spiral-hub" />
-            <text
-              x={CX}
-              y={CY - 10}
-              textAnchor="middle"
-              className={`period-spiral-current-number ${specialLabel ? "is-special" : ""}`}
-            >
-              {specialLabel ?? day}
-            </text>
-            <text x={CX} y={CY + 42} textAnchor="middle" className="period-spiral-current-caption">
-              {specialLabel ? "SÚE" : `day ${day}`}
-            </text>
-          </a>
         </g>
+
+        <circle
+          cx={CX + glow.x}
+          cy={CY + glow.y}
+          r={72 * glow.scale}
+          fill={`url(#period-glow-${gradientId})`}
+          className="period-spiral-glow"
+          opacity={glow.opacity}
+        />
+
+        <a href={`/day?iso=${currentIso}`} aria-label={specialLabel ?? `Day ${day}, ${currentIso}`}>
+          <circle
+            cx={CX}
+            cy={CY}
+            r={SPIRAL_HUB_RADIUS}
+            fill="var(--paper-deep)"
+            className="period-spiral-hub"
+          />
+          <text
+            x={CX}
+            y={CY - 10}
+            textAnchor="middle"
+            className={`period-spiral-current-number ${specialLabel ? "is-special" : ""}`}
+          >
+            {specialLabel ?? day}
+          </text>
+          <text x={CX} y={CY + 42} textAnchor="middle" className="period-spiral-current-caption">
+            {specialLabel ? "SÚE" : `day ${day}`}
+          </text>
+        </a>
       </svg>
     </div>
   );
