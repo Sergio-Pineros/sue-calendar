@@ -33,7 +33,16 @@ for (let i = 1; i < segments.length; i += 1) {
   assert(r < rPrev, `section ${i} sits closer to the center than section ${i - 1}`);
   assert(segments[i].path.startsWith("M") && segments[i].path.endsWith("Z"), `section ${i} is a closed shape`);
 }
-assert(segments[0].labelX > SPIRAL_CENTER && segments[0].labelY < SPIRAL_CENTER, "today sits top-right, starting at 12 o'clock");
+assert(
+  Math.abs(segments[0].labelX - SPIRAL_CENTER) < 1 && segments[0].labelY < SPIRAL_CENTER,
+  "today's number sits on the vertical center, above the hub",
+);
+assert(segments[0].toTurns - segments[0].fromTurns === 1 / DAYS_PER_TURN, "today keeps a one-seventh arc");
+assert(segments[0].width > segments[1].width * 1.25, "today's band is thicker than the next section");
+assert(
+  segments[0].labelSize > segments[1].labelSize * 1.2 && segments[0].labelSize < segments[1].labelSize * 1.35,
+  "today's number is about a quarter larger than the next",
+);
 
 for (let offset = 0; offset < SPIRAL_SEGMENTS; offset += 1) {
   assert(segments[offset].ring === Math.floor(offset / DAYS_PER_TURN), `day ${offset} is on week ring ${Math.floor(offset / 7)}`);
@@ -48,13 +57,20 @@ for (let t = 0; t + 1 <= SPIRAL_SEGMENTS / DAYS_PER_TURN; t += 0.01) {
 }
 const end = SPIRAL_SEGMENTS / DAYS_PER_TURN;
 assert(innerRadius(end) - SPIRAL_HUB_RADIUS > 4, "the last section clears the center day");
-assert(outerRadius(0) <= 396, "the outer ring fits the view box");
+assert(SPIRAL_CENTER - (outerRadius(0) + 0.9) >= 8 - 1e-6, "today's outer edge keeps 8px inside the view box");
 assert(bandWidth(0) > bandWidth(end), "the band narrows toward the center");
 
 assert(todayLightPath(0) === "", "no light before the day has started");
 assert(todayLightPath(0.5).startsWith("M"), "light fills the elapsed part of today");
-const [nx, ny] = todayNowPoint(0);
-assert(Math.abs(nx - SPIRAL_CENTER) < 1e-6 && ny < SPIRAL_CENTER, "the day starts at 12 o'clock");
+const pointAngle = ([x, y]: [number, number]) => Math.atan2(y - SPIRAL_CENTER, x - SPIRAL_CENTER);
+const noon = todayNowPoint(0.5);
+const startAngle = pointAngle(todayNowPoint(0));
+const endAngle = pointAngle(todayNowPoint(1));
+assert(Math.abs(noon[0] - SPIRAL_CENTER) < 1 && noon[1] < SPIRAL_CENTER, "noon sits at 12 o'clock on today");
+assert(
+  Math.abs(Math.abs(startAngle + Math.PI / 2) - Math.abs(endAngle + Math.PI / 2)) < 1e-6,
+  "today extends the same angle left and right of 12 o'clock",
+);
 assert(todayOpacity(0.5) === 1 && todayOpacity(1) < todayOpacity(0.8), "today fades only late in the day");
 assert(aheadOpacity(1) > aheadOpacity(20), "far days are quieter than tomorrow");
 

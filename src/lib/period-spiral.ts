@@ -1,31 +1,55 @@
 /**
- * Rolling 28-day spiral. Today is the outermost section, starting at
- * 12 o'clock; each later day sits one section further clockwise and inward.
+ * Rolling 28-day spiral. Today is the outermost section and its middle sits
+ * at 12 o'clock; each later day sits one section further clockwise and inward.
  * One full turn is one week, so the same weekday lines up on every ring.
- * Days 0–26 are band sections; day 27 (the farthest) is the center disc.
+ * Today's band is thicker, and the extra grows outward. Days 0–26 are band
+ * sections; day 27 (the farthest) is the center disc.
  */
 export const SPIRAL_WINDOW_DAYS = 28;
 export const SPIRAL_SEGMENTS = SPIRAL_WINDOW_DAYS - 1;
 export const DAYS_PER_TURN = 7;
 export const SPIRAL_CENTER = 400;
-export const SPIRAL_HUB_RADIUS = 50;
 export const SPIRAL_DAY_TURN = 360 / DAYS_PER_TURN;
 
-const OUTER_RADIUS = 394;
-const OUTER_WIDTH = 72;
-const INNER_WIDTH = 54;
+const VIEW_MARGIN = 8;
+const TODAY_STROKE = 1.8;
+const MAX_TODAY_RADIUS = SPIRAL_CENTER - VIEW_MARGIN - TODAY_STROKE / 2;
+const BASE_OUTER_RADIUS = 394;
+const BASE_OUTER_WIDTH = 72;
+const BASE_INNER_WIDTH = 54;
+const BASE_RING_GAP = 10;
+const BASE_HUB_RADIUS = 50;
+const BASE_SEGMENT_GAP = 7;
+const BASE_CORNER = 10;
+const TODAY_WIDTH_RATIO = 1.35;
+const TODAY_LABEL_SCALE = 1.25;
 const WIDTH_SPAN_TURNS = 4;
-const RING_GAP = 10;
-const SEGMENT_GAP = 7;
-const CORNER = 10;
 const EDGE_STEPS = 18;
 
-export function bandWidth(turns: number): number {
+/**
+ * The whole spiral shrinks by one factor so today's thicker band still
+ * leaves VIEW_MARGIN inside the 800 view box. Gap, corners and the center
+ * disc shrink with it, which keeps the ring clearance.
+ */
+const SPIRAL_SCALE =
+  MAX_TODAY_RADIUS / (BASE_OUTER_RADIUS + (TODAY_WIDTH_RATIO - 1) * BASE_OUTER_WIDTH);
+
+const OUTER_RADIUS = BASE_OUTER_RADIUS * SPIRAL_SCALE;
+const OUTER_WIDTH = BASE_OUTER_WIDTH * SPIRAL_SCALE;
+const INNER_WIDTH = BASE_INNER_WIDTH * SPIRAL_SCALE;
+const RING_GAP = BASE_RING_GAP * SPIRAL_SCALE;
+const SEGMENT_GAP = BASE_SEGMENT_GAP * SPIRAL_SCALE;
+const CORNER = BASE_CORNER * SPIRAL_SCALE;
+export const SPIRAL_HUB_RADIUS = BASE_HUB_RADIUS * SPIRAL_SCALE;
+
+const TODAY_TURNS = 1 / DAYS_PER_TURN;
+const TODAY_EXTRA = OUTER_WIDTH * (TODAY_WIDTH_RATIO - 1);
+
+function structuralBandWidth(turns: number): number {
   return OUTER_WIDTH + ((INNER_WIDTH - OUTER_WIDTH) * turns) / WIDTH_SPAN_TURNS;
 }
 
-/** Outer edge radius after `turns` revolutions; the inner edge is this minus bandWidth. */
-export function outerRadius(turns: number): number {
+function structuralOuterRadius(turns: number): number {
   return (
     OUTER_RADIUS -
     (OUTER_WIDTH + RING_GAP) * turns -
@@ -33,12 +57,27 @@ export function outerRadius(turns: number): number {
   );
 }
 
+/** Today's band is thicker. The extra is only on its outer edge. */
+function todayBulge(turns: number): number {
+  return turns < TODAY_TURNS ? TODAY_EXTRA : 0;
+}
+
+export function bandWidth(turns: number): number {
+  return structuralBandWidth(turns) + todayBulge(turns);
+}
+
+/** Outer edge radius after `turns` revolutions; the inner edge is this minus bandWidth. */
+export function outerRadius(turns: number): number {
+  return structuralOuterRadius(turns) + todayBulge(turns);
+}
+
 export function innerRadius(turns: number): number {
   return outerRadius(turns) - bandWidth(turns);
 }
 
+/** Half a section back, so the middle of every section lines up and today is centered at 12 o'clock. */
 function screenAngle(turns: number): number {
-  return -Math.PI / 2 + turns * Math.PI * 2;
+  return -Math.PI / 2 + (turns - 0.5 / DAYS_PER_TURN) * Math.PI * 2;
 }
 
 export function spiralPoint(turns: number, radius: number): [number, number] {
@@ -107,6 +146,7 @@ export function spiralSegments(): SpiralSegment[] {
     const toTurns = (offset + 1) / DAYS_PER_TURN;
     const mid = (fromTurns + toTurns) / 2;
     const width = bandWidth(mid);
+    const labelSize = structuralBandWidth(mid) * 0.44 * (offset === 0 ? TODAY_LABEL_SCALE : 1);
     const [labelX, labelY] = spiralPoint(mid, outerRadius(mid) - width / 2);
     const [x1, y1] = spiralPoint(fromTurns, innerRadius(fromTurns) + 6);
     const [x2, y2] = spiralPoint(fromTurns, outerRadius(fromTurns) - 6);
@@ -119,7 +159,7 @@ export function spiralSegments(): SpiralSegment[] {
       path: bandPath(fromTurns, toTurns),
       labelX,
       labelY,
-      labelSize: width * 0.44,
+      labelSize,
       edge: { x1, y1, x2, y2 },
     };
   });
@@ -133,10 +173,11 @@ export function todayLightPath(progress: number): string {
   return bandPath(0, p / DAYS_PER_TURN);
 }
 
+/** Time marker on the outer rim, so it never sits on the day number. */
 export function todayNowPoint(progress: number): [number, number] {
   const p = Math.min(1, Math.max(0, progress));
   const turns = p / DAYS_PER_TURN;
-  return spiralPoint(turns, outerRadius(turns) - bandWidth(turns) / 2);
+  return spiralPoint(turns, outerRadius(turns) - 8);
 }
 
 export function dayLightProgress(secondsSinceMidnight: number): number {
