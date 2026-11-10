@@ -153,6 +153,7 @@ export function PeriodSpiral({
           />
 
           {points.map((point) => {
+            if (point.day === day) return null;
             const iso = dates[point.day - 1];
             const mapped = gregorianToSue(iso, state.settings.naming);
             const sprint = activeSprintsOn(state.sprints, iso)[0];
