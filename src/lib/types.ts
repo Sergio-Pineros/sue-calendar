@@ -229,6 +229,54 @@ export type Sprint = {
   createdAt: string;
 };
 
+export type EnergyTier = "deep" | "steady" | "low";
+
+export type EnergyState = "sharp" | "steady" | "fried";
+
+export type Chronotype = "lark" | "third-bird" | "owl";
+
+/** Times are minutes after local midnight. */
+export type EnergyProfile = {
+  saved: boolean;
+  chronotype: Chronotype | null;
+  dayStart: number;
+  dayEnd: number;
+  peakStart: number;
+  peakEnd: number;
+  dipStart: number;
+  dipEnd: number;
+  secondWindStart: number | null;
+  secondWindEnd: number | null;
+};
+
+export type DaySlice = {
+  id: string;
+  start: number;
+  end: number;
+};
+
+export type DayTask = {
+  id: string;
+  title: string;
+  tier: EnergyTier;
+  tierConfirmed: boolean;
+  minutes: number | null;
+  dueToday: boolean;
+  sliceId: string | null;
+  done: boolean;
+};
+
+export type EnergyCheckIn = {
+  state: EnergyState;
+  at: string;
+};
+
+export type DayPlan = {
+  slices: DaySlice[];
+  tasks: DayTask[];
+  checkIn: EnergyCheckIn | null;
+};
+
 export type SueSettings = {
   naming: NamingSystem;
   customPeriodNames: string[];
@@ -251,6 +299,7 @@ export type SueSettings = {
   frequencyFavorites: number[];
   companionCalendar: CompanionCalendarId;
   companionMode: CompanionCalendarMode;
+  energyProfile: EnergyProfile;
 };
 
 export type SueState = {
@@ -262,6 +311,7 @@ export type SueState = {
   personalCycles: PersonalCycle[];
   reflections: Reflection[];
   sprints: Sprint[];
+  dayPlans: Record<string, DayPlan>;
 };
 
 export type NamingContext = {

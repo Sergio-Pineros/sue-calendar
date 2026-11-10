@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import type {
+  DayPlan,
   ExternalEvent,
   Goal,
   Habit,
@@ -24,6 +25,7 @@ import type {
 import { applySkippedOnboarding, emptyState, loadState, newGoal, saveState } from "@/lib/storage";
 import { markEntered } from "@/lib/entry";
 import { nextPeriodRef } from "@/lib/sue-calendar";
+import { emptyDayPlan } from "@/lib/energy";
 
 type StoreContextValue = {
   ready: boolean;
@@ -57,6 +59,7 @@ type StoreContextValue = {
   mergeGoogleEvents: (events: ExternalEvent[], calendarIds: string[]) => void;
   mergeAppleEvents: (events: ExternalEvent[], calendarIds: string[]) => void;
   replaceState: (next: SueState) => void;
+  updateDayPlan: (iso: string, updater: (plan: DayPlan) => DayPlan) => void;
 };
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -313,6 +316,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           ...next,
           settings: { ...emptyState().settings, ...next.settings },
         })),
+      updateDayPlan: (iso, updater) =>
+        patch((s) => {
+          const plans = s.dayPlans ?? {};
+          const nextPlan = updater(plans[iso] ?? emptyDayPlan());
+          const empty =
+            nextPlan.tasks.length === 0 && nextPlan.slices.length === 0 && !nextPlan.checkIn;
+          const { [iso]: _previous, ...others } = plans;
+          void _previous;
+          return { ...s, dayPlans: empty ? others : { ...others, [iso]: nextPlan } };
+        }),
     }),
     [completeOnboarding, setCustomPeriodNames, setLayer, setNaming, setTheme, setViewYear, skipOnboarding, state, updateSettings],
   );

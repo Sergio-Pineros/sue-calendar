@@ -34,6 +34,7 @@ import {
 } from "./weekdays";
 import { isThemeId } from "./themes";
 import { normalizeFavorites } from "./frequency";
+import { defaultEnergyProfile, normalizeDayPlans, normalizeEnergyProfile } from "./energy";
 
 const STORAGE_KEY = "sue:v1";
 export const APPLE_STORAGE_KEY = "sue:apple";
@@ -76,6 +77,7 @@ export function defaultSettings(): SueSettings {
     frequencyFavorites: [],
     companionCalendar: "gregorian",
     companionMode: "companion",
+    energyProfile: defaultEnergyProfile(),
   };
 }
 
@@ -173,6 +175,7 @@ export function emptyState(): SueState {
     personalCycles: [],
     reflections: [],
     sprints: [],
+    dayPlans: {},
   };
 }
 
@@ -226,6 +229,7 @@ export function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSet
     companionMode: isCompanionCalendarMode(raw.companionMode)
       ? raw.companionMode
       : base.companionMode,
+    energyProfile: normalizeEnergyProfile(raw.energyProfile),
   };
 }
 
@@ -242,6 +246,7 @@ export function loadState(): SueState {
       ...parsed,
       settings: normalizeSettings(parsed.settings),
       sprints: parsed.sprints ?? [],
+      dayPlans: normalizeDayPlans(parsed.dayPlans),
     };
   } catch {
     return emptyState();
@@ -295,6 +300,7 @@ export function parseBackup(raw: string): SueState {
     personalCycles: parsed.personalCycles ?? [],
     reflections: parsed.reflections ?? [],
     sprints: parsed.sprints ?? [],
+    dayPlans: normalizeDayPlans(parsed.dayPlans),
   };
 }
 

@@ -62,6 +62,14 @@ export function addDays(iso: string, amount: number): string {
   return toISODate(next.getUTCFullYear(), next.getUTCMonth() + 1, next.getUTCDate());
 }
 
+export function daysBetween(fromIso: string, toIso: string): number {
+  const a = parseISODate(fromIso);
+  const b = parseISODate(toIso);
+  return Math.round(
+    (Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)) / 86_400_000,
+  );
+}
+
 export function weekdayIndex(iso: string): number {
   const { year, month, day } = parseISODate(iso);
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
