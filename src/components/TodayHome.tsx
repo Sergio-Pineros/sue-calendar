@@ -22,6 +22,7 @@ import { weekdayShortLabel } from "@/lib/weekdays";
 import { copy } from "@/lib/copy";
 import { activeSprintsOn, sprintIntensityOn } from "@/lib/sprints";
 import { suggestedTone } from "@/lib/frequency";
+import { CompanionCalendarLine } from "./CalendarLibrary";
 
 export function TodayHome() {
   const {
@@ -83,6 +84,7 @@ export function TodayHome() {
       >
         {formatGregorianLong(today)}
       </button>
+      <CompanionCalendarLine iso={today} className="home-companion-line" />
 
       {open && (
         <div className="home-detail">

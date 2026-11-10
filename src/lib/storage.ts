@@ -15,6 +15,10 @@ import type {
   WeekdayNumberPreset,
 } from "./types";
 import {
+  isCompanionCalendarId,
+  isCompanionCalendarMode,
+} from "./companion-calendars";
+import {
   emptyPeriodColorOverrides,
   isPeriodColorPreset,
   normalizePeriodColorOverrides,
@@ -70,6 +74,8 @@ export function defaultSettings(): SueSettings {
     appleCalendarIds: [],
     lastSyncedAt: null,
     frequencyFavorites: [],
+    companionCalendar: "gregorian",
+    companionMode: "companion",
   };
 }
 
@@ -214,6 +220,12 @@ export function normalizeSettings(raw: Partial<SueSettings> | undefined): SueSet
     layers: { ...base.layers, ...raw.layers },
     appleCalendarIds: raw.appleCalendarIds ?? [],
     frequencyFavorites: normalizeFavorites(raw.frequencyFavorites),
+    companionCalendar: isCompanionCalendarId(raw.companionCalendar)
+      ? raw.companionCalendar
+      : base.companionCalendar,
+    companionMode: isCompanionCalendarMode(raw.companionMode)
+      ? raw.companionMode
+      : base.companionMode,
   };
 }
 

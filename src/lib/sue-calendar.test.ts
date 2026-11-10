@@ -19,6 +19,7 @@ import "./frequency.test";
 import "./spring.test";
 import "./caldav.test";
 import "./entry.test";
+import "./companion-calendars.test";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {

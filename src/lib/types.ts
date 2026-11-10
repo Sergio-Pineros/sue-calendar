@@ -20,6 +20,39 @@ export type ThemeId =
 
 export type PeriodColorPreset = "amethyst" | "seasons" | "moon" | "spectrum";
 
+export type CompanionCalendarId =
+  | "gregorian"
+  | "julian"
+  | "ethiopian"
+  | "juche"
+  | "minguo"
+  | "buddhist"
+  | "hebrew"
+  | "islamic"
+  | "persian"
+  | "coptic"
+  | "vikram-samvat"
+  | "saka"
+  | "kali-yuga"
+  | "bengali"
+  | "malayalam"
+  | "chinese"
+  | "japanese"
+  | "maya-long-count"
+  | "roman-auc"
+  | "ancient-egyptian"
+  | "babylonian"
+  | "holocene"
+  | "thelemic"
+  | "asatru-runic"
+  | "french-republican"
+  | "international-fixed"
+  | "positivist"
+  | "ophiuchus"
+  | "celtic-tree";
+
+export type CompanionCalendarMode = "companion" | "follow";
+
 export type EvidenceType =
   | "fact"
   | "calculation"
@@ -214,6 +247,8 @@ export type SueSettings = {
   appleCalendarIds: string[];
   lastSyncedAt: string | null;
   frequencyFavorites: number[];
+  companionCalendar: CompanionCalendarId;
+  companionMode: CompanionCalendarMode;
 };
 
 export type SueState = {

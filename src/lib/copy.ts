@@ -207,6 +207,28 @@ export const copy = {
     autoSeasons: "Seasons",
     autoMoon: "Moon",
     autoSpectrum: "Spectrum",
+    companionCalendar: "Companion calendar",
+    companionCalendarHint:
+      "SÚE remains the 13 × 28 planning surface. Choose another calendar for a quiet date line below it.",
+    companionCalendarChange: "Browse calendars",
+    companionModeCompanion: "Keep the 28-day view",
+    companionModeFollow: "Follow its labels",
+    companionModeHint:
+      "Follow changes labels and month language where the conversion is reliable; it does not replace SÚE’s wheel.",
+    calendarLibrary: "Calendar library",
+    calendarLibraryClose: "Close calendar library",
+    calendarLibraryOrigin: "Origin",
+    calendarLibraryCommunity: "Culture / community",
+    calendarLibraryMechanics: "How it works",
+    calendarLibraryMoon: "Moon relationship",
+    calendarLibrary2026: "2026 status",
+    calendarLibraryFact: "A small historical fact",
+    calendarLibrarySources: "Sources",
+    calendarLibraryDeepTime: "Deep time is not a calendar",
+    calendarLibraryDeepTimeBody:
+      "The age of Earth, the age of the universe, and geologic epochs describe measured histories. They do not assign civil months or dates, so SÚE keeps them outside this calendar library.",
+    calendarSupport: "Support",
+    calendarNoConversion: "No single responsible conversion",
     google: "Google Calendar",
     googleHint:
       "Read and write. Google remains the source of truth unless you create an event from SÚE. In Google Cloud create an OAuth client, authorize this origin, and put the Client ID in .env.local.",

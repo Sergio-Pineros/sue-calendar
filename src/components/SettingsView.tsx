@@ -26,6 +26,7 @@ import { todayISO } from "@/lib/sue-calendar";
 import { PERIOD_PRESETS } from "@/lib/naming";
 import { THEMES } from "@/lib/themes";
 import { PeriodColorStudio } from "./PeriodColorStudio";
+import { CompanionCalendarSettings } from "./CalendarLibrary";
 import {
   WEEKDAYS,
   WEEKDAY_NAME_PRESETS,
@@ -186,6 +187,8 @@ export function SettingsView() {
         </button>
         <p className="mt-2 text-sm text-ink-soft">{copy.settings.setupHint}</p>
       </header>
+
+      <CompanionCalendarSettings />
 
       <section className="space-y-3">
         <h2 className="display text-2xl">{copy.settings.theme}</h2>

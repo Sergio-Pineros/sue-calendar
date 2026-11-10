@@ -16,6 +16,7 @@ import { useSueStore } from "./StoreProvider";
 import { MoonGlyph } from "./MoonGlyph";
 import { SourceBadge } from "./SourceBadge";
 import { EventComposer } from "./EventComposer";
+import { CompanionCalendarLine } from "./CalendarLibrary";
 import { copy } from "@/lib/copy";
 import { weekdayLabel, weekdayNumber, formatWeekdayNumber } from "@/lib/weekdays";
 import { activeSprintsOn, applySprintOverride, sprintIntensityOn } from "@/lib/sprints";
@@ -45,6 +46,7 @@ export function DayView({ iso }: { iso: string }) {
             {formatGregorianLong(iso)}
           </h1>
           <p className="mt-2 text-ink-soft">{formatSueLabel(mapped)}</p>
+          <CompanionCalendarLine iso={iso} />
           <p className="mt-1 text-xs text-ink-soft">
             {weekdayLabel(mapped.weekdayIndex, state.settings)}
             {number !== null ? ` · ${formatWeekdayNumber(number)}` : ""}
