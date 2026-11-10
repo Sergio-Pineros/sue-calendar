@@ -18,6 +18,7 @@ import "./moon.test";
 import "./frequency.test";
 import "./spring.test";
 import "./period-spiral.test";
+import "./energy.test";
 import "./caldav.test";
 import "./entry.test";
 import "./companion-calendars.test";

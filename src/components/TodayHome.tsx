@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MoonBackdrop } from "@/components/MoonBackdrop";
-import { PeriodSpiral } from "@/components/PeriodSpiral";
+import { DaySpiral } from "@/components/DaySpiral";
+import { DaySheet } from "@/components/DaySheet";
 import { useSueStore } from "@/components/StoreProvider";
 import { useLocalDateISO } from "@/hooks/useLocalDateISO";
 import {
@@ -37,6 +38,7 @@ export function TodayHome() {
   const [focusOpen, setFocusOpen] = useState(false);
   const [focusTitle, setFocusTitle] = useState("");
   const [habitTitle, setHabitTitle] = useState("");
+  const [sheetIso, setSheetIso] = useState<string | null>(null);
   const naming = {
     preset: state.settings.naming,
     customNames: state.settings.customPeriodNames,
@@ -73,20 +75,17 @@ export function TodayHome() {
     <div className="home">
       <div className="home-wheel">
         <MoonBackdrop iso={today} />
-        <PeriodSpiral
-          year={mapped.sueYear}
-          period={mapped.suePeriod ?? (mapped.isLeapDay ? 6 : 13)}
-          currentDay={mapped.sueDayInPeriod}
-          currentIso={today}
-          specialLabel={
-            mapped.isYearDay
-              ? copy.year.yearDay
-              : mapped.isLeapDay
-                ? copy.year.leapDay
-                : null
-          }
-        />
+        <DaySpiral todayIso={today} onOpenDay={setSheetIso} />
       </div>
+      {sheetIso && (
+        <DaySheet
+          key="day-sheet"
+          iso={sheetIso}
+          todayIso={today}
+          onStep={setSheetIso}
+          onClose={() => setSheetIso(null)}
+        />
+      )}
 
       <button
         type="button"

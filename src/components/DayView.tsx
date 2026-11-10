@@ -17,6 +17,7 @@ import { MoonGlyph } from "./MoonGlyph";
 import { SourceBadge } from "./SourceBadge";
 import { EventComposer } from "./EventComposer";
 import { CompanionCalendarLine } from "./CalendarLibrary";
+import { DayFocus } from "./DayFocus";
 import { copy } from "@/lib/copy";
 import { weekdayLabel, weekdayNumber, formatWeekdayNumber } from "@/lib/weekdays";
 import { activeSprintsOn, applySprintOverride, sprintIntensityOn } from "@/lib/sprints";
@@ -96,6 +97,8 @@ export function DayView({ iso }: { iso: string }) {
 
       {mapped.isYearDay && <p className="text-sm text-ink-soft">{copy.day.yearDay}</p>}
       {mapped.isLeapDay && <p className="text-sm text-ink-soft">{copy.day.leapDay}</p>}
+
+      <DayFocus iso={iso} />
 
       {sprints.length > 0 && (
         <section>
