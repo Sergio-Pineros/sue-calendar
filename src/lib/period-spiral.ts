@@ -16,19 +16,23 @@ export type PeriodSpiralPoint = {
 export type PeriodSpiralOptions = {
   cx?: number;
   cy?: number;
+  innerRadius?: number;
   radialStep?: number;
   angleStep?: number;
   maxRadius?: number;
 };
 
 const DEFAULT_CENTER = 400;
-const DEFAULT_RADIAL_STEP = 11.5;
+const DEFAULT_INNER_RADIUS = 116;
 const DEFAULT_ANGLE_STEP = 0.5;
-const DEFAULT_MAX_RADIUS = 310;
+const DEFAULT_MAX_RADIUS = 360;
 
 /**
  * A signed day distance keeps the current day at the center:
  * past days wind into the center from the left, and upcoming days wind out.
+ * The first visible position leaves a quiet gap around the hub; the remaining
+ * radial pitch adapts to the current day so the farthest period day fills the
+ * available spiral instead of collapsing on short half-periods.
  */
 export function periodSpiralPoint(
   day: number,
@@ -39,9 +43,18 @@ export function periodSpiralPoint(
   const safeCurrent = clamp(Math.round(currentDay), 1, PERIOD_SPIRAL_DAYS);
   const relative = safeDay - safeCurrent;
   const distance = Math.abs(relative);
-  const radialStep = options.radialStep ?? DEFAULT_RADIAL_STEP;
+  const innerRadius = options.innerRadius ?? DEFAULT_INNER_RADIUS;
   const maxRadius = options.maxRadius ?? DEFAULT_MAX_RADIUS;
-  const radius = Math.min(maxRadius, distance * radialStep);
+  const maxDistance = Math.max(safeCurrent - 1, PERIOD_SPIRAL_DAYS - safeCurrent);
+  const radialStep =
+    options.radialStep ??
+    (maxDistance > 1
+      ? (maxRadius - innerRadius) / (maxDistance - 1)
+      : maxRadius - innerRadius);
+  const radius =
+    distance === 0
+      ? 0
+      : Math.min(maxRadius, innerRadius + (distance - 1) * Math.max(0, radialStep));
   const angle =
     -Math.PI / 2 + relative * (options.angleStep ?? DEFAULT_ANGLE_STEP);
   const cx = options.cx ?? DEFAULT_CENTER;
@@ -52,8 +65,8 @@ export function periodSpiralPoint(
     distance === 0
       ? 1
       : relative < 0
-        ? Math.max(0.12, 0.7 - distance * 0.02)
-        : 0.42 + (distance / (PERIOD_SPIRAL_DAYS - 1)) * 0.42;
+        ? 0.24 + (distance / Math.max(maxDistance, 1)) * 0.38
+        : 0.42 + (distance / Math.max(maxDistance, 1)) * 0.44;
 
   return {
     day: safeDay,

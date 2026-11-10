@@ -161,9 +161,8 @@ export function PeriodSpiral({
             const hasEvent =
               state.settings.layers.events && eventsOnDate(state.events, iso).length > 0;
             const hasRest = state.restBlocks.some((block) => block.date === iso);
-            const isCurrent = point.day === day;
-            const size = isCurrent ? 62 : 15 + Math.abs(point.relative) * 0.45;
-            const safeSize = Math.max(15, size);
+            const size = 18 + Math.abs(point.relative) * 0.62;
+            const safeSize = Math.max(18, size);
             const status =
               hasRest || intensity === "rest"
                 ? "rest"
@@ -178,7 +177,7 @@ export function PeriodSpiral({
             return (
               <g
                 key={iso}
-                className={`period-spiral-day ${isCurrent ? "is-current" : ""} ${point.relative < 0 ? "is-past" : ""}`}
+                className={`period-spiral-day ${point.relative < 0 ? "is-past" : ""}`}
                 transform={`translate(${point.x} ${point.y})`}
                 style={{
                   opacity: point.opacity,
@@ -186,7 +185,7 @@ export function PeriodSpiral({
                 }}
               >
                 <a href={`/day?iso=${iso}`} aria-label={`Day ${point.day}, ${iso}`}>
-                  <circle r={isCurrent ? 42 : 24} fill="transparent" />
+                  <circle r="24" fill="transparent" />
                   <text
                     textAnchor="middle"
                     dominantBaseline="middle"
@@ -197,7 +196,7 @@ export function PeriodSpiral({
                   {(status || mapped.moon.name === "new" || mapped.moon.name === "full") && (
                     <circle
                       cy={safeSize * 0.72}
-                      r={isCurrent ? 4 : 2.5}
+                      r="2.5"
                       className={`period-spiral-status ${status}`}
                     />
                   )}

@@ -744,7 +744,7 @@ html[data-year-blend] body {
 
 .app-root {
   min-height: 100svh;
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px));
 }
 
 .page {
@@ -1330,9 +1330,10 @@ body {
 }
 
 .home-wheel {
-  min-height: min(94vw, 720px);
+  width: min(100vw, 760px);
+  min-height: min(100vw, 720px);
   max-width: 760px;
-  padding: 16px;
+  padding: 8px;
 }
 
 .home-wheel .wheel-stage {
@@ -1342,10 +1343,11 @@ body {
 .period-spiral {
   position: relative;
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
 }
 
 .period-spiral-svg {
+  display: block;
   width: 100%;
   overflow: visible;
   cursor: grab;
